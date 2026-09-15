@@ -173,6 +173,23 @@
 
                 />
 
+            <!-- TICKET 2491 - 2026-09-15 -->
+            <ImageView
+                android:id="@+id/corr_floracion_hembra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no"
+
+                />
+
+            <ImageView
+                android:id="@+id/corr_incremento_linea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no"
+
+                />
+
             <ImageView
                 android:id="@+id/corr_inicio_corte_seda"
                 android:layout_width="wrap_content"
@@ -373,11 +390,76 @@
             app:layout_constraintStart_toEndOf="@id/tv_5_floracion"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- TICKET 2491 - 2026-09-15 -->
+        <TextView
+            android:id="@+id/lbl_floracion_hembra"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tv_5_floracion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_floracion_hembra"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="90% Floracion Hembra"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_floracion_hembra"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/tv_5_floracion"
+            app:layout_constraintStart_toEndOf="@id/lbl_floracion_hembra"
+            app:layout_constraintEnd_toStartOf="@id/iv_floracion_hembra"
+            android:textAlignment="textEnd" />
+
+        <ImageView
+            android:id="@+id/iv_floracion_hembra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_email_24_no"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/tv_5_floracion"
+            app:layout_constraintStart_toEndOf="@id/tv_floracion_hembra"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_incremento_linea"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tv_floracion_hembra"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_incremento_linea"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="Incremento Linea"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_incremento_linea"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/tv_floracion_hembra"
+            app:layout_constraintStart_toEndOf="@id/lbl_incremento_linea"
+            app:layout_constraintEnd_toStartOf="@id/iv_incremento_linea"
+            android:textAlignment="textEnd" />
+
+        <ImageView
+            android:id="@+id/iv_incremento_linea"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_email_24_no"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/tv_floracion_hembra"
+            app:layout_constraintStart_toEndOf="@id/tv_incremento_linea"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <TextView
             android:id="@+id/lbl_inicio_corte_seda"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tv_5_floracion"
+            app:layout_constraintTop_toBottomOf="@id/tv_incremento_linea"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_inicio_corte_seda"
             android:layout_marginTop="@dimen/padding_small"
@@ -390,7 +472,7 @@
             android:layout_height="wrap_content"
             tool:text="2022-07-01"
             android:layout_marginTop="@dimen/padding_small"
-            app:layout_constraintTop_toBottomOf="@id/tv_5_floracion"
+            app:layout_constraintTop_toBottomOf="@id/tv_incremento_linea"
             app:layout_constraintStart_toEndOf="@id/lbl_inicio_corte_seda"
             app:layout_constraintEnd_toStartOf="@id/iv_inicio_corte_seda"
             android:textAlignment="textEnd"
@@ -404,7 +486,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_email_24_no"
             android:layout_marginTop="@dimen/padding_small"
-            app:layout_constraintTop_toBottomOf="@id/tv_5_floracion"
+            app:layout_constraintTop_toBottomOf="@id/tv_incremento_linea"
             app:layout_constraintStart_toEndOf="@id/tv_inicio_corte_seda"
             app:layout_constraintEnd_toEndOf="parent" />
 

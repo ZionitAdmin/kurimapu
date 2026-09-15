@@ -31,6 +31,9 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
     private final ImageView corr_inicio_despano;
     private final ImageView corr_inicio_siembra;
     private final ImageView corr_5_floracion;
+    // TICKET 2491 - 2026-09-15
+    private final ImageView corr_floracion_hembra;
+    private final ImageView corr_incremento_linea;
     private final ImageView corr_inicio_corte_seda;
     private final ImageView corr_inicio_cosecha;
     private final ImageView corr_termino_cosecha;
@@ -53,6 +56,11 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
     private final ImageView iv_inicio_siembra;
     private final TextView tv_5_floracion;
     private final ImageView iv_5_floracion;
+    // TICKET 2491 - 2026-09-15
+    private final TextView tv_floracion_hembra;
+    private final ImageView iv_floracion_hembra;
+    private final TextView tv_incremento_linea;
+    private final ImageView iv_incremento_linea;
     private final TextView tv_inicio_corte_seda;
     private final ImageView iv_inicio_corte_seda;
     private final TextView tv_inicio_cosecha;
@@ -98,6 +106,9 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
         corr_inicio_siembra = itemView.findViewById(R.id.corr_inicio_siembra);
         corr_inicio_despano = itemView.findViewById(R.id.corr_inicio_despano);
         corr_5_floracion = itemView.findViewById(R.id.corr_5_floracion);
+        // TICKET 2491 - 2026-09-15
+        corr_floracion_hembra = itemView.findViewById(R.id.corr_floracion_hembra);
+        corr_incremento_linea = itemView.findViewById(R.id.corr_incremento_linea);
         corr_inicio_corte_seda = itemView.findViewById(R.id.corr_inicio_corte_seda);
         corr_inicio_cosecha = itemView.findViewById(R.id.corr_inicio_cosecha);
         corr_termino_cosecha = itemView.findViewById(R.id.corr_termino_cosecha);
@@ -123,6 +134,11 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
         iv_inicio_despano = itemView.findViewById(R.id.iv_inicio_despano);
         tv_5_floracion = itemView.findViewById(R.id.tv_5_floracion);
         iv_5_floracion = itemView.findViewById(R.id.iv_5_floracion);
+        // TICKET 2491 - 2026-09-15
+        tv_floracion_hembra = itemView.findViewById(R.id.tv_floracion_hembra);
+        iv_floracion_hembra = itemView.findViewById(R.id.iv_floracion_hembra);
+        tv_incremento_linea = itemView.findViewById(R.id.tv_incremento_linea);
+        iv_incremento_linea = itemView.findViewById(R.id.iv_incremento_linea);
         tv_inicio_corte_seda = itemView.findViewById(R.id.tv_inicio_corte_seda);
         iv_inicio_corte_seda = itemView.findViewById(R.id.iv_inicio_corte_seda);
         tv_inicio_cosecha = itemView.findViewById(R.id.tv_inicio_cosecha);
@@ -175,6 +191,9 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
                 String inicioDespano = (anexoCorreos.getInicio_despano() != null && !anexoCorreos.getInicio_despano().equals("0000-00-00") ? anexoCorreos.getInicio_despano() : "" );
                 String inicioSiembra = (anexoCorreos.getInicio_siembra() != null && !anexoCorreos.getInicio_siembra().equals("0000-00-00") ? anexoCorreos.getInicio_siembra() : "" );
                 String cincoPorciento = (anexoCorreos.getCinco_porciento_floracion() != null && !anexoCorreos.getCinco_porciento_floracion().equals("0000-00-00") ? anexoCorreos.getCinco_porciento_floracion() :"" );
+                // TICKET 2491 - 2026-09-15
+                String floracionHembra = (anexoCorreos.getFecha_floracion_hembra() != null && !anexoCorreos.getFecha_floracion_hembra().equals("0000-00-00") ? anexoCorreos.getFecha_floracion_hembra() : "" );
+                String incrementoLinea = (anexoCorreos.getFecha_incremento_linea() != null && !anexoCorreos.getFecha_incremento_linea().equals("0000-00-00") ? anexoCorreos.getFecha_incremento_linea() : "" );
                 String inicioCorteSeda = (anexoCorreos.getInicio_corte_seda() != null && !anexoCorreos.getInicio_corte_seda().equals("0000-00-00") ? anexoCorreos.getInicio_corte_seda() : "" );
                 String inicioCosecha = (anexoCorreos.getInicio_cosecha() != null && !anexoCorreos.getInicio_cosecha().equals("0000-00-00") ? anexoCorreos.getInicio_cosecha() : "" );
                 String terminoCosecha = (anexoCorreos.getTermino_cosecha() != null && !anexoCorreos.getTermino_cosecha().equals("0000-00-00") ? anexoCorreos.getTermino_cosecha() : "" );
@@ -202,6 +221,9 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
                 corr_inicio_siembra.setImageDrawable((anexoCorreos.getCorreo_inicio_siembra() > 0) ? correoSi : correoNo);
                 corr_inicio_despano.setImageDrawable((anexoCorreos.getCorreo_inicio_despano() > 0) ? correoSi : correoNo);
                 corr_5_floracion.setImageDrawable((anexoCorreos.getCorreo_cinco_porciento_floracion() > 0) ? correoSi: correoNo );
+                // TICKET 2491 - 2026-09-15
+                corr_floracion_hembra.setImageDrawable((anexoCorreos.getCorreo_floracion_hembra() > 0) ? correoSi : correoNo );
+                corr_incremento_linea.setImageDrawable((anexoCorreos.getCorreo_incremento_linea() > 0) ? correoSi : correoNo );
                 corr_inicio_corte_seda.setImageDrawable((anexoCorreos.getCorreo_inicio_corte_seda() > 0) ? correoSi : correoNo );
                 corr_inicio_cosecha.setImageDrawable((anexoCorreos.getCorreo_inicio_cosecha() > 0) ? correoSi: correoNo );
                 corr_termino_cosecha.setImageDrawable((anexoCorreos.getCorreo_termino_cosecha() > 0) ? correoSi : correoNo );
@@ -217,6 +239,9 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
                 iv_inicio_siembra.setImageDrawable((anexoCorreos.getCorreo_inicio_siembra() > 0) ? correoSi : correoNo);
                 iv_inicio_despano.setImageDrawable((anexoCorreos.getCorreo_inicio_despano() > 0) ? correoSi : correoNo);
                 iv_5_floracion.setImageDrawable((anexoCorreos.getCorreo_cinco_porciento_floracion() > 0) ? correoSi: correoNo );
+                // TICKET 2491 - 2026-09-15
+                iv_floracion_hembra.setImageDrawable((anexoCorreos.getCorreo_floracion_hembra() > 0) ? correoSi : correoNo );
+                iv_incremento_linea.setImageDrawable((anexoCorreos.getCorreo_incremento_linea() > 0) ? correoSi : correoNo );
                 iv_inicio_corte_seda.setImageDrawable((anexoCorreos.getCorreo_inicio_corte_seda() > 0) ? correoSi : correoNo );
                 iv_inicio_cosecha.setImageDrawable((anexoCorreos.getCorreo_inicio_cosecha() > 0) ? correoSi: correoNo );
                 iv_termino_cosecha.setImageDrawable((anexoCorreos.getCorreo_termino_cosecha() > 0) ? correoSi : correoNo );
@@ -237,6 +262,9 @@ public class AnexosCorreosFechasViewHolder extends RecyclerView.ViewHolder {
                 tv_inicio_siembra.setText(inicioSiembra);
                 tv_inicio_despano.setText(inicioDespano);
                 tv_5_floracion.setText(cincoPorciento);
+                // TICKET 2491 - 2026-09-15
+                tv_floracion_hembra.setText(floracionHembra);
+                tv_incremento_linea.setText(incrementoLinea);
                 tv_inicio_corte_seda.setText(inicioCorteSeda);
                 tv_inicio_cosecha.setText(inicioCosecha+" "+horaInicioCosecha);
                 tv_termino_cosecha.setText(terminoCosecha);

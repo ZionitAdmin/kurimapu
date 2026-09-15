@@ -229,14 +229,24 @@ public class DialogLibroCampo extends DialogFragment {
                 MainActivity.myAppDB.myDao().insertDatoDetalle(temp);
             }
 
-            // TICKET 2491 - 2026-09-15
-            pro_cli_mat pcm = MainActivity.myAppDB.myDao().getProCliMatByIdProp(idImportante, idClienteFinal, prefs.getString(Utilidades.SHARED_VISIT_TEMPORADA, "1"));
-            if (pcm != null && pcm.getIdentificador() != null) {
-                if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_FLORACION_HEMBRA))) {
-                    sincronizarAnexoCorreoFecha(true, temp.getValor_detalle());
-                } else if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_INCREMENTO_LINEA))) {
-                    sincronizarAnexoCorreoFecha(false, temp.getValor_detalle());
+            // TICKET 2491 - 2026-09-15: usar el campo de clase "temporada" (el mismo que usa
+            // setearEditTexts()/cargarInterfaz() para armar esta misma pantalla), no
+            // prefs.SHARED_VISIT_TEMPORADA - si difieren, esta consulta no encuentra el
+            // pro_cli_mat correcto y la sincronizacion nunca se dispara, en silencio.
+            // Envuelto en try/catch a proposito: si esto falla, NO debe cortar el resto del
+            // for (que guarda los demas campos del Libro de Campo) - antes de este cambio, una
+            // excepcion aca abortaba el loop completo y los campos siguientes nunca se guardaban.
+            try {
+                pro_cli_mat pcm = MainActivity.myAppDB.myDao().getProCliMatByIdProp(idImportante, idClienteFinal, temporada);
+                if (pcm != null && pcm.getIdentificador() != null) {
+                    if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_FLORACION_HEMBRA))) {
+                        sincronizarAnexoCorreoFecha(true, temp.getValor_detalle());
+                    } else if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_INCREMENTO_LINEA))) {
+                        sincronizarAnexoCorreoFecha(false, temp.getValor_detalle());
+                    }
                 }
+            } catch (Exception e) {
+                Toasty.error(requireActivity(), "No se pudo sincronizar la fecha en Anexo Fechas: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
             }
 
         }
