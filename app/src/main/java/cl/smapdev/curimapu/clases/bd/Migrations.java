@@ -263,4 +263,15 @@ public class Migrations {
                     "dias TEXT ); ");
         }
     };
+
+    // TICKET 2491 - 2026-09-15: campos solo lectura, se ingresan y modifican desde el Libro de Campo (web)
+    public static final Migration MIGRATION_17_TO_18 = new Migration(17, 18) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN fecha_floracion_hembra TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_floracion_hembra INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN fecha_incremento_linea TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_incremento_linea INTEGER NOT NULL DEFAULT 0;");
+        }
+    };
 }

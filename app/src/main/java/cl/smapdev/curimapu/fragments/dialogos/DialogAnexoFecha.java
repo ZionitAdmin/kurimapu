@@ -38,6 +38,9 @@ public class DialogAnexoFecha extends DialogFragment {
     private EditText et_inicio_despano;
     private EditText et_inicio_siembra;
     private EditText et_cinco_porc_floracion;
+    // TICKET 2491 - 2026-09-15: solo lectura, se ingresan y modifican desde el Libro de Campo (web)
+    private EditText et_floracion_hembra;
+    private EditText et_incremento_linea;
     private EditText et_inicio_corte_seda;
     private EditText et_inicio_cosecha;
     private EditText et_inicio_cosecha_hora;
@@ -145,6 +148,22 @@ public class DialogAnexoFecha extends DialogFragment {
                             !anexoFechas.getCinco_porciento_floracion().equals("0000-00-00"))
                     ? Utilidades.voltearFechaVista(anexoFechas.getCinco_porciento_floracion())
                     : "";
+
+            // TICKET 2491 - 2026-09-15: solo lectura, se ingresan y modifican desde el Libro de Campo (web)
+            String floracionHembra = (
+                    anexoFechas.getFecha_floracion_hembra() != null &&
+                            !anexoFechas.getFecha_floracion_hembra().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getFecha_floracion_hembra())
+                    : "";
+
+            String incrementoLinea = (
+                    anexoFechas.getFecha_incremento_linea() != null &&
+                            !anexoFechas.getFecha_incremento_linea().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getFecha_incremento_linea())
+                    : "";
+
+            et_floracion_hembra.setText(floracionHembra);
+            et_incremento_linea.setText(incrementoLinea);
 
             String inicioCorteSeda = (
                     anexoFechas.getInicio_corte_seda() != null &&
@@ -447,6 +466,13 @@ public class DialogAnexoFecha extends DialogFragment {
         fhc.setSiem_tempra_grami(et_fecha_siembra_temprada.getText().toString());
 
 
+        // TICKET 2491 - 2026-09-15: solo lectura en este dialogo, se preservan tal cual venian
+        // (nunca se toman de la UI) para no perderlas localmente al guardar otros campos.
+        fhc.setFecha_floracion_hembra(anexoFechas == null ? null : anexoFechas.getFecha_floracion_hembra());
+        fhc.setCorreo_floracion_hembra(anexoFechas == null ? 0 : anexoFechas.getCorreo_floracion_hembra());
+        fhc.setFecha_incremento_linea(anexoFechas == null ? null : anexoFechas.getFecha_incremento_linea());
+        fhc.setCorreo_incremento_linea(anexoFechas == null ? 0 : anexoFechas.getCorreo_incremento_linea());
+
         fhc.setCorreo_inicio_siembra(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_siembra());
         fhc.setCorreo_inicio_despano(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_despano());
         fhc.setCorreo_cinco_porciento_floracion(anexoFechas == null ? 0 : anexoFechas.getCorreo_cinco_porciento_floracion());
@@ -534,6 +560,8 @@ public class DialogAnexoFecha extends DialogFragment {
         et_inicio_despano = view.findViewById(R.id.et_inicio_despano);
         et_inicio_siembra = view.findViewById(R.id.et_inicio_siembra);
         et_cinco_porc_floracion = view.findViewById(R.id.et_cinco_porc_floracion);
+        et_floracion_hembra = view.findViewById(R.id.et_floracion_hembra);
+        et_incremento_linea = view.findViewById(R.id.et_incremento_linea);
         et_inicio_corte_seda = view.findViewById(R.id.et_inicio_corte_seda);
         et_inicio_cosecha = view.findViewById(R.id.et_inicio_cosecha);
         et_inicio_cosecha_hora = view.findViewById(R.id.et_inicio_cosecha_hora);

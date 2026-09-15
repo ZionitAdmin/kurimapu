@@ -36,6 +36,8 @@ import cl.smapdev.curimapu.MainActivity;
 import cl.smapdev.curimapu.R;
 import cl.smapdev.curimapu.clases.adapters.CropRotationAdapter;
 import cl.smapdev.curimapu.clases.adapters.GenericAdapter;
+import cl.smapdev.curimapu.clases.tablas.AnexoCorreoFechas;
+import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.CropRotation;
 import cl.smapdev.curimapu.clases.tablas.detalle_visita_prop;
 import cl.smapdev.curimapu.clases.tablas.pro_cli_mat;
@@ -179,6 +181,9 @@ public class DialogLibroCampo extends DialogFragment {
 
     public void onSave() {
 
+        // TICKET 2491 - 2026-09-15
+        int idClienteFinal = MainActivity.myAppDB.myDao().getIdClienteByAnexo(prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, ""));
+
         for (int i = 0; i < editTexts.size(); i++) {
             if (!id_generica.contains(editTexts.get(i).getId())) continue;
 
@@ -224,6 +229,16 @@ public class DialogLibroCampo extends DialogFragment {
                 MainActivity.myAppDB.myDao().insertDatoDetalle(temp);
             }
 
+            // TICKET 2491 - 2026-09-15
+            pro_cli_mat pcm = MainActivity.myAppDB.myDao().getProCliMatByIdProp(idImportante, idClienteFinal, prefs.getString(Utilidades.SHARED_VISIT_TEMPORADA, "1"));
+            if (pcm != null && pcm.getIdentificador() != null) {
+                if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_FLORACION_HEMBRA))) {
+                    sincronizarAnexoCorreoFecha(true, temp.getValor_detalle());
+                } else if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_INCREMENTO_LINEA))) {
+                    sincronizarAnexoCorreoFecha(false, temp.getValor_detalle());
+                }
+            }
+
         }
 
         Dialog dialog = getDialog();
@@ -231,6 +246,56 @@ public class DialogLibroCampo extends DialogFragment {
         if (dialog != null) {
             dialog.dismiss();
         }
+    }
+
+    /**
+     * TICKET 2491 - 2026-09-15: replica en anexo_correo_fechas (local) el valor guardado desde el
+     * Libro de Campo para los identificadores 245 (floracion hembra) y 295 (incremento linea),
+     * igual que hace core/models/libro.php -> asignarValor() en la web (fecha_floracion_hembra /
+     * fecha_incremento_linea, un valor por id_ac). Si ya existe fila local para el anexo, se
+     * modifica el MISMO objeto leido (nunca se reconstruye uno nuevo desde cero) para no perder
+     * el resto de los campos (inicio_despano, flags correo_X, etc.) al guardar. Se marca
+     * estado_sincro_corr_fech = 0 para que quede pendiente y se suba junto con el resto de las
+     * fechas por el mismo camino que ya usa el modulo Anexo Fechas (subir_fechas.php), que ya
+     * sabe insertar/actualizar estos 2 campos y disparar el correo.
+     */
+    private void sincronizarAnexoCorreoFecha(boolean esFloracionHembra, String valor) {
+
+        if (valor == null || valor.trim().isEmpty()) return;
+
+        int idAnexo;
+        try {
+            idAnexo = Integer.parseInt(prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, ""));
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        AnexoCorreoFechas existente = MainActivity.myAppDB.DaoAnexosFechas().getAnexoCorreoFechasByAnexo(idAnexo);
+
+        if (existente != null) {
+            if (esFloracionHembra) {
+                existente.setFecha_floracion_hembra(valor);
+            } else {
+                existente.setFecha_incremento_linea(valor);
+            }
+            existente.setEstado_sincro_corr_fech(0);
+            MainActivity.myAppDB.DaoAnexosFechas().UpdateFechasAnexos(existente);
+            return;
+        }
+
+        AnexoCorreoFechas nuevo = new AnexoCorreoFechas();
+        nuevo.setId_ac_corr_fech(idAnexo);
+
+        Config config = MainActivity.myAppDB.myDao().getConfig();
+        nuevo.setId_fieldman(config.getId_usuario());
+
+        if (esFloracionHembra) {
+            nuevo.setFecha_floracion_hembra(valor);
+        } else {
+            nuevo.setFecha_incremento_linea(valor);
+        }
+        nuevo.setEstado_sincro_corr_fech(0);
+        MainActivity.myAppDB.DaoAnexosFechas().insertFechasAnexos(nuevo);
     }
 
 

@@ -184,6 +184,12 @@
         <item>CEREALERA</item>
         <item>MONOGRANO</item>
     </string-array>
+
+    <string-array name="origen_visita">
+        <item>@string/select</item>
+        <item>Presencial</item>
+        <item>Telefónica</item>
+    </string-array>
 </resources>
 
 

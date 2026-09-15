@@ -31,6 +31,9 @@
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!-- Alertas push (Firebase Cloud Messaging) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -70,6 +73,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".clases.firebase.MiFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

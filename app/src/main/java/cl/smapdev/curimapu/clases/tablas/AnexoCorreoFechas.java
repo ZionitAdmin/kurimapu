@@ -42,6 +42,23 @@ public class AnexoCorreoFechas {
     @Expose
     private int correo_cinco_porciento_floracion;
 
+    // TICKET 2491 - 2026-09-15: solo lectura, se ingresan y modifican desde el Libro de Campo (web)
+    @SerializedName("fecha_floracion_hembra")
+    @Expose
+    private String fecha_floracion_hembra;
+
+    @SerializedName("correo_floracion_hembra")
+    @Expose
+    private int correo_floracion_hembra;
+
+    @SerializedName("fecha_incremento_linea")
+    @Expose
+    private String fecha_incremento_linea;
+
+    @SerializedName("correo_incremento_linea")
+    @Expose
+    private int correo_incremento_linea;
+
 
     @SerializedName("inicio_corte_seda")
     @Expose
@@ -334,6 +351,38 @@ public class AnexoCorreoFechas {
 
     public void setCorreo_cinco_porciento_floracion(int correo_cinco_porciento_floracion) {
         this.correo_cinco_porciento_floracion = correo_cinco_porciento_floracion;
+    }
+
+    public String getFecha_floracion_hembra() {
+        return fecha_floracion_hembra;
+    }
+
+    public void setFecha_floracion_hembra(String fecha_floracion_hembra) {
+        this.fecha_floracion_hembra = fecha_floracion_hembra;
+    }
+
+    public int getCorreo_floracion_hembra() {
+        return correo_floracion_hembra;
+    }
+
+    public void setCorreo_floracion_hembra(int correo_floracion_hembra) {
+        this.correo_floracion_hembra = correo_floracion_hembra;
+    }
+
+    public String getFecha_incremento_linea() {
+        return fecha_incremento_linea;
+    }
+
+    public void setFecha_incremento_linea(String fecha_incremento_linea) {
+        this.fecha_incremento_linea = fecha_incremento_linea;
+    }
+
+    public int getCorreo_incremento_linea() {
+        return correo_incremento_linea;
+    }
+
+    public void setCorreo_incremento_linea(int correo_incremento_linea) {
+        this.correo_incremento_linea = correo_incremento_linea;
     }
 
     public String getInicio_corte_seda() {

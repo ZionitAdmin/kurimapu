@@ -11,3 +11,6 @@
 gradlew
 gradlew.bat
 *.apk
+
+# TICKET 2491 - 2026-09-15: credenciales de Firebase, repo es publico - copiar a mano a cada maquina
+app/google-services.json

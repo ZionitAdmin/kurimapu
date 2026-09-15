@@ -94,6 +94,61 @@
 
         />
 
+    <!-- TICKET 2491 - 2026-09-15: solo lectura, se ingresan y modifican desde el Libro de Campo (web) -->
+    <TextView
+        android:id="@+id/lbl_floracion_hembra"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="90% Floracion Hembra"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_floracion_hembra"
+        app:layout_constraintBottom_toBottomOf="@id/et_floracion_hembra"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_floracion_hembra"
+        />
+
+    <EditText
+        android:id="@+id/et_floracion_hembra"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        android:enabled="false"
+        app:layout_constraintTop_toBottomOf="@id/et_cinco_porc_floracion"
+        app:layout_constraintStart_toEndOf="@id/lbl_floracion_hembra"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_incremento_linea"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="Incremento Linea"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_incremento_linea"
+        app:layout_constraintBottom_toBottomOf="@id/et_incremento_linea"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_incremento_linea"
+        />
+
+    <EditText
+        android:id="@+id/et_incremento_linea"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        android:enabled="false"
+        app:layout_constraintTop_toBottomOf="@id/et_floracion_hembra"
+        app:layout_constraintStart_toEndOf="@id/lbl_incremento_linea"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
     <TextView
         android:id="@+id/inicio_corte_seda"
         android:layout_width="0dp"
@@ -113,7 +168,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_weight="3"
         android:inputType="date"
-        app:layout_constraintTop_toBottomOf="@id/et_cinco_porc_floracion"
+        app:layout_constraintTop_toBottomOf="@id/et_incremento_linea"
         app:layout_constraintStart_toEndOf="@id/inicio_corte_seda"
         app:layout_constraintEnd_toEndOf="parent"
         android:drawableStart="@drawable/ic_date_range"

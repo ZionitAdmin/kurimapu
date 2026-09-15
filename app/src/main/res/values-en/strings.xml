@@ -450,4 +450,10 @@ Depending on the state, it can be edited or not.</string>
     <string name="fotografia_raices">fotografia raices</string>
     <string name="fotos_raices">Fotos Raices</string>
     <string name="inicio_siembra">Inicio siembra hembra</string>
+
+    <string-array name="origen_visita">
+        <item>@string/select</item>
+        <item>Presencial</item>
+        <item>Telefónica</item>
+    </string-array>
 </resources>

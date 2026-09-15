@@ -450,6 +450,25 @@
                     app:layout_constraintTop_toBottomOf="@id/lbl_planta_voluntaria"
                     app:layout_constraintEnd_toEndOf="parent" />
 
+                <TextView
+                    android:id="@+id/lbl_origen_visita"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Origen de la visita"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toBottomOf="@id/sp_planta_voluntaria"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+
+                <Spinner
+                    android:id="@+id/sp_origen_visita"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lbl_origen_visita"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

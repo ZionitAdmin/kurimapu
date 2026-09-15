@@ -57,7 +57,7 @@ import cl.smapdev.curimapu.clases.tablas.EstacionFloracionDetalle;
 
 public class Utilidades {
 
-    public static final String APPLICATION_VERSION = "6.0.28112025";
+    public static final String APPLICATION_VERSION = "6.1.05082026";
 
     public static final String FRAGMENT_INICIO = "fragmental_inicio";
     public static final String FRAGMENT_FICHAS = "fragment_fichas";
@@ -88,6 +88,13 @@ public class Utilidades {
     public static final int IDENTIFICADOR_LC_FECHA_SIEMBRA = 83;
     public static final int IDENTIFICADOR_LC_FECHA_LINEA_HEMBRA = 90;
 
+    // TICKET 2491 - 2026-09-15: no tiene relacion con los IDENTIFICADOR_LC_FECHA_* de arriba
+    // (esos no se usan en ningun lado). Al guardar el Libro de Campo con estos identificadores,
+    // el valor tambien se replica en anexo_correo_fechas (ver DialogAnexoFecha) igual que en la
+    // web (ver core/models/libro.php -> asignarValor()).
+    public static final int IDENTIFICADOR_LC_FLORACION_HEMBRA = 245;
+    public static final int IDENTIFICADOR_LC_INCREMENTO_LINEA = 295;
+
 
     public static final String affiliate_id = "vb7jbic553ts";
 
@@ -102,9 +109,9 @@ public class Utilidades {
     public static final String KEY_EXPORT = "9aB4c5D7eF";
     //    public static final String IP_PRODUCCION = "192.168.1.42";
     public static final String IP_PRODUCCION = "curiexport.zpruebas.cl";
-    //    public static final String IP_PRODUCCION = "curiexport.zcloud.cl";
+    //public static final String IP_PRODUCCION = "curiexport.zcloud.cl";
     public static final String URL_SERVER_API = "https://" + IP_PRODUCCION;
-//    public static final String URL_SERVER_API = "http://" + IP_PRODUCCION + "/curimapu";
+    //    public static final String URL_SERVER_API = "http://" + IP_PRODUCCION + "/curimapu";
 
 
     public static final String FILTRO_TEMPORADA = "filtro_temporada";
@@ -513,6 +520,16 @@ public class Utilidades {
         return inte;
     }
 
+    public static int traducirOrigenVisita(int origen) {
+        if (origen == 0) {
+            return 1;
+        } else if (origen == 1) {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
+
     private static int exifToDegrees(int exifOrientation) {
         if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
             return 90;
@@ -688,6 +705,8 @@ public class Utilidades {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Para Android 13 y superior, solicitar READ_MEDIA_IMAGES si es necesario
             permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES);
+            // Requerido desde Android 13 para poder mostrar notificaciones (alertas push)
+            permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             // Para versiones anteriores a Android 10, solicitar el permiso de escritura antiguo
             permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);

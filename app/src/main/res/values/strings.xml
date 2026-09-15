@@ -104,6 +104,12 @@
         <item>NO</item>
     </string-array>
 
+    <string-array name="origen_visita">
+        <item>@string/select</item>
+        <item>Presencial</item>
+        <item>Telefónica</item>
+    </string-array>
+
     <!--    SPINNERS FORM  VISITA-->
     <string-array name="fenologico">
         <item>@string/select</item>

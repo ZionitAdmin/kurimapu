@@ -10,6 +10,7 @@ import cl.smapdev.curimapu.clases.relaciones.RecomendacionesRequest;
 import cl.smapdev.curimapu.clases.relaciones.Respuesta;
 import cl.smapdev.curimapu.clases.relaciones.SubidaDatos;
 import cl.smapdev.curimapu.clases.relaciones.SubirFechasRetro;
+import cl.smapdev.curimapu.clases.relaciones.TokenFcmRequest;
 import cl.smapdev.curimapu.clases.relaciones.resFecha;
 import cl.smapdev.curimapu.clases.tablas.WeatherApiStatus;
 import retrofit2.Call;
@@ -54,6 +55,9 @@ public interface ApiService {
 
     @POST("comprobar_servidor.php")
     Call<Respuesta> comprobarServidor(@Body SubidaDatos subidaDatos);
+
+    @POST("guardar_token_fcm.php")
+    Call<Respuesta> guardarTokenFcm(@Body TokenFcmRequest tokenFcmRequest);
 
 
     @POST("subir_fechas.php")

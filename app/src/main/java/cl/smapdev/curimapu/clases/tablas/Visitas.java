@@ -162,6 +162,15 @@ public class Visitas {
     //    SI o NO
     private String planta_voluntaria;
 
+    private int origen_visita;
+
+    public int getOrigen_visita() {
+        return origen_visita;
+    }
+
+    public void setOrigen_visita(int origen_visita) {
+        this.origen_visita = origen_visita;
+    }
 
     public String getFecha_estimada_postura_abejas() {
         return fecha_estimada_postura_abejas;

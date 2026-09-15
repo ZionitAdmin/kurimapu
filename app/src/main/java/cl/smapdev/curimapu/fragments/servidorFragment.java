@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import cl.smapdev.curimapu.MainActivity;
 import cl.smapdev.curimapu.R;
 import cl.smapdev.curimapu.clases.adapters.UsuariosAdapter;
+import cl.smapdev.curimapu.clases.firebase.FcmTokenHelper;
 import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.Usuario;
 import cl.smapdev.curimapu.clases.utilidades.Utilidades;
@@ -155,6 +156,9 @@ public class servidorFragment extends Fragment {
                     cnf.setServidorSeleccionado(shared.getString(Utilidades.SHARED_SERVER_ID_SERVER, Utilidades.URL_SERVER_API));
                     ejecutarSeguro(() -> {
                         MainActivity.myAppDB.myDao().updateConfig(cnf);
+
+                        FcmTokenHelper.registrarTokenDelUsuario(cnf.getServidorSeleccionado(), cnf.getId_usuario_suplandato());
+
                         handler.post(() -> {
                             activity.cambiarFragment(new FragmentPrincipal(), Utilidades.FRAGMENT_INICIO, R.anim.slide_in_left, R.anim.slide_out_left);
                         });

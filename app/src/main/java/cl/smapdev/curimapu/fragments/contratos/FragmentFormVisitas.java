@@ -93,7 +93,7 @@ public class FragmentFormVisitas extends Fragment {
 
     //UI
     private Spinner sp_fenologico, sp_cosecha, sp_crecimiento, sp_fito,
-            sp_general_cultivo, sp_humedad, sp_malezas, sp_planta_voluntaria;
+            sp_general_cultivo, sp_humedad, sp_malezas, sp_planta_voluntaria,sp_origen_visita;
     private TextView titulo_raices;
     private Button btn_guardar, btn_volver, btn_buscar_obs;
     private ConstraintLayout contenedor_estados, contenedor_monitoreo;
@@ -116,6 +116,8 @@ public class FragmentFormVisitas extends Fragment {
 
     private final ArrayList<String> fenologico = new ArrayList<>(),
             planta_voluntaria = new ArrayList<>(), cosecha = new ArrayList<>(),
+
+            origen_visita = new ArrayList<>(),
             crecimiento = new ArrayList<>(), maleza = new ArrayList<>();
 
     private ExecutorService executors;
@@ -213,6 +215,8 @@ public class FragmentFormVisitas extends Fragment {
         exec.getBackground().execute(() -> {
 
             planta_voluntaria.addAll(Arrays.asList(getResources().getStringArray(R.array.plantas_voluntarias)));
+            origen_visita.addAll(Arrays.asList(getResources().getStringArray(R.array.origen_visita)));
+
             fenologico.addAll(Arrays.asList(getResources().getStringArray(R.array.fenologico)));
             cosecha.addAll(Arrays.asList(getResources().getStringArray(R.array.cosecha)));
             crecimiento.addAll(Arrays.asList(getResources().getStringArray(R.array.crecimiento)));
@@ -344,6 +348,7 @@ public class FragmentFormVisitas extends Fragment {
         sp_fenologico.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, fenologico));
         sp_cosecha.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, cosecha));
         sp_planta_voluntaria.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, planta_voluntaria));
+        sp_origen_visita.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, origen_visita));
         sp_crecimiento.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, crecimiento));
         sp_fito.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, crecimiento));
         sp_general_cultivo.setAdapter(new SpinnerAdapter(activity, R.layout.spinner_template_view, crecimiento));
@@ -1040,6 +1045,7 @@ public class FragmentFormVisitas extends Fragment {
         Visitas visitas = visitasCompletas.getVisitas();
 
         sp_planta_voluntaria.setSelection(planta_voluntaria.indexOf(visitas.getPlanta_voluntaria()));
+        sp_origen_visita.setSelection(Utilidades.traducirOrigenVisita(visitas.getOrigen_visita()));
 
 
         sp_fenologico.setSelection(fenologico.indexOf(visitas.getPhenological_state_visita()));
@@ -1081,6 +1087,7 @@ public class FragmentFormVisitas extends Fragment {
         sp_fenologico.setEnabled(false);
         sp_cosecha.setEnabled(false);
         sp_planta_voluntaria.setEnabled(false);
+        sp_origen_visita.setEnabled(false);
         sp_crecimiento.setEnabled(false);
         sp_fito.setEnabled(false);
         sp_general_cultivo.setEnabled(false);
@@ -1111,6 +1118,7 @@ public class FragmentFormVisitas extends Fragment {
         sp_fenologico = view.findViewById(R.id.sp_feno);
         sp_cosecha = view.findViewById(R.id.sp_cosecha);
         sp_planta_voluntaria = view.findViewById(R.id.sp_planta_voluntaria);
+        sp_origen_visita = view.findViewById(R.id.sp_origen_visita);
         sp_crecimiento = view.findViewById(R.id.sp_crecimiento);
         sp_fito = view.findViewById(R.id.sp_fito);
         sp_general_cultivo = view.findViewById(R.id.sp_general_cultivo);
@@ -1307,6 +1315,7 @@ public class FragmentFormVisitas extends Fragment {
 
             Visitas visitaNueva = new Visitas();
 
+            visitaNueva.setOrigen_visita(visitas.getOrigen_visita()); //agregado por RDC 18-06-2026
             visitaNueva.setClave_unica_visita(claveUnicaClon);
             visitaNueva.setEstado_server_visitas(0);
             visitaNueva.setId_anexo_visita(idAc);
@@ -1430,10 +1439,11 @@ public class FragmentFormVisitas extends Fragment {
 
     private void saveVisitaMonitoreo(List<String> idAcs) {
 
-        if (sp_fenologico.getSelectedItemPosition() <= 0 || sp_planta_voluntaria.getSelectedItemPosition() <= 0) {
+        if (sp_fenologico.getSelectedItemPosition() <= 0 || sp_planta_voluntaria.getSelectedItemPosition() <= 0|| sp_origen_visita.getSelectedItemPosition() <= 0) {
             Utilidades.avisoListo(activity, "Hey", "no puede dejar elementos en '--seleccione--'.", "entiendo");
             return;
         }
+        int origenVisita = (sp_origen_visita.getSelectedItemPosition()==1) ? 0 : 1 ;
         String alfaNumerico = getResources().getString(R.string.alfanumericos_con_signos);
         String phenoStateVisita = sp_fenologico.getSelectedItem().toString();
         String plantaVoluntaria = sp_planta_voluntaria.getSelectedItem().toString();
@@ -1445,6 +1455,7 @@ public class FragmentFormVisitas extends Fragment {
 
             visitas.setPhenological_state_visita(phenoStateVisita);
             visitas.setPlanta_voluntaria(plantaVoluntaria);
+            visitas.setOrigen_visita(origenVisita);
 
             visitas.setObservation_visita(etobs);
 
