@@ -238,15 +238,31 @@ public class DialogLibroCampo extends DialogFragment {
             // excepcion aca abortaba el loop completo y los campos siguientes nunca se guardaban.
             try {
                 pro_cli_mat pcm = MainActivity.myAppDB.myDao().getProCliMatByIdProp(idImportante, idClienteFinal, temporada);
+                // TICKET 2491 - 2026-09-15: log siempre visible en Logcat, independiente de si el
+                // Toast de abajo logra mostrarse o no - necesario para diagnosticar sin depender
+                // de que alguien vea un aviso en pantalla en el momento exacto que aparece.
+                Log.e("TICKET_2491", "onSave() idImportante=" + idImportante + " idClienteFinal=" + idClienteFinal
+                        + " temporada=" + temporada + " pcm=" + (pcm == null ? "NULL" : "id_prop_mat_cli=" + pcm.getId_prop_mat_cli() + " identificador=" + pcm.getIdentificador())
+                        + " valor=" + temp.getValor_detalle());
                 if (pcm != null && pcm.getIdentificador() != null) {
                     if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_FLORACION_HEMBRA))) {
                         sincronizarAnexoCorreoFecha(true, temp.getValor_detalle());
+                        Log.e("TICKET_2491", "sincronizarAnexoCorreoFecha(floracion_hembra) OK para idImportante=" + idImportante);
                     } else if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_INCREMENTO_LINEA))) {
                         sincronizarAnexoCorreoFecha(false, temp.getValor_detalle());
+                        Log.e("TICKET_2491", "sincronizarAnexoCorreoFecha(incremento_linea) OK para idImportante=" + idImportante);
                     }
                 }
             } catch (Exception e) {
-                Toasty.error(requireActivity(), "No se pudo sincronizar la fecha en Anexo Fechas: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
+                Log.e("TICKET_2491", "EXCEPCION en sincronizacion idImportante=" + idImportante, e);
+                // TICKET 2491 - 2026-09-15: el Toast va en su propio try/catch para que, si el
+                // Fragment no esta attached en ese momento (requireActivity() puede tirar), esa
+                // segunda excepcion no quede sin registrar y no oculte la causa real de arriba.
+                try {
+                    Toasty.error(requireActivity(), "No se pudo sincronizar la fecha en Anexo Fechas: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
+                } catch (Exception e2) {
+                    Log.e("TICKET_2491", "Ademas fallo el Toast de aviso", e2);
+                }
             }
 
         }
