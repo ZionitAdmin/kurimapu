@@ -191,6 +191,16 @@ public class Descargas {
                         f.setFecha_destruccion_semillero(fch.getFecha_destruccion_semillero());
                         f.setHora_inicio_cosecha(fch.getHora_inicio_cosecha());
                         f.setDetalle_labores(fch.getDetalle_labores());
+
+                        // TICKET 2491 - 2026-09-16: faltaban estos 4 campos aca - por eso una
+                        // edicion hecha desde la web (Libro de Campo) despues de que el anexo ya
+                        // existia localmente (creado por la APK) nunca se reflejaba al Descargar,
+                        // se quedaba pegada la fecha/estado original de la APK.
+                        f.setFecha_floracion_hembra(fch.getFecha_floracion_hembra());
+                        f.setCorreo_floracion_hembra(fch.getCorreo_floracion_hembra());
+                        f.setFecha_incremento_linea(fch.getFecha_incremento_linea());
+                        f.setCorreo_incremento_linea(fch.getCorreo_incremento_linea());
+
                         f.setEstado_sincro_corr_fech(1);
 
                         MainActivity.myAppDB.DaoAnexosFechas().UpdateFechasAnexos(f);
