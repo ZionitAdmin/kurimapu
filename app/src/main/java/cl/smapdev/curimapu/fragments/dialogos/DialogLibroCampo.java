@@ -36,8 +36,6 @@ import cl.smapdev.curimapu.MainActivity;
 import cl.smapdev.curimapu.R;
 import cl.smapdev.curimapu.clases.adapters.CropRotationAdapter;
 import cl.smapdev.curimapu.clases.adapters.GenericAdapter;
-import cl.smapdev.curimapu.clases.tablas.AnexoCorreoFechas;
-import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.CropRotation;
 import cl.smapdev.curimapu.clases.tablas.detalle_visita_prop;
 import cl.smapdev.curimapu.clases.tablas.pro_cli_mat;
@@ -181,9 +179,6 @@ public class DialogLibroCampo extends DialogFragment {
 
     public void onSave() {
 
-        // TICKET 2491 - 2026-09-15
-        int idClienteFinal = MainActivity.myAppDB.myDao().getIdClienteByAnexo(prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, ""));
-
         for (int i = 0; i < editTexts.size(); i++) {
             if (!id_generica.contains(editTexts.get(i).getId())) continue;
 
@@ -194,75 +189,54 @@ public class DialogLibroCampo extends DialogFragment {
             int index1 = id_generica.indexOf(editTexts.get(i).getId());
             int idImportante = id_importante.get(index1);
             if (!tempText.isEnabled()) continue;
-            detalle_visita_prop temp = new detalle_visita_prop();
-            temp.setEstado_detalle(0);
-            temp.setId_visita_detalle(0);
-            temp.setId_prop_mat_cli_detalle(idImportante);
 
-            int idAEditar = MainActivity.myAppDB.myDao().getIdDatoDetalle(idImportante, prefs.getInt(Utilidades.SHARED_VISIT_VISITA_ID, 0));
-            String datoDetalle = MainActivity.myAppDB.myDao().getDatoDetalle(idImportante, prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, ""));
-
-            if ((datoDetalle != null && datoDetalle.isEmpty()) && tempText.getText().toString().isEmpty()) {
-                continue;
-            }
-
-            switch (tempText.getInputType()) {
-                case InputType.TYPE_CLASS_TEXT:
-                case InputType.TYPE_CLASS_NUMBER:
-                case InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED:
-                    String text = tempText.getText().toString().toUpperCase();
-                    temp.setValor_detalle(text);
-                    break;
-                case InputType.TYPE_CLASS_DATETIME:
-                    String prevValue = tempText.getText().toString();
-                    String fe = Utilidades.voltearFechaBD(prevValue);
-                    fe = (fe.isEmpty()) ? prevValue : fe;
-                    temp.setValor_detalle(fe);
-                    break;
-            }
-
-
-            if (idAEditar > 0) {
-                temp.setId_det_vis_prop_detalle(idAEditar);
-                MainActivity.myAppDB.myDao().updateDatoDetalle(temp);
-            } else {
-                MainActivity.myAppDB.myDao().insertDatoDetalle(temp);
-            }
-
-            // TICKET 2491 - 2026-09-15: usar el campo de clase "temporada" (el mismo que usa
-            // setearEditTexts()/cargarInterfaz() para armar esta misma pantalla), no
-            // prefs.SHARED_VISIT_TEMPORADA - si difieren, esta consulta no encuentra el
-            // pro_cli_mat correcto y la sincronizacion nunca se dispara, en silencio.
-            // Envuelto en try/catch a proposito: si esto falla, NO debe cortar el resto del
-            // for (que guarda los demas campos del Libro de Campo) - antes de este cambio, una
-            // excepcion aca abortaba el loop completo y los campos siguientes nunca se guardaban.
+            // TICKET 2491 - 2026-09-16: cada campo se guarda en su propio try/catch para que,
+            // si uno falla, no se pierdan los demas (antes una excepcion aca abortaba todo el
+            // for) y para que la falla quede registrada sin bloquear ni interrumpir al usuario.
             try {
-                pro_cli_mat pcm = MainActivity.myAppDB.myDao().getProCliMatByIdProp(idImportante, idClienteFinal, temporada);
-                // TICKET 2491 - 2026-09-15: log siempre visible en Logcat, independiente de si el
-                // Toast de abajo logra mostrarse o no - necesario para diagnosticar sin depender
-                // de que alguien vea un aviso en pantalla en el momento exacto que aparece.
-                Log.e("TICKET_2491", "onSave() idImportante=" + idImportante + " idClienteFinal=" + idClienteFinal
-                        + " temporada=" + temporada + " pcm=" + (pcm == null ? "NULL" : "id_prop_mat_cli=" + pcm.getId_prop_mat_cli() + " identificador=" + pcm.getIdentificador())
-                        + " valor=" + temp.getValor_detalle());
-                if (pcm != null && pcm.getIdentificador() != null) {
-                    if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_FLORACION_HEMBRA))) {
-                        sincronizarAnexoCorreoFecha(true, temp.getValor_detalle());
-                        Log.e("TICKET_2491", "sincronizarAnexoCorreoFecha(floracion_hembra) OK para idImportante=" + idImportante);
-                    } else if (pcm.getIdentificador().equals(String.valueOf(Utilidades.IDENTIFICADOR_LC_INCREMENTO_LINEA))) {
-                        sincronizarAnexoCorreoFecha(false, temp.getValor_detalle());
-                        Log.e("TICKET_2491", "sincronizarAnexoCorreoFecha(incremento_linea) OK para idImportante=" + idImportante);
-                    }
+                detalle_visita_prop temp = new detalle_visita_prop();
+                temp.setEstado_detalle(0);
+                temp.setId_visita_detalle(0);
+                temp.setId_prop_mat_cli_detalle(idImportante);
+
+                int idAEditar = MainActivity.myAppDB.myDao().getIdDatoDetalle(idImportante, prefs.getInt(Utilidades.SHARED_VISIT_VISITA_ID, 0));
+                String datoDetalle = MainActivity.myAppDB.myDao().getDatoDetalle(idImportante, prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, ""));
+
+                if ((datoDetalle != null && datoDetalle.isEmpty()) && tempText.getText().toString().isEmpty()) {
+                    continue;
+                }
+
+                switch (tempText.getInputType()) {
+                    case InputType.TYPE_CLASS_TEXT:
+                    case InputType.TYPE_CLASS_NUMBER:
+                    case InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED:
+                        String text = tempText.getText().toString().toUpperCase();
+                        temp.setValor_detalle(text);
+                        break;
+                    case InputType.TYPE_CLASS_DATETIME:
+                    case InputType.TYPE_NULL:
+                        // TICKET 2491 - 2026-09-16: el calendario de fecha deja el campo en
+                        // TYPE_NULL despues de tocarlo (setearEditTexts(), listener agregado en
+                        // el commit 75ae812 del 28-nov-2025 para bloquear tipeo manual). Sin
+                        // este case el switch no matcheaba, valor_detalle quedaba en null (el
+                        // default de Java) y el UPDATE/INSERT de abajo pisaba con null la fecha
+                        // que el autoguardado (al perder foco) ya habia guardado bien.
+                        String prevValue = tempText.getText().toString();
+                        String fe = Utilidades.voltearFechaBD(prevValue);
+                        fe = (fe.isEmpty()) ? prevValue : fe;
+                        temp.setValor_detalle(fe);
+                        break;
+                }
+
+
+                if (idAEditar > 0) {
+                    temp.setId_det_vis_prop_detalle(idAEditar);
+                    MainActivity.myAppDB.myDao().updateDatoDetalle(temp);
+                } else {
+                    MainActivity.myAppDB.myDao().insertDatoDetalle(temp);
                 }
             } catch (Exception e) {
-                Log.e("TICKET_2491", "EXCEPCION en sincronizacion idImportante=" + idImportante, e);
-                // TICKET 2491 - 2026-09-15: el Toast va en su propio try/catch para que, si el
-                // Fragment no esta attached en ese momento (requireActivity() puede tirar), esa
-                // segunda excepcion no quede sin registrar y no oculte la causa real de arriba.
-                try {
-                    Toasty.error(requireActivity(), "No se pudo sincronizar la fecha en Anexo Fechas: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
-                } catch (Exception e2) {
-                    Log.e("TICKET_2491", "Ademas fallo el Toast de aviso", e2);
-                }
+                Log.e("TICKET_2491", "No se pudo guardar el campo idImportante=" + idImportante, e);
             }
 
         }
@@ -272,56 +246,6 @@ public class DialogLibroCampo extends DialogFragment {
         if (dialog != null) {
             dialog.dismiss();
         }
-    }
-
-    /**
-     * TICKET 2491 - 2026-09-15: replica en anexo_correo_fechas (local) el valor guardado desde el
-     * Libro de Campo para los identificadores 245 (floracion hembra) y 295 (incremento linea),
-     * igual que hace core/models/libro.php -> asignarValor() en la web (fecha_floracion_hembra /
-     * fecha_incremento_linea, un valor por id_ac). Si ya existe fila local para el anexo, se
-     * modifica el MISMO objeto leido (nunca se reconstruye uno nuevo desde cero) para no perder
-     * el resto de los campos (inicio_despano, flags correo_X, etc.) al guardar. Se marca
-     * estado_sincro_corr_fech = 0 para que quede pendiente y se suba junto con el resto de las
-     * fechas por el mismo camino que ya usa el modulo Anexo Fechas (subir_fechas.php), que ya
-     * sabe insertar/actualizar estos 2 campos y disparar el correo.
-     */
-    private void sincronizarAnexoCorreoFecha(boolean esFloracionHembra, String valor) {
-
-        if (valor == null || valor.trim().isEmpty()) return;
-
-        int idAnexo;
-        try {
-            idAnexo = Integer.parseInt(prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, ""));
-        } catch (NumberFormatException e) {
-            return;
-        }
-
-        AnexoCorreoFechas existente = MainActivity.myAppDB.DaoAnexosFechas().getAnexoCorreoFechasByAnexo(idAnexo);
-
-        if (existente != null) {
-            if (esFloracionHembra) {
-                existente.setFecha_floracion_hembra(valor);
-            } else {
-                existente.setFecha_incremento_linea(valor);
-            }
-            existente.setEstado_sincro_corr_fech(0);
-            MainActivity.myAppDB.DaoAnexosFechas().UpdateFechasAnexos(existente);
-            return;
-        }
-
-        AnexoCorreoFechas nuevo = new AnexoCorreoFechas();
-        nuevo.setId_ac_corr_fech(idAnexo);
-
-        Config config = MainActivity.myAppDB.myDao().getConfig();
-        nuevo.setId_fieldman(config.getId_usuario());
-
-        if (esFloracionHembra) {
-            nuevo.setFecha_floracion_hembra(valor);
-        } else {
-            nuevo.setFecha_incremento_linea(valor);
-        }
-        nuevo.setEstado_sincro_corr_fech(0);
-        MainActivity.myAppDB.DaoAnexosFechas().insertFechasAnexos(nuevo);
     }
 
 

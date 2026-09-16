@@ -324,6 +324,15 @@ public interface MyDao {
     @Query("SELECT id_det_vis_prop_detalle FROM detalle_visita_prop where id_prop_mat_cli_detalle = :idProp AND id_visita_detalle = :idVisita")
     int getIdDatoDetalle(int idProp, int idVisita);
 
+    // TICKET 2491 - 2026-09-16: usada tras updateDetallesToVisits(), cuando la visita ya
+    // tiene su id real, para leer el valor guardado de un campo del Libro de Campo por
+    // identificador (245/295) y recien ahi sincronizar anexo_correo_fechas - evita hacerlo
+    // al guardar el LC (antes de que la visita exista de verdad, ver DialogLibroCampo).
+    @Query("SELECT DVP.valor_detalle FROM detalle_visita_prop DVP " +
+            "INNER JOIN pro_cli_mat PCM ON (PCM.id_prop_mat_cli = DVP.id_prop_mat_cli_detalle) " +
+            "WHERE DVP.id_visita_detalle = :idVisita AND PCM.identificador = :identificador LIMIT 1")
+    String getValorDetalleByVisitaEIdentificador(int idVisita, String identificador);
+
     @Insert
     void insertDatoDetalle(detalle_visita_prop detalle_visita_prop);
 

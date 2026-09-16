@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,6 +68,7 @@ import cl.smapdev.curimapu.clases.relaciones.AnexoCompleto;
 import cl.smapdev.curimapu.clases.relaciones.SpinnerItem;
 import cl.smapdev.curimapu.clases.relaciones.VisitasCompletas;
 import cl.smapdev.curimapu.clases.tablas.AnexoContrato;
+import cl.smapdev.curimapu.clases.tablas.AnexoCorreoFechas;
 import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.Evaluaciones;
 import cl.smapdev.curimapu.clases.tablas.Fotos;
@@ -1432,6 +1434,11 @@ public class FragmentFormVisitas extends Fragment {
                 dtNueva.setValor_detalle(dt.getValor_detalle());
                 MainActivity.myAppDB.myDao().insertDatoDetalle(dtNueva);
             }
+
+            // TICKET 2491 - 2026-09-16: el Libro de Campo clonado arriba puede traer valores
+            // para los identificadores 245/295 - sin esto, el anexo replicado (idAc) nunca
+            // actualiza su propio anexo_correo_fechas, solo el anexo original de la visita.
+            sincronizarFechasEspecialesLC(Integer.parseInt(idAc), visitaNueva.getId_visita());
         }
 
     }
@@ -1498,6 +1505,8 @@ public class FragmentFormVisitas extends Fragment {
                 MainActivity.myAppDB.DaoEvaluaciones().updateEvaluacionesObligadas(Integer.parseInt(an.getId_anexo_contrato()), claveUnica);
                 MainActivity.myAppDB.myDao().updateFotosWithVisita((int) finalIdVisita, anexoCompleto.getAnexoContrato().getId_anexo_contrato());
                 MainActivity.myAppDB.myDao().updateDetallesToVisits((int) finalIdVisita);
+                // TICKET 2491 - 2026-09-16: recien aqui, con la visita ya guardada de verdad.
+                sincronizarFechasEspecialesLC(Integer.parseInt(an.getId_anexo_contrato()), (int) finalIdVisita);
                 Visitas visitas1 = MainActivity.myAppDB.myDao().getVisitas((int) finalIdVisita);
                 visitas1.setId_visita_local((int) idVisita);
                 MainActivity.myAppDB.myDao().updateVisita(visitas1);
@@ -1663,6 +1672,8 @@ public class FragmentFormVisitas extends Fragment {
                 MainActivity.myAppDB.DaoEvaluaciones().updateEvaluacionesGuardar(Integer.parseInt(an.getId_anexo_contrato()), claveUnica);
                 MainActivity.myAppDB.myDao().updateFotosWithVisita((int) finalIdVisita, anexoCompleto.getAnexoContrato().getId_anexo_contrato());
                 MainActivity.myAppDB.myDao().updateDetallesToVisits((int) finalIdVisita);
+                // TICKET 2491 - 2026-09-16: recien aqui, con la visita ya guardada de verdad.
+                sincronizarFechasEspecialesLC(Integer.parseInt(an.getId_anexo_contrato()), (int) finalIdVisita);
                 Visitas visitas1 = MainActivity.myAppDB.myDao().getVisitas((int) finalIdVisita);
                 visitas1.setId_visita_local(idVisita);
                 MainActivity.myAppDB.myDao().updateVisita(visitas1);
@@ -1678,5 +1689,59 @@ public class FragmentFormVisitas extends Fragment {
                 handler.post(() -> Utilidades.avisoListo(activity, "Problemas", "No se pudo guardar la visita " + e.getMessage(), "entiendo"));
             }
         });
+    }
+
+    // TICKET 2491 - 2026-09-16: replica en anexo_correo_fechas (local) el valor guardado en el
+    // Libro de Campo para los identificadores 245 (90% floracion hembra) y 295 (incremento
+    // linea), igual que hace core/models/libro.php -> asignarValor() en la web. Se dispara aca,
+    // despues de updateDetallesToVisits() - o sea, cuando la visita YA quedo guardada de verdad
+    // con su id real - y no desde DialogLibroCampo.onSave(): si se hiciera ahi, un usuario que
+    // llena el LC y abandona la visita sin guardarla dejaria un registro pendiente de subir en
+    // anexo_correo_fechas para una visita que nunca existio.
+    private void sincronizarFechasEspecialesLC(int idAnexo, int idVisita) {
+        try {
+            String valorFloracionHembra = MainActivity.myAppDB.myDao().getValorDetalleByVisitaEIdentificador(idVisita, String.valueOf(Utilidades.IDENTIFICADOR_LC_FLORACION_HEMBRA));
+            String valorIncrementoLinea = MainActivity.myAppDB.myDao().getValorDetalleByVisitaEIdentificador(idVisita, String.valueOf(Utilidades.IDENTIFICADOR_LC_INCREMENTO_LINEA));
+
+            if (!TextUtils.isEmpty(valorFloracionHembra)) {
+                guardarFechaAnexoCorreo(idAnexo, true, valorFloracionHembra);
+            }
+            if (!TextUtils.isEmpty(valorIncrementoLinea)) {
+                guardarFechaAnexoCorreo(idAnexo, false, valorIncrementoLinea);
+            }
+        } catch (Exception e) {
+            // TICKET 2491 - 2026-09-16: no debe impedir ni bloquear el guardado de la visita,
+            // que ya termino exitosamente en este punto - solo se deja registro en Logcat.
+            Log.e("TICKET_2491", "No se pudo sincronizar anexo_correo_fechas para visita " + idVisita, e);
+        }
+    }
+
+    private void guardarFechaAnexoCorreo(int idAnexo, boolean esFloracionHembra, String valor) {
+        AnexoCorreoFechas existente = MainActivity.myAppDB.DaoAnexosFechas().getAnexoCorreoFechasByAnexo(idAnexo);
+
+        if (existente != null) {
+            if (esFloracionHembra) {
+                existente.setFecha_floracion_hembra(valor);
+            } else {
+                existente.setFecha_incremento_linea(valor);
+            }
+            existente.setEstado_sincro_corr_fech(0);
+            MainActivity.myAppDB.DaoAnexosFechas().UpdateFechasAnexos(existente);
+            return;
+        }
+
+        AnexoCorreoFechas nuevo = new AnexoCorreoFechas();
+        nuevo.setId_ac_corr_fech(idAnexo);
+
+        Config config = MainActivity.myAppDB.myDao().getConfig();
+        nuevo.setId_fieldman(config.getId_usuario());
+
+        if (esFloracionHembra) {
+            nuevo.setFecha_floracion_hembra(valor);
+        } else {
+            nuevo.setFecha_incremento_linea(valor);
+        }
+        nuevo.setEstado_sincro_corr_fech(0);
+        MainActivity.myAppDB.DaoAnexosFechas().insertFechasAnexos(nuevo);
     }
 }

@@ -1,5 +1,6 @@
 package cl.smapdev.curimapu.clases.tablas;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -49,6 +50,7 @@ public class AnexoCorreoFechas {
 
     @SerializedName("correo_floracion_hembra")
     @Expose
+    @ColumnInfo(defaultValue = "0")
     private int correo_floracion_hembra;
 
     @SerializedName("fecha_incremento_linea")
@@ -57,6 +59,7 @@ public class AnexoCorreoFechas {
 
     @SerializedName("correo_incremento_linea")
     @Expose
+    @ColumnInfo(defaultValue = "0")
     private int correo_incremento_linea;
 
 
