@@ -65,12 +65,16 @@ import cl.smapdev.curimapu.clases.relaciones.EstacionesCompletas;
 import cl.smapdev.curimapu.clases.relaciones.GsonDescargas;
 import cl.smapdev.curimapu.clases.relaciones.MuestraHumedadRequest;
 import cl.smapdev.curimapu.clases.relaciones.RecomendacionesRequest;
+import cl.smapdev.curimapu.clases.relaciones.RespuestaFecha;
 import cl.smapdev.curimapu.clases.relaciones.Respuesta;
 import cl.smapdev.curimapu.clases.relaciones.SpinnerItem;
 import cl.smapdev.curimapu.clases.relaciones.SubidaDatos;
+import cl.smapdev.curimapu.clases.relaciones.SubirFechasRetro;
+import cl.smapdev.curimapu.clases.relaciones.resFecha;
 import cl.smapdev.curimapu.clases.retrofit.ApiService;
 import cl.smapdev.curimapu.clases.retrofit.RetrofitClient;
 import cl.smapdev.curimapu.clases.tablas.AnexoContrato;
+import cl.smapdev.curimapu.clases.tablas.AnexoCorreoFechas;
 import cl.smapdev.curimapu.clases.tablas.CheckListCapacitacionSiembra;
 import cl.smapdev.curimapu.clases.tablas.CheckListCapacitacionSiembraDetalle;
 import cl.smapdev.curimapu.clases.tablas.CheckListCosecha;
@@ -1078,6 +1082,11 @@ public class FragmentPrincipal extends Fragment {
                         ocultarProgreso();
                     }
                     preparaSubirRecomendaciones();
+                    // TICKET 2491 - 2026-09-16: si esta visita dejo pendiente una fecha en
+                    // anexo_correo_fechas (245/295), se sube de inmediato aca - antes solo se
+                    // subia si el usuario entraba manualmente a la pantalla Anexo Fechas y
+                    // apretaba el boton de subir, lo que dejaba el dato sin sincronizar.
+                    revisarYSubirAnexoFecha(id_visita);
                     Toasty.success(activity, "Se subio La visita con exito", Toast.LENGTH_SHORT, true).show();
                 }
             }
@@ -1086,6 +1095,96 @@ public class FragmentPrincipal extends Fragment {
             public void onFailure(@NonNull Call<Respuesta> call, @NonNull Throwable t) {
                 ocultarProgreso();
                 Utilidades.avisoListo(getActivity(), "ATENCION", "PROBLEMA EN LA COMUNICACION \nMENSAJE: \n" + t.getMessage(), "ENTIENDO");
+            }
+        });
+    }
+
+    // TICKET 2491 - 2026-09-16: revisa si la visita recien subida dejo pendiente (estado_sincro_corr_fech
+    // = 0) una fecha en anexo_correo_fechas para su anexo (identificadores 245/295, ver
+    // sincronizarFechasEspecialesLC en FragmentFormVisitas.java) y, si es asi, la sube de inmediato.
+    // No usa AnexoCorreoFechaSync (el mecanismo del boton manual de la pantalla Anexo Fechas) porque
+    // esa clase muestra su propio ProgressDialog no cancelable - aca llamamos al mismo endpoint
+    // (subir_fechas.php via ApiService.enviarFechas) directo, sin ninguna UI, para que el usuario no
+    // vea un dialogo inesperado justo despues del aviso de "visita subida con exito". No sube nada si
+    // no hay pendientes para este anexo puntual - no toca fechas pendientes de otros anexos. Corre en
+    // segundo plano y nunca lanza excepcion hacia afuera, para no afectar el guardado de la visita,
+    // que en este punto ya se confirmo exitoso.
+    private void revisarYSubirAnexoFecha(int idVisita) {
+        ejecutarSeguro(() -> {
+            try {
+                Visitas visita = MainActivity.myAppDB.myDao().getVisitas(idVisita);
+                if (visita == null || visita.getId_anexo_visita() == null) return;
+
+                int idAnexo = Integer.parseInt(visita.getId_anexo_visita());
+                AnexoCorreoFechas fecha = MainActivity.myAppDB.DaoAnexosFechas().getAnexoCorreoFechasByAnexo(idAnexo);
+
+                if (fecha == null || fecha.getEstado_sincro_corr_fech() != 0) return;
+
+                List<AnexoCorreoFechas> lista = new ArrayList<>();
+                lista.add(fecha);
+
+                Config config = MainActivity.myAppDB.myDao().getConfig();
+                SubirFechasRetro sfp = new SubirFechasRetro();
+                sfp.setId_dispo(config.getId());
+                sfp.setId_usuario(config.getId_usuario());
+                sfp.setFechas(lista);
+
+                ApiService apiService = RetrofitClient.getClient(config.getServidorSeleccionado()).create(ApiService.class);
+                apiService.enviarFechas(sfp).enqueue(new Callback<resFecha>() {
+                    @Override
+                    public void onResponse(@NonNull Call<resFecha> call, @NonNull Response<resFecha> response) {
+                        if (!response.isSuccessful()) return;
+                        resFecha res = response.body();
+                        if (res == null || res.getCodigoRespuesta() != 0) return;
+                        if (res.getRespuestaFechas() == null || res.getRespuestaFechas().isEmpty()) return;
+
+                        ejecutarSeguro(() -> {
+                            try {
+                                // TICKET 2491 - 2026-09-16: subir_fechas.php devuelve el estado de
+                                // TODOS los anexos (no solo el de esta visita, ver nota del archivo
+                                // PHP) - por eso hay que filtrar aca y actualizar SOLO idAnexo, para
+                                // no marcar como sincronizados otros anexos que nunca se subieron en
+                                // esta llamada.
+                                for (RespuestaFecha fc : res.getRespuestaFechas()) {
+                                    if (Integer.parseInt(fc.getAnexo()) != idAnexo) continue;
+
+                                    AnexoCorreoFechas acf = MainActivity.myAppDB.DaoAnexosFechas().getAnexoCorreoFechasByAnexo(idAnexo);
+                                    if (acf == null) break;
+                                    acf.setCorreo_termino_labores_post_cosechas(fc.getCorreo_termino_labores());
+                                    acf.setCorreo_termino_cosecha(fc.getCorreo_termino_cosecha());
+                                    acf.setCorreo_inicio_despano(fc.getCorreo_inicio_despano());
+                                    acf.setCorreo_inicio_cosecha(fc.getCorreo_inicio_cosecha());
+                                    acf.setCorreo_inicio_corte_seda(fc.getCorreo_inicio_corte_seda());
+                                    acf.setCorreo_cinco_porciento_floracion(fc.getCorreo_cinco_porciento());
+                                    acf.setCorreo_inicio_siembra(fc.getCorreo_inicio_siembra());
+                                    acf.setCorreo_fin_destruccion_semillero(fc.getCorreo_fin_destruccion_semillero());
+                                    acf.setCorreo_siembra_temprana(fc.getCorreo_siembra_temprana());
+                                    acf.setCorreo_destruccion_semillero(fc.getCorreo_destruccion_semillero());
+                                    // TICKET 2491 - 2026-09-16: floracion hembra / incremento linea -
+                                    // el correo real se manda en subida_de_datos.php al subir la
+                                    // visita; esto solo refleja localmente que ya se mando.
+                                    acf.setCorreo_floracion_hembra(fc.getCorreo_floracion_hembra());
+                                    acf.setCorreo_incremento_linea(fc.getCorreo_incremento_linea());
+                                    acf.setEstado_sincro_corr_fech(1);
+                                    MainActivity.myAppDB.DaoAnexosFechas().UpdateFechasAnexos(acf);
+                                    break;
+                                }
+                            } catch (Exception e) {
+                                Log.e("TICKET_2491", "No se pudo actualizar anexo_correo_fechas tras confirmar subida, visita " + idVisita, e);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<resFecha> call, @NonNull Throwable t) {
+                        // TICKET 2491 - 2026-09-16: sin conexion o falla de red - queda en
+                        // estado_sincro_corr_fech = 0 y se reintenta con la proxima visita de este
+                        // anexo, o manualmente desde la pantalla Anexo Fechas. No molesta al usuario.
+                        Log.e("TICKET_2491", "Fallo de red subiendo anexo_correo_fechas tras visita " + idVisita, t);
+                    }
+                });
+            } catch (Exception e) {
+                Log.e("TICKET_2491", "No se pudo subir anexo_correo_fechas tras subir visita " + idVisita, e);
             }
         });
     }

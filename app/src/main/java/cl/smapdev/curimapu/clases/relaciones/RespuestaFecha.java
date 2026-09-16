@@ -41,6 +41,17 @@ public class RespuestaFecha {
     @Expose
     private int correo_termino_labores;
 
+    // TICKET 2491 - 2026-09-16: subir_fechas.php ya devolvia estos 2 campos en su respuesta (viene
+    // de un SELECT * de toda la fila), pero esta clase nunca los mapeaba - por eso la APK nunca
+    // reflejaba si el correo de 90% floracion hembra / incremento linea ya se habia enviado.
+    @SerializedName("correo_floracion_hembra")
+    @Expose
+    private int correo_floracion_hembra;
+
+    @SerializedName("correo_incremento_linea")
+    @Expose
+    private int correo_incremento_linea;
+
     @SerializedName("correo_destruccion_semillero")
     @Expose
     private int correo_destruccion_semillero;
@@ -171,5 +182,21 @@ public class RespuestaFecha {
 
     public void setCorreo_termino_labores(int correo_termino_labores) {
         this.correo_termino_labores = correo_termino_labores;
+    }
+
+    public int getCorreo_floracion_hembra() {
+        return correo_floracion_hembra;
+    }
+
+    public void setCorreo_floracion_hembra(int correo_floracion_hembra) {
+        this.correo_floracion_hembra = correo_floracion_hembra;
+    }
+
+    public int getCorreo_incremento_linea() {
+        return correo_incremento_linea;
+    }
+
+    public void setCorreo_incremento_linea(int correo_incremento_linea) {
+        this.correo_incremento_linea = correo_incremento_linea;
     }
 }
