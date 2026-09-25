@@ -5,6 +5,7 @@ import java.util.List;
 import cl.smapdev.curimapu.clases.relaciones.CheckListRequest;
 import cl.smapdev.curimapu.clases.relaciones.EstacionFloracionRequest;
 import cl.smapdev.curimapu.clases.relaciones.GsonDescargas;
+import cl.smapdev.curimapu.clases.relaciones.MensajeInicioRespuesta;
 import cl.smapdev.curimapu.clases.relaciones.MuestraHumedadRequest;
 import cl.smapdev.curimapu.clases.relaciones.RecomendacionesRequest;
 import cl.smapdev.curimapu.clases.relaciones.Respuesta;
@@ -58,6 +59,10 @@ public interface ApiService {
 
     @POST("guardar_token_fcm.php")
     Call<Respuesta> guardarTokenFcm(@Body TokenFcmRequest tokenFcmRequest);
+
+    // TICKET 2477 (extra) - 2026-09-25: mensaje OGM de inicio actualizado, despues de subir una visita
+    @GET("mensaje_inicio.php")
+    Call<MensajeInicioRespuesta> mensajeInicio(@Query("id_usuario") int id_usuario);
 
 
     @POST("subir_fechas.php")

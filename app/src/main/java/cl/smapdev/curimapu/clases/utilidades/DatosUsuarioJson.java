@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import cl.smapdev.curimapu.clases.relaciones.GsonDescargas;
+import cl.smapdev.curimapu.clases.relaciones.MensajeInicio;
 
 /*
  * TICKET 2477 (extra) - 2026-09-25
@@ -71,6 +72,12 @@ public class DatosUsuarioJson {
             return Collections.unmodifiableSet(set);
         }
 
+        // false cuando solo se ha guardado el mensaje (el usuario aun no descarga con esta version):
+        // en ese caso los filtros OGM/PROPIOS no deben filtrar
+        public boolean tieneListas() {
+            return anexosPropios != null && anexosOgm != null;
+        }
+
         public boolean esPropio(String idAnexo) {
             return idAnexo != null && setPropios.contains(idAnexo);
         }
@@ -108,6 +115,29 @@ public class DatosUsuarioJson {
         datos.mensajeTitulo = descarga.getMensaje_inicio().getTitulo();
         datos.mensajeTexto = descarga.getMensaje_inicio().getTexto();
 
+        escribir(context, idUsuario, datos);
+    }
+
+    // se llama despues de subir una visita con exito: cambia SOLO el mensaje y conserva las
+    // listas OGM/PROPIOS ya guardadas. Si el usuario aun no tiene archivo, las listas quedan
+    // nulas (sin datos) para que los filtros no oculten nada.
+    public static synchronized void actualizarMensaje(Context context, int idUsuario, MensajeInicio mensaje) {
+        if (context == null || mensaje == null) return;
+
+        Datos anterior = obtener(context, idUsuario);
+
+        Datos datos = new Datos();
+        if (anterior != null) {
+            datos.anexosPropios = anterior.anexosPropios;
+            datos.anexosOgm = anterior.anexosOgm;
+        }
+        datos.mensajeTitulo = mensaje.getTitulo();
+        datos.mensajeTexto = mensaje.getTexto();
+
+        escribir(context, idUsuario, datos);
+    }
+
+    private static void escribir(Context context, int idUsuario, Datos datos) {
         File destino = archivo(context, idUsuario);
         File temporal = new File(destino.getAbsolutePath() + ".tmp");
 

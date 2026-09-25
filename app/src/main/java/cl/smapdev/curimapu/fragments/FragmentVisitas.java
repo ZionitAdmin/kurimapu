@@ -281,7 +281,7 @@ public class FragmentVisitas extends Fragment {
                 Log.e("FILTROS_RAPIDOS", "no se pudo leer el JSON: " + e.getMessage());
             }
 
-            if (datos != null) {
+            if (datos != null && datos.tieneListas()) {
                 List<AnexoCompleto> filtrada = new ArrayList<>();
                 for (AnexoCompleto ac : anexosSinFiltro) {
                     String idAc = (ac.getAnexoContrato() != null) ? ac.getAnexoContrato().getId_anexo_contrato() : null;

@@ -63,6 +63,7 @@ import cl.smapdev.curimapu.clases.relaciones.EstacionFloracionCompleto;
 import cl.smapdev.curimapu.clases.relaciones.EstacionFloracionRequest;
 import cl.smapdev.curimapu.clases.relaciones.EstacionesCompletas;
 import cl.smapdev.curimapu.clases.relaciones.GsonDescargas;
+import cl.smapdev.curimapu.clases.relaciones.MensajeInicioRespuesta;
 import cl.smapdev.curimapu.clases.relaciones.MuestraHumedadRequest;
 import cl.smapdev.curimapu.clases.relaciones.RecomendacionesRequest;
 import cl.smapdev.curimapu.clases.relaciones.RespuestaFecha;
@@ -423,6 +424,46 @@ public class FragmentPrincipal extends Fragment {
         txt_mensaje_inicio_titulo.setVisibility(titulo.isEmpty() ? View.GONE : View.VISIBLE);
         txt_mensaje_inicio_texto.setText(texto);
         contenedor_mensaje_inicio.setVisibility(View.VISIBLE);
+    }
+
+    // TICKET 2477 (extra) - 2026-09-25: despues de subir una visita con exito se vuelve a pedir
+    // el mensaje OGM, para que el conteo de pendientes baje sin esperar a la proxima descarga.
+    // La visita ya quedo subida: si esto falla por cualquier motivo, se mantiene el mensaje anterior.
+    void refrescarMensajeInicio() {
+        try {
+            if (activity == null) return;
+            final Context appContext = activity.getApplicationContext();
+            Config cnf = MainActivity.myAppDB.myDao().getConfig();
+            if (cnf == null) return;
+            final int idUsuario = cnf.getId_usuario_suplandato();
+
+            ApiService apiService = RetrofitClient.getClient(cnf.getServidorSeleccionado()).create(ApiService.class);
+            apiService.mensajeInicio(idUsuario).enqueue(new Callback<MensajeInicioRespuesta>() {
+                @Override
+                public void onResponse(@NonNull Call<MensajeInicioRespuesta> call, @NonNull Response<MensajeInicioRespuesta> response) {
+                    try {
+                        MensajeInicioRespuesta res = response.body();
+                        if (res == null || res.getCodigoRespuesta() != 0 || res.getMensajeInicio() == null) return;
+
+                        DatosUsuarioJson.actualizarMensaje(appContext, idUsuario, res.getMensajeInicio());
+
+                        // la respuesta puede llegar cuando el usuario ya salio de inicio
+                        if (isAdded() && getView() != null) {
+                            mostrarMensajeInicio();
+                        }
+                    } catch (Exception e) {
+                        Log.e("MENSAJE_INICIO", "no se pudo actualizar el mensaje: " + e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MensajeInicioRespuesta> call, @NonNull Throwable t) {
+                    Log.e("MENSAJE_INICIO", "no se pudo pedir el mensaje: " + t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.e("MENSAJE_INICIO", "no se pudo pedir el mensaje: " + e.getMessage());
+        }
     }
 
     void ocultarBotoneraSubida() {
@@ -1127,6 +1168,7 @@ public class FragmentPrincipal extends Fragment {
                     // apretaba el boton de subir, lo que dejaba el dato sin sincronizar.
                     revisarYSubirAnexoFecha(id_visita);
                     Toasty.success(activity, "Se subio La visita con exito", Toast.LENGTH_SHORT, true).show();
+                    refrescarMensajeInicio(); // TICKET 2477 (extra) - 2026-09-25
                 }
             }
 
