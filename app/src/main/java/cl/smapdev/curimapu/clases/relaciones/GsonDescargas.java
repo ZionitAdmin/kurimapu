@@ -225,6 +225,28 @@ public class GsonDescargas {
     @Embedded
     private List<SitiosNoVisitados> array_sitios_no_visitados;
 
+    /* TICKET 2477 (extra) - 2026-09-25: solo se leen y se guardan en JSON local (no van a la BD) */
+    @SerializedName("anexos_propios")
+    private List<Integer> anexos_propios;
+
+    @SerializedName("anexos_ogm")
+    private List<Integer> anexos_ogm;
+
+    @SerializedName("mensaje_inicio")
+    private MensajeInicio mensaje_inicio;
+
+    public List<Integer> getAnexos_propios() {
+        return anexos_propios;
+    }
+
+    public List<Integer> getAnexos_ogm() {
+        return anexos_ogm;
+    }
+
+    public MensajeInicio getMensaje_inicio() {
+        return mensaje_inicio;
+    }
+
 
     public List<SitiosNoVisitados> getArray_sitios_no_visitados() {
         return array_sitios_no_visitados;

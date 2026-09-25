@@ -95,6 +95,7 @@ import cl.smapdev.curimapu.clases.tablas.MuestraHumedad;
 import cl.smapdev.curimapu.clases.tablas.Temporada;
 import cl.smapdev.curimapu.clases.tablas.Visitas;
 import cl.smapdev.curimapu.clases.tablas.detalle_visita_prop;
+import cl.smapdev.curimapu.clases.utilidades.DatosUsuarioJson;
 import cl.smapdev.curimapu.clases.utilidades.DescargaImagenes;
 import cl.smapdev.curimapu.clases.utilidades.DescargaImagenesI;
 import cl.smapdev.curimapu.clases.utilidades.InternetStateClass;
@@ -109,6 +110,11 @@ public class FragmentPrincipal extends Fragment {
     private MainActivity activity;
     private RecyclerView lista_sitios_no_visitados;
     private RecyclerView lista_primera_prioridad;
+
+    // TICKET 2477 (extra) - 2026-09-25: mensaje de inicio
+    private LinearLayout contenedor_mensaje_inicio;
+    private TextView txt_mensaje_inicio_titulo;
+    private TextView txt_mensaje_inicio_texto;
     private final ArrayList<String> id_temporadas = new ArrayList<>();
     private final ArrayList<String> desc_temporadas = new ArrayList<>();
     private Handler handlerGrafico;
@@ -232,6 +238,10 @@ public class FragmentPrincipal extends Fragment {
         lista_primera_prioridad = view.findViewById(R.id.lista_primera_prioridad);
         img_muestra_subidas = view.findViewById(R.id.img_muestra_subidas);
         contenedor_botonera_subida = view.findViewById(R.id.contenedor_botonera_subida);
+        contenedor_mensaje_inicio = view.findViewById(R.id.contenedor_mensaje_inicio);
+        txt_mensaje_inicio_titulo = view.findViewById(R.id.txt_mensaje_inicio_titulo);
+        txt_mensaje_inicio_texto = view.findViewById(R.id.txt_mensaje_inicio_texto);
+        mostrarMensajeInicio();
 
         Utilidades.setToolbar(activity, view, "Curimapu", "Bienvenido");
 
@@ -384,6 +394,35 @@ public class FragmentPrincipal extends Fragment {
                 contenedor_alerta_inicio.setVisibility((!anexos.isEmpty()) ? View.VISIBLE : View.GONE);
             });
         });
+    }
+
+    // TICKET 2477 (extra) - 2026-09-25: muestra el mensaje OGM guardado en el JSON del usuario;
+    // si no hay archivo o el mensaje viene vacio, no se muestra nada
+    void mostrarMensajeInicio() {
+        if (contenedor_mensaje_inicio == null) return;
+
+        String titulo = "";
+        String texto = "";
+        try {
+            Config cnf = MainActivity.myAppDB.myDao().getConfig();
+            DatosUsuarioJson.Datos datos = (cnf != null) ? DatosUsuarioJson.obtener(activity, cnf.getId_usuario_suplandato()) : null;
+            if (datos != null) {
+                titulo = datos.getMensajeTitulo();
+                texto = datos.getMensajeTexto();
+            }
+        } catch (Exception e) {
+            Log.e("MENSAJE_INICIO", "no se pudo leer el mensaje: " + e.getMessage());
+        }
+
+        if (texto.isEmpty()) {
+            contenedor_mensaje_inicio.setVisibility(View.GONE);
+            return;
+        }
+
+        txt_mensaje_inicio_titulo.setText(titulo);
+        txt_mensaje_inicio_titulo.setVisibility(titulo.isEmpty() ? View.GONE : View.VISIBLE);
+        txt_mensaje_inicio_texto.setText(texto);
+        contenedor_mensaje_inicio.setVisibility(View.VISIBLE);
     }
 
     void ocultarBotoneraSubida() {
@@ -1347,6 +1386,7 @@ public class FragmentPrincipal extends Fragment {
                 handlerGrafico.post(() -> {
                     ocultarProgreso();
                     Toasty.success(activity, "Datos descargados con éxito", Toast.LENGTH_LONG, true).show();
+                    mostrarMensajeInicio(); // TICKET 2477 (extra) - 2026-09-25
                     setSpecialSeason(temporadaList);
                     revisarAnexosPendienteFecha();
                     activity.cambiarNombreUser(cnf.getId_usuario());
@@ -1394,6 +1434,11 @@ public class FragmentPrincipal extends Fragment {
                                 mostrarProgreso("guardando datos de temporada " + descTempActual + "  (" + (i + 1) + "/" + totalTemporadas + ")")
                         );
                         boolean[] problema = volqueoDatos(data);
+
+                        // TICKET 2477 (extra) - 2026-09-25: listas OGM/PROPIOS y mensaje de inicio a JSON local
+                        if (!problema[0] && !problema[1]) {
+                            DatosUsuarioJson.guardar(activity, cnf.getId_usuario_suplandato(), data);
+                        }
 
 
                         handlerGrafico.post(() -> {

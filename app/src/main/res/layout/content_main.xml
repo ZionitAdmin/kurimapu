@@ -329,7 +329,6 @@
                 app:layout_constraintHeight_max="300dp"
                 app:layout_constraintVertical_weight="1"
                 app:layout_constraintTop_toBottomOf="@id/contenedor_title_sitio_visitado"
-                app:layout_constraintBottom_toBottomOf="parent"
 
                 />
 
@@ -343,6 +342,42 @@
                 app:layout_constraintStart_toStartOf="@id/lista_sitios_no_visitados"
                 app:layout_constraintEnd_toEndOf="@id/lista_sitios_no_visitados"
                 android:visibility="gone" />
+
+            <!-- TICKET 2477 (extra) - 2026-09-25: mensaje OGM que llega en la descarga (oculto si no hay) -->
+            <LinearLayout
+                android:id="@+id/contenedor_mensaje_inicio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/lista_sitios_no_visitados"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    android:layout_marginVertical="@dimen/padding" />
+
+                <TextView
+                    android:id="@+id/txt_mensaje_inicio_titulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/txt_mensaje_inicio_texto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

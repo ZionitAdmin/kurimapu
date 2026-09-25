@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,11 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -42,8 +45,10 @@ import cl.smapdev.curimapu.clases.adapters.AnexosAdapter;
 import cl.smapdev.curimapu.clases.adapters.SpinnerToolbarAdapter;
 import cl.smapdev.curimapu.clases.modelo.EvaluacionAnterior;
 import cl.smapdev.curimapu.clases.relaciones.AnexoCompleto;
+import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.Fotos;
 import cl.smapdev.curimapu.clases.tablas.Temporada;
+import cl.smapdev.curimapu.clases.utilidades.DatosUsuarioJson;
 import cl.smapdev.curimapu.clases.utilidades.Utilidades;
 import cl.smapdev.curimapu.fragments.contratos.FragmentFormVisitas;
 import cl.smapdev.curimapu.fragments.contratos.FragmentListVisits;
@@ -68,6 +73,13 @@ public class FragmentVisitas extends Fragment {
 
     private String marca_especial_temporada;
     private AnexosAdapter anexosAdapter;
+
+    // TICKET 2477 (extra) - 2026-09-25: filtros rapidos OGM / PROPIOS (parten desactivados)
+    private Button btn_filtro_ogm;
+    private Button btn_filtro_propios;
+    private boolean filtroOgm = false;
+    private boolean filtroPropios = false;
+    private List<AnexoCompleto> anexosSinFiltro = new ArrayList<>();
 
 
     @Override
@@ -101,6 +113,22 @@ public class FragmentVisitas extends Fragment {
         }
         lista_anexos.setHasFixedSize(true);
         lista_anexos.setLayoutManager(lManager);
+
+        // TICKET 2477 (extra) - 2026-09-25: cada boton se activa/desactiva de forma independiente
+        btn_filtro_ogm = view.findViewById(R.id.btn_filtro_ogm);
+        btn_filtro_propios = view.findViewById(R.id.btn_filtro_propios);
+        pintarBotonFiltro(btn_filtro_ogm, filtroOgm);
+        pintarBotonFiltro(btn_filtro_propios, filtroPropios);
+        btn_filtro_ogm.setOnClickListener(v -> {
+            filtroOgm = !filtroOgm;
+            pintarBotonFiltro(btn_filtro_ogm, filtroOgm);
+            aplicarFiltrosRapidos();
+        });
+        btn_filtro_propios.setOnClickListener(v -> {
+            filtroPropios = !filtroPropios;
+            pintarBotonFiltro(btn_filtro_propios, filtroPropios);
+            aplicarFiltrosRapidos();
+        });
 
 
         spinner_toolbar = view.findViewById(R.id.spinner_toolbar);
@@ -230,13 +258,57 @@ public class FragmentVisitas extends Fragment {
     }
 
     public void crearAdaptador(List<AnexoCompleto> anexo) {
-        anexosAdapter = new AnexosAdapter(anexo,
+        // TICKET 2477 (extra) - 2026-09-25: se guarda la lista completa (de la temporada o del
+        // dialogo "Filtros") y sobre ella se aplican los filtros OGM / PROPIOS
+        anexosSinFiltro = (anexo != null) ? anexo : new ArrayList<>();
+        aplicarFiltrosRapidos();
+    }
+
+    // TICKET 2477 (extra) - 2026-09-25: filtra con las listas del JSON local del usuario
+    // (DatosUsuarioJson). Con los dos activos, el anexo debe cumplir ambos. Si el usuario
+    // todavia no tiene JSON (no ha descargado con esta version) no se filtra.
+    private void aplicarFiltrosRapidos() {
+        List<AnexoCompleto> lista = anexosSinFiltro;
+
+        if (filtroOgm || filtroPropios) {
+            DatosUsuarioJson.Datos datos = null;
+            try {
+                Config cnf = MainActivity.myAppDB.myDao().getConfig();
+                if (cnf != null) {
+                    datos = DatosUsuarioJson.obtener(activity, cnf.getId_usuario_suplandato());
+                }
+            } catch (Exception e) {
+                Log.e("FILTROS_RAPIDOS", "no se pudo leer el JSON: " + e.getMessage());
+            }
+
+            if (datos != null) {
+                List<AnexoCompleto> filtrada = new ArrayList<>();
+                for (AnexoCompleto ac : anexosSinFiltro) {
+                    String idAc = (ac.getAnexoContrato() != null) ? ac.getAnexoContrato().getId_anexo_contrato() : null;
+                    if (filtroOgm && !datos.esOgm(idAc)) continue;
+                    if (filtroPropios && !datos.esPropio(idAc)) continue;
+                    filtrada.add(ac);
+                }
+                lista = filtrada;
+            }
+        }
+
+        anexosAdapter = new AnexosAdapter(lista,
                 (view1, anexos) -> nuevaVisita(anexos),
                 (view1, anexos) -> mostrarMenu(anexos),
                 getContext()
         );
 
         lista_anexos.setAdapter(anexosAdapter);
+    }
+
+    // TICKET 2477 (extra) - 2026-09-25: activo = color primario con texto blanco, inactivo = gris
+    private void pintarBotonFiltro(Button boton, boolean activo) {
+        if (boton == null || activity == null) return;
+        boton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(activity,
+                activo ? R.color.colorPrimary : R.color.colorGrey)));
+        boton.setTextColor(ContextCompat.getColor(activity,
+                activo ? R.color.colorOnPrimary : R.color.colorOnSurface));
     }
 
     public void nuevaVisita(AnexoCompleto anexo) {

@@ -11,12 +11,44 @@
     tools:showIn="@layout/fragment_visitas"
     android:id="@+id/relative">
 
+    <!-- TICKET 2477 (extra) - 2026-09-25: filtros rapidos OGM / PROPIOS, en una sola fila -->
+    <LinearLayout
+        android:id="@+id/fila_filtros_rapidos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="4dp">
+
+        <Button
+            android:id="@+id/btn_filtro_ogm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="OGM"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_filtro_propios"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="PROPIOS"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lista_anexos"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/fila_filtros_rapidos"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true" />
 <!--    <LinearLayout-->
