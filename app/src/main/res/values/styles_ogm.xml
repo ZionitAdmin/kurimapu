@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TICKET 2512 - 2026-09-29: estilos propios de la pantalla "Ver OGM propios" (DialogOgmPropios) -->
+<resources>
+
+    <!-- tema claro fijo a pantalla completa, independiente del tema de la app -->
+    <style name="OgmDialogPantallaCompleta" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@color/ogm_fondo</item>
+        <item name="android:statusBarColor">@color/ogm_verde_oscuro</item>
+    </style>
+
+    <!-- dato con icono dentro de la tarjeta de anexo (comuna, especie, temporada, ...) -->
+    <style name="OgmDatoCard">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/ogm_texto_sec</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- boton de filtro de cuatrimestre (Todos / Pendientes / C1 / C2 / C3) -->
+    <style name="OgmTab">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/ogm_tab</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textColor">@color/ogm_blanco</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+</resources>

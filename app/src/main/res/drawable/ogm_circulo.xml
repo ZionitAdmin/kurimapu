@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TICKET 2512 - 2026-09-29: circulo de iniciales del usuario (DialogOgmPropios) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/ogm_blanco_20" />
+</shape>

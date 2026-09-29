@@ -12,6 +12,7 @@
     android:id="@+id/relative">
 
     <!-- TICKET 2477 (extra) - 2026-09-25: filtros rapidos OGM / PROPIOS, en una sola fila -->
+    <!-- TICKET 2512 - 2026-09-29: textos "Ver OGM propios" (abre DialogOgmPropios) y "Ver Asignados a mi" (filtro) -->
     <LinearLayout
         android:id="@+id/fila_filtros_rapidos"
         android:layout_width="match_parent"
@@ -29,7 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="4dp"
-            android:text="OGM"
+            android:text="Ver OGM propios"
+            android:textAllCaps="false"
             android:textSize="12sp" />
 
         <Button
@@ -38,7 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="4dp"
-            android:text="PROPIOS"
+            android:text="Ver Asignados a mi"
+            android:textAllCaps="false"
             android:textSize="12sp" />
 
     </LinearLayout>

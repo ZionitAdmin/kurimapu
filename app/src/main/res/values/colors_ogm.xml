@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TICKET 2512 - 2026-09-29: colores propios de la pantalla "Ver OGM propios" (DialogOgmPropios).
+     Son fijos (no cambian con modo noche) para que la pantalla se vea igual en todos los equipos. -->
+<resources>
+    <color name="ogm_verde_oscuro">#1F4D2C</color>
+    <color name="ogm_verde_medio">#2F6A3F</color>
+    <color name="ogm_verde_borde">#4F8A5F</color>
+    <color name="ogm_cafe_pendiente">#6E5B3A</color>
+    <color name="ogm_fondo">#F6F5F1</color>
+    <color name="ogm_borde_card">#E3E1DA</color>
+    <color name="ogm_texto">#1F1F1F</color>
+    <color name="ogm_texto_sec">#6B6B6B</color>
+    <color name="ogm_blanco">#FFFFFF</color>
+    <color name="ogm_blanco_70">#B3FFFFFF</color>
+    <color name="ogm_blanco_20">#33FFFFFF</color>
+    <color name="ogm_rojo">#C62828</color>
+    <color name="ogm_rojo_bg">#FDECEA</color>
+    <color name="ogm_verde_ok">#2E7D32</color>
+    <color name="ogm_verde_ok_bg">#E6F4E7</color>
+    <color name="ogm_ambar">#A15C00</color>
+    <color name="ogm_ambar_bg">#FFF1DC</color>
+</resources>

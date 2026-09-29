@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TICKET 2512 - 2026-09-29: pantalla "Ver OGM propios" (DialogOgmPropios), solo lectura -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ogm_fondo"
+    android:orientation="vertical">
+
+    <!-- encabezado: usuario, cuatrimestre, indicadores y filtros de cuatrimestre -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/ogm_verde_oscuro"
+        android:orientation="vertical"
+        android:paddingStart="14dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ogm_tv_iniciales"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ogm_circulo"
+                android:gravity="center"
+                android:textColor="@color/ogm_blanco"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ogm_tv_nombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/ogm_blanco"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/ogm_tv_subtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/ogm_blanco_70"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/ogm_btn_cerrar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ogm_tab"
+                android:drawableStart="@drawable/ic_ogm_cerrar"
+                android:drawablePadding="4dp"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
+                android:text="Cerrar"
+                android:textColor="@color/ogm_blanco"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/ogm_tv_cuatrimestre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawableStart="@drawable/ic_ogm_cuatrimestre"
+            android:drawablePadding="6dp"
+            android:drawableTint="@color/ogm_blanco"
+            android:gravity="center_vertical"
+            android:textColor="@color/ogm_blanco"
+            android:textSize="12sp" />
+
+        <!-- indicadores del cuatrimestre actual -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/ogm_redondeado"
+                android:backgroundTint="@color/ogm_verde_medio"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/ogm_tv_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textColor="@color/ogm_blanco"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mis campos"
+                    android:textColor="@color/ogm_blanco_70"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/ogm_redondeado"
+                android:backgroundTint="@color/ogm_verde_medio"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/ogm_tv_visitados"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textColor="@color/ogm_blanco"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Visitados"
+                    android:textColor="@color/ogm_blanco_70"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/ogm_redondeado"
+                android:backgroundTint="@color/ogm_cafe_pendiente"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/ogm_tv_pendientes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textColor="@color/ogm_blanco"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pendientes"
+                    android:textColor="@color/ogm_blanco_70"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- filtros de cuatrimestre: Todos / Pendientes / C1 / C2 / C3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ogm_tab_todos"
+                style="@style/OgmTab"
+                android:layout_marginEnd="3dp"
+                android:text="Todos" />
+
+            <TextView
+                android:id="@+id/ogm_tab_pendientes"
+                style="@style/OgmTab"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:text="Pendientes" />
+
+            <TextView
+                android:id="@+id/ogm_tab_c1"
+                style="@style/OgmTab"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:text="C1" />
+
+            <TextView
+                android:id="@+id/ogm_tab_c2"
+                style="@style/OgmTab"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp"
+                android:text="C2" />
+
+            <TextView
+                android:id="@+id/ogm_tab_c3"
+                style="@style/OgmTab"
+                android:layout_marginStart="3dp"
+                android:text="C3" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- especies presentes en los anexos OGM propios -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="10dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/ogm_chips_especies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="14dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="14dp">
+
+        <TextView
+            android:id="@+id/ogm_tv_titulo_lista"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/ogm_texto"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/ogm_tv_cantidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ogm_texto_sec"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ogm_lista"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/ogm_tv_mensaje"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
+            android:textColor="@color/ogm_texto_sec"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/ogm_progreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+</LinearLayout>

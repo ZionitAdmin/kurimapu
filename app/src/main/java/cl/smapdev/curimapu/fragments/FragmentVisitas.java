@@ -53,6 +53,7 @@ import cl.smapdev.curimapu.clases.utilidades.Utilidades;
 import cl.smapdev.curimapu.fragments.contratos.FragmentFormVisitas;
 import cl.smapdev.curimapu.fragments.contratos.FragmentListVisits;
 import cl.smapdev.curimapu.fragments.dialogos.DialogFilterTables;
+import cl.smapdev.curimapu.fragments.dialogos.DialogOgmPropios;
 import cl.smapdev.curimapu.infraestructure.utils.coroutines.ApplicationExecutors;
 import es.dmoral.toasty.Toasty;
 
@@ -75,9 +76,10 @@ public class FragmentVisitas extends Fragment {
     private AnexosAdapter anexosAdapter;
 
     // TICKET 2477 (extra) - 2026-09-25: filtros rapidos OGM / PROPIOS (parten desactivados)
+    // TICKET 2512 - 2026-09-29: el boton OGM ("Ver OGM propios") ya no filtra, abre DialogOgmPropios;
+    // PROPIOS ("Ver Asignados a mi") sigue siendo filtro
     private Button btn_filtro_ogm;
     private Button btn_filtro_propios;
-    private boolean filtroOgm = false;
     private boolean filtroPropios = false;
     private List<AnexoCompleto> anexosSinFiltro = new ArrayList<>();
 
@@ -117,13 +119,10 @@ public class FragmentVisitas extends Fragment {
         // TICKET 2477 (extra) - 2026-09-25: cada boton se activa/desactiva de forma independiente
         btn_filtro_ogm = view.findViewById(R.id.btn_filtro_ogm);
         btn_filtro_propios = view.findViewById(R.id.btn_filtro_propios);
-        pintarBotonFiltro(btn_filtro_ogm, filtroOgm);
+        pintarBotonFiltro(btn_filtro_ogm, true);
         pintarBotonFiltro(btn_filtro_propios, filtroPropios);
-        btn_filtro_ogm.setOnClickListener(v -> {
-            filtroOgm = !filtroOgm;
-            pintarBotonFiltro(btn_filtro_ogm, filtroOgm);
-            aplicarFiltrosRapidos();
-        });
+        // TICKET 2512 - 2026-09-29: abre la pantalla de solo lectura "Ver OGM propios"
+        btn_filtro_ogm.setOnClickListener(v -> abrirOgmPropios());
         btn_filtro_propios.setOnClickListener(v -> {
             filtroPropios = !filtroPropios;
             pintarBotonFiltro(btn_filtro_propios, filtroPropios);
@@ -264,13 +263,25 @@ public class FragmentVisitas extends Fragment {
         aplicarFiltrosRapidos();
     }
 
+    // TICKET 2512 - 2026-09-29: pantalla aparte (DialogFragment); si falla no afecta esta lista
+    private void abrirOgmPropios() {
+        try {
+            if (getChildFragmentManager().findFragmentByTag(DialogOgmPropios.TAG_DIALOGO) != null) return;
+            new DialogOgmPropios().show(getChildFragmentManager(), DialogOgmPropios.TAG_DIALOGO);
+        } catch (Exception e) {
+            Log.e("OGM_PROPIOS", "no se pudo abrir la pantalla: " + e.getMessage());
+            Toasty.error(activity, "No se pudo abrir Ver OGM propios", Toast.LENGTH_LONG, true).show();
+        }
+    }
+
     // TICKET 2477 (extra) - 2026-09-25: filtra con las listas del JSON local del usuario
-    // (DatosUsuarioJson). Con los dos activos, el anexo debe cumplir ambos. Si el usuario
-    // todavia no tiene JSON (no ha descargado con esta version) no se filtra.
+    // (DatosUsuarioJson). Si el usuario todavia no tiene JSON (no ha descargado con esta
+    // version) no se filtra.
+    // TICKET 2512 - 2026-09-29: queda solo el filtro PROPIOS ("Ver Asignados a mi")
     private void aplicarFiltrosRapidos() {
         List<AnexoCompleto> lista = anexosSinFiltro;
 
-        if (filtroOgm || filtroPropios) {
+        if (filtroPropios) {
             DatosUsuarioJson.Datos datos = null;
             try {
                 Config cnf = MainActivity.myAppDB.myDao().getConfig();
@@ -285,8 +296,7 @@ public class FragmentVisitas extends Fragment {
                 List<AnexoCompleto> filtrada = new ArrayList<>();
                 for (AnexoCompleto ac : anexosSinFiltro) {
                     String idAc = (ac.getAnexoContrato() != null) ? ac.getAnexoContrato().getId_anexo_contrato() : null;
-                    if (filtroOgm && !datos.esOgm(idAc)) continue;
-                    if (filtroPropios && !datos.esPropio(idAc)) continue;
+                    if (!datos.esPropio(idAc)) continue;
                     filtrada.add(ac);
                 }
                 lista = filtrada;
