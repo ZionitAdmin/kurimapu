@@ -108,8 +108,9 @@ public class Utilidades {
 
     public static final String KEY_EXPORT = "9aB4c5D7eF";
     //    public static final String IP_PRODUCCION = "192.168.1.42";
-    public static final String IP_PRODUCCION = "curiexport.zpruebas.cl";
-    //public static final String IP_PRODUCCION = "curiexport.zcloud.cl";
+    // TICKET 2512 - 2026-09-29: APK para produccion (zcloud); para pruebas volver a zpruebas
+    //public static final String IP_PRODUCCION = "curiexport.zpruebas.cl";
+    public static final String IP_PRODUCCION = "curiexport.zcloud.cl";
     public static final String URL_SERVER_API = "https://" + IP_PRODUCCION;
     //    public static final String URL_SERVER_API = "http://" + IP_PRODUCCION + "/curimapu";
 
