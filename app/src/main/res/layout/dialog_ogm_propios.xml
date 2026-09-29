@@ -61,6 +61,7 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- TICKET 2512 - 2026-09-29: texto "Salir" a pedido del cliente; solo cierra esta pantalla -->
             <TextView
                 android:id="@+id/ogm_btn_cerrar"
                 android:layout_width="wrap_content"
@@ -73,7 +74,7 @@
                 android:paddingTop="6dp"
                 android:paddingEnd="12dp"
                 android:paddingBottom="6dp"
-                android:text="Cerrar"
+                android:text="Salir"
                 android:textColor="@color/ogm_blanco"
                 android:textSize="13sp" />
         </LinearLayout>
