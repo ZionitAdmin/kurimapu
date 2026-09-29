@@ -119,7 +119,9 @@ public class FragmentVisitas extends Fragment {
         // TICKET 2477 (extra) - 2026-09-25: cada boton se activa/desactiva de forma independiente
         btn_filtro_ogm = view.findViewById(R.id.btn_filtro_ogm);
         btn_filtro_propios = view.findViewById(R.id.btn_filtro_propios);
-        pintarBotonFiltro(btn_filtro_ogm, true);
+        // TICKET 2512 - 2026-09-29: gris (como boton inactivo), no es un filtro; si se pinta activo
+        // da la impresion de que la lista esta filtrada
+        pintarBotonFiltro(btn_filtro_ogm, false);
         pintarBotonFiltro(btn_filtro_propios, filtroPropios);
         // TICKET 2512 - 2026-09-29: abre la pantalla de solo lectura "Ver OGM propios"
         btn_filtro_ogm.setOnClickListener(v -> abrirOgmPropios());
