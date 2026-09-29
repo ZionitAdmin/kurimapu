@@ -26,15 +26,33 @@ public class CheckListSiembra {
 
     //suelo
     @Expose
-    private int chequeo_aislacion; //si, no
+    private int chequeo_aislacion; //si, no - TICKET 2494 - 2026-09-29: en desuso, reemplazado por aislacion_norte/sur/este/oeste
     @Expose
-    private String cama_semilla; //bueno, regular, malo
+    private String cama_semilla; //TICKET 2494 - 2026-09-29: cambia de opciones (arado vertedera, roto fresa, vibro cultivador, encamador)
     @Expose
-    private String cultivo_anterior;
+    private String cultivo_anterior; //TICKET 2494 - 2026-09-29: en desuso, ya no se usa
     @Expose
     private String estado_humedad;
     @Expose
-    private String compactacion;
+    private String compactacion; //TICKET 2494 - 2026-09-29: en desuso, reemplazado por medicion_compactacion
+
+    //TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
+    @Expose
+    private String cama_raices; //subsolador, clarificador
+    @Expose
+    private String medicion_compactacion; //bueno, regular, malo
+    @Expose
+    private String profundidad_cama_raices;
+    @Expose
+    private String temperatura_suelo;
+    @Expose
+    private String aislacion_norte;
+    @Expose
+    private String aislacion_sur;
+    @Expose
+    private String aislacion_este;
+    @Expose
+    private String aislacion_oeste;
 
     //siembra
     @Expose
@@ -377,6 +395,70 @@ public class CheckListSiembra {
 
     public void setCompactacion(String compactacion) {
         this.compactacion = compactacion;
+    }
+
+    public String getCama_raices() {
+        return cama_raices;
+    }
+
+    public void setCama_raices(String cama_raices) {
+        this.cama_raices = cama_raices;
+    }
+
+    public String getMedicion_compactacion() {
+        return medicion_compactacion;
+    }
+
+    public void setMedicion_compactacion(String medicion_compactacion) {
+        this.medicion_compactacion = medicion_compactacion;
+    }
+
+    public String getProfundidad_cama_raices() {
+        return profundidad_cama_raices;
+    }
+
+    public void setProfundidad_cama_raices(String profundidad_cama_raices) {
+        this.profundidad_cama_raices = profundidad_cama_raices;
+    }
+
+    public String getTemperatura_suelo() {
+        return temperatura_suelo;
+    }
+
+    public void setTemperatura_suelo(String temperatura_suelo) {
+        this.temperatura_suelo = temperatura_suelo;
+    }
+
+    public String getAislacion_norte() {
+        return aislacion_norte;
+    }
+
+    public void setAislacion_norte(String aislacion_norte) {
+        this.aislacion_norte = aislacion_norte;
+    }
+
+    public String getAislacion_sur() {
+        return aislacion_sur;
+    }
+
+    public void setAislacion_sur(String aislacion_sur) {
+        this.aislacion_sur = aislacion_sur;
+    }
+
+    public String getAislacion_este() {
+        return aislacion_este;
+    }
+
+    public void setAislacion_este(String aislacion_este) {
+        this.aislacion_este = aislacion_este;
+    }
+
+    public String getAislacion_oeste() {
+        return aislacion_oeste;
+    }
+
+    public void setAislacion_oeste(String aislacion_oeste) {
+        this.aislacion_oeste = aislacion_oeste;
     }
 
     public int getProtocolo_siembra() {

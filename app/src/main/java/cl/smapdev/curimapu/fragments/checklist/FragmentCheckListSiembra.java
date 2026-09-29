@@ -79,14 +79,18 @@ public class FragmentCheckListSiembra extends Fragment {
     private TextView tv_condicion_semilla;
     private TextView tv_supervisor_curimapu;
 
-    //suelo
-    private RadioGroup grupo_chequeo_aislacion;
-    private RadioButton btn_chequeo_si;
-    private RadioButton btn_chequeo_no;
+    //suelo - TICKET 2494 - 2026-09-29: rediseno, se saca chequeo_aislacion y cultivo_anterior
+    private Spinner sp_cama_raices;
+    private Spinner sp_medicion_compactacion;
+    private EditText et_profundidad_cama_raices;
     private Spinner sp_cama_semilla;
-    private EditText et_cultivo_anterior;
     private Spinner sp_estado_humedad;
-    private Spinner sp_compactacion;
+    private EditText et_temperatura_suelo;
+    //aislacion - TICKET 2494 - 2026-09-29: nuevo apartado, para todas las especies
+    private EditText et_aislacion_norte;
+    private EditText et_aislacion_sur;
+    private EditText et_aislacion_este;
+    private EditText et_aislacion_oeste;
 
     //siembra
     private EditText et_protocolo_siembra;
@@ -244,6 +248,9 @@ public class FragmentCheckListSiembra extends Fragment {
     private final ArrayList<String> chk_1 = new ArrayList<>();
     private final ArrayList<String> chk_2 = new ArrayList<>();
     private final ArrayList<String> chk_3 = new ArrayList<>();
+    // TICKET 2494 - 2026-09-29: opciones nuevas de Cama de raices y Cama de semillas
+    private final ArrayList<String> chkCamaRaices = new ArrayList<>();
+    private final ArrayList<String> chkCamaSemilla = new ArrayList<>();
 
 
     public void setCheckListSiembra(CheckListSiembra checkListSiembra) {
@@ -291,6 +298,9 @@ public class FragmentCheckListSiembra extends Fragment {
         chk_1.addAll(Arrays.asList(getResources().getStringArray(R.array.desplegable_checklist_1)));
         chk_2.addAll(Arrays.asList(getResources().getStringArray(R.array.desplegable_checklist_2)));
         chk_3.addAll(Arrays.asList(getResources().getStringArray(R.array.desplegable_checklist_3)));
+        // TICKET 2494 - 2026-09-29: rediseno seccion Suelo
+        chkCamaRaices.addAll(Arrays.asList(getResources().getStringArray(R.array.desplegable_cama_raices)));
+        chkCamaSemilla.addAll(Arrays.asList(getResources().getStringArray(R.array.desplegable_cama_semilla)));
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<AnexoCompleto> futureVisitas = executor.submit(() ->
@@ -344,18 +354,24 @@ public class FragmentCheckListSiembra extends Fragment {
     private void levantarDatos() {
 
 
-        if (checkListSiembra.getChequeo_aislacion() > 0) {
-            btn_chequeo_si.setChecked((checkListSiembra.getChequeo_aislacion() == 1));
-            btn_chequeo_no.setChecked((checkListSiembra.getChequeo_aislacion() == 2));
+        // TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
+        if (checkListSiembra.getCama_raices() != null && !checkListSiembra.getCama_raices().isEmpty()) {
+            int d = chkCamaRaices.indexOf(checkListSiembra.getCama_raices());
+            sp_cama_raices.setSelection(d);
+        }
+
+        if (checkListSiembra.getMedicion_compactacion() != null && !checkListSiembra.getMedicion_compactacion().isEmpty()) {
+            int d = chk_1.indexOf(checkListSiembra.getMedicion_compactacion());
+            sp_medicion_compactacion.setSelection(d);
+        }
+
+        if (checkListSiembra.getProfundidad_cama_raices() != null && !checkListSiembra.getProfundidad_cama_raices().isEmpty()) {
+            et_profundidad_cama_raices.setText(checkListSiembra.getProfundidad_cama_raices());
         }
 
         if (checkListSiembra.getCama_semilla() != null && !checkListSiembra.getCama_semilla().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getCama_semilla());
+            int d = chkCamaSemilla.indexOf(checkListSiembra.getCama_semilla());
             sp_cama_semilla.setSelection(d);
-        }
-
-        if (checkListSiembra.getCultivo_anterior() != null && !checkListSiembra.getCultivo_anterior().isEmpty()) {
-            et_cultivo_anterior.setText(checkListSiembra.getCultivo_anterior());
         }
 
         if (checkListSiembra.getEstado_humedad() != null && !checkListSiembra.getEstado_humedad().isEmpty()) {
@@ -363,9 +379,24 @@ public class FragmentCheckListSiembra extends Fragment {
             sp_estado_humedad.setSelection(d);
         }
 
-        if (checkListSiembra.getCompactacion() != null && !checkListSiembra.getCompactacion().isEmpty()) {
-            int d = chk_2.indexOf(checkListSiembra.getCompactacion());
-            sp_compactacion.setSelection(d);
+        if (checkListSiembra.getTemperatura_suelo() != null && !checkListSiembra.getTemperatura_suelo().isEmpty()) {
+            et_temperatura_suelo.setText(checkListSiembra.getTemperatura_suelo());
+        }
+
+        if (checkListSiembra.getAislacion_norte() != null && !checkListSiembra.getAislacion_norte().isEmpty()) {
+            et_aislacion_norte.setText(checkListSiembra.getAislacion_norte());
+        }
+
+        if (checkListSiembra.getAislacion_sur() != null && !checkListSiembra.getAislacion_sur().isEmpty()) {
+            et_aislacion_sur.setText(checkListSiembra.getAislacion_sur());
+        }
+
+        if (checkListSiembra.getAislacion_este() != null && !checkListSiembra.getAislacion_este().isEmpty()) {
+            et_aislacion_este.setText(checkListSiembra.getAislacion_este());
+        }
+
+        if (checkListSiembra.getAislacion_oeste() != null && !checkListSiembra.getAislacion_oeste().isEmpty()) {
+            et_aislacion_oeste.setText(checkListSiembra.getAislacion_oeste());
         }
 
         if (checkListSiembra.getProtocolo_siembra() > 0) {
@@ -741,14 +772,17 @@ public class FragmentCheckListSiembra extends Fragment {
         tv_supervisor_curimapu = view.findViewById(R.id.tv_supervisor_curimapu);
 
 
-        //suelo
-        grupo_chequeo_aislacion = view.findViewById(R.id.grupo_chequeo_aislacion);
-        btn_chequeo_si = view.findViewById(R.id.btn_chequeo_si);
-        btn_chequeo_no = view.findViewById(R.id.btn_chequeo_no);
+        //suelo - TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
+        sp_cama_raices = view.findViewById(R.id.sp_cama_raices);
+        sp_medicion_compactacion = view.findViewById(R.id.sp_medicion_compactacion);
+        et_profundidad_cama_raices = view.findViewById(R.id.et_profundidad_cama_raices);
         sp_cama_semilla = view.findViewById(R.id.sp_cama_semilla);
-        et_cultivo_anterior = view.findViewById(R.id.et_cultivo_anterior);
         sp_estado_humedad = view.findViewById(R.id.sp_estado_humedad);
-        sp_compactacion = view.findViewById(R.id.sp_compactacion);
+        et_temperatura_suelo = view.findViewById(R.id.et_temperatura_suelo);
+        et_aislacion_norte = view.findViewById(R.id.et_aislacion_norte);
+        et_aislacion_sur = view.findViewById(R.id.et_aislacion_sur);
+        et_aislacion_este = view.findViewById(R.id.et_aislacion_este);
+        et_aislacion_oeste = view.findViewById(R.id.et_aislacion_oeste);
 
         //siembra
         et_protocolo_siembra = view.findViewById(R.id.et_protocolo_siembra);
@@ -1389,10 +1423,20 @@ public class FragmentCheckListSiembra extends Fragment {
             siembra.setClave_unica(checkListSiembra.getClave_unica());
         }
 
-        //suelo
-        if (btn_chequeo_si.isChecked() || btn_chequeo_no.isChecked()) {
-            int chequeoAislacion = (btn_chequeo_si.isChecked()) ? 1 : 2;
-            siembra.setChequeo_aislacion(chequeoAislacion);
+        //suelo - TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
+        if (!sp_cama_raices.getSelectedItem().toString().equals(comparaSpinner)) {
+            String camaRaices = sp_cama_raices.getSelectedItem().toString();
+            siembra.setCama_raices(camaRaices);
+        }
+
+        if (!sp_medicion_compactacion.getSelectedItem().toString().equals(comparaSpinner)) {
+            String medicionCompactacion = sp_medicion_compactacion.getSelectedItem().toString();
+            siembra.setMedicion_compactacion(medicionCompactacion);
+        }
+
+        if (!et_profundidad_cama_raices.getText().toString().isEmpty()) {
+            String profundidadCamaRaices = et_profundidad_cama_raices.getText().toString();
+            siembra.setProfundidad_cama_raices(profundidadCamaRaices);
         }
 
         if (!sp_cama_semilla.getSelectedItem().toString().equals(comparaSpinner)) {
@@ -1400,19 +1444,30 @@ public class FragmentCheckListSiembra extends Fragment {
             siembra.setCama_semilla(cama_semilla);
         }
 
-        if (!et_cultivo_anterior.getText().toString().isEmpty()) {
-            String cultivo_anterior = et_cultivo_anterior.getText().toString();
-            siembra.setCultivo_anterior(cultivo_anterior);
-        }
-
         if (!sp_estado_humedad.getSelectedItem().toString().equals(comparaSpinner)) {
             String estadoHumedad = sp_estado_humedad.getSelectedItem().toString();
             siembra.setEstado_humedad(estadoHumedad);
         }
 
-        if (!sp_compactacion.getSelectedItem().toString().equals(comparaSpinner)) {
-            String compactacion = sp_compactacion.getSelectedItem().toString();
-            siembra.setCompactacion(compactacion);
+        if (!et_temperatura_suelo.getText().toString().isEmpty()) {
+            String temperaturaSuelo = et_temperatura_suelo.getText().toString();
+            siembra.setTemperatura_suelo(temperaturaSuelo);
+        }
+
+        if (!et_aislacion_norte.getText().toString().isEmpty()) {
+            siembra.setAislacion_norte(et_aislacion_norte.getText().toString());
+        }
+
+        if (!et_aislacion_sur.getText().toString().isEmpty()) {
+            siembra.setAislacion_sur(et_aislacion_sur.getText().toString());
+        }
+
+        if (!et_aislacion_este.getText().toString().isEmpty()) {
+            siembra.setAislacion_este(et_aislacion_este.getText().toString());
+        }
+
+        if (!et_aislacion_oeste.getText().toString().isEmpty()) {
+            siembra.setAislacion_oeste(et_aislacion_oeste.getText().toString());
         }
 
         //siembra
@@ -1581,10 +1636,6 @@ public class FragmentCheckListSiembra extends Fragment {
             siembra.setDistancia_hileras(Double.parseDouble(distanciaHileras));
         }
 
-        if (btn_chequeo_si.isChecked() || btn_chequeo_no.isChecked()) {
-            int chequeo = (btn_chequeo_si.isChecked()) ? 1 : 2;
-            siembra.setRueda_angosta(chequeo);
-        }
         if (!et_numero_semillas_mt.getText().toString().isEmpty()) {
             String numeroSemillas = et_numero_semillas_mt.getText().toString();
             siembra.setNumero_semillas(Double.parseDouble(numeroSemillas));

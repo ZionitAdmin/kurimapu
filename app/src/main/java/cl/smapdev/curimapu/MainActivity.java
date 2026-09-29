@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .addMigrations(Migrations.MIGRATION_15_TO_16)
                 .addMigrations(Migrations.MIGRATION_16_TO_17)
                 .addMigrations(Migrations.MIGRATION_17_TO_18) // TICKET 2491 - 2026-09-15
+                .addMigrations(Migrations.MIGRATION_18_TO_19) // TICKET 2494 - 2026-09-29
                 .build();
 
 

@@ -274,4 +274,20 @@ public class Migrations {
             database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_incremento_linea INTEGER NOT NULL DEFAULT 0;");
         }
     };
+
+    // TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion del checklist de siembra.
+    // chequeo_aislacion y cultivo_anterior quedan como columnas huerfanas (SQLite no soporta DROP COLUMN aqui).
+    public static final Migration MIGRATION_18_TO_19 = new Migration(18, 19) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN cama_raices TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN medicion_compactacion TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN profundidad_cama_raices TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN temperatura_suelo TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN aislacion_norte TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN aislacion_sur TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN aislacion_este TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN aislacion_oeste TEXT;");
+        }
+    };
 }

@@ -41,6 +41,16 @@
     <string name="cultivo_anterior">CULTIVO ANTERIOR</string>
     <string name="estado_humedad">ESTADO HUMEDAD</string>
     <string name="compactacion">COMPACTACION</string>
+    <!-- TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion -->
+    <string name="cama_raices">CAMA DE RAICES</string>
+    <string name="medicion_compactacion">MEDICION DE COMPACTACION</string>
+    <string name="profundidad_cama_raices">PROFUNDIDAD CAMA DE RAICES (M)</string>
+    <string name="temperatura_suelo">TEMPERATURA DEL SUELO</string>
+    <string name="aislacion">AISLACION</string>
+    <string name="aislacion_norte">NORTE</string>
+    <string name="aislacion_sur">SUR</string>
+    <string name="aislacion_este">ESTE</string>
+    <string name="aislacion_oeste">OESTE</string>
     <string name="siembra">SIEMBRA</string>
     <string name="protocolo_siembra_n">PROTOCOLO SIEMBRA N°</string>
     <string name="fotograf_a_cartel_de_identificacion_en_visita">FOTOGRAFÍA CARTEL DE IDENTIFICACION EN VISITA</string>

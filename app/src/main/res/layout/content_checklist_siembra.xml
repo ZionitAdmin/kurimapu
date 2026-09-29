@@ -273,50 +273,81 @@
             app:layout_constraintEnd_toEndOf="parent"
             >
 
+            <!-- TICKET 2494 - 2026-09-29: rediseno seccion Suelo -->
             <TextView
-                android:id="@+id/lbl_chequeo_aislacion"
+                android:id="@+id/lbl_cama_raices"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/grupo_chequeo_aislacion"
+                app:layout_constraintEnd_toStartOf="@id/sp_cama_raices"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:text="@string/chequeo_aislacion"
+                android:text="@string/cama_raices"
                 android:layout_marginTop="@dimen/padding_small"
                 />
 
-            <RadioGroup
-                android:id="@+id/grupo_chequeo_aislacion"
+            <Spinner
+                android:id="@+id/sp_cama_raices"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/lbl_chequeo_aislacion"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:entries="@array/desplegable_cama_raices"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/lbl_cama_raices"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <RadioButton
-                    android:id="@+id/btn_chequeo_si"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/si"
-                    tool:layout_editor_absoluteX="199dp"
-                    tool:layout_editor_absoluteY="95dp" />
-                <RadioButton
-                    android:id="@+id/btn_chequeo_no"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no"
-                    tool:layout_editor_absoluteX="199dp"
-                    tool:layout_editor_absoluteY="95dp" />
-            </RadioGroup>
+            <TextView
+                android:id="@+id/lbl_medicion_compactacion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/medicion_compactacion"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/sp_cama_raices"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/sp_medicion_compactacion"
+                />
+
+            <Spinner
+                android:id="@+id/sp_medicion_compactacion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/desplegable_checklist_1"
+                android:layout_marginTop="@dimen/padding_small"
+                app:layout_constraintTop_toBottomOf="@id/sp_cama_raices"
+                app:layout_constraintStart_toEndOf="@id/lbl_medicion_compactacion"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/lbl_profundidad_cama_raices"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/profundidad_cama_raices"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/sp_medicion_compactacion"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_profundidad_cama_raices"
+                />
+
+            <EditText
+                android:id="@+id/et_profundidad_cama_raices"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/sp_medicion_compactacion"
+                app:layout_constraintStart_toEndOf="@id/lbl_profundidad_cama_raices"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
 
             <TextView
                 android:id="@+id/lbl_cama_semilla"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/cama_semilla"
+                android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/grupo_chequeo_aislacion"
+                app:layout_constraintTop_toBottomOf="@id/et_profundidad_cama_raices"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/sp_cama_semilla"
                 />
@@ -325,34 +356,11 @@
                 android:id="@+id/sp_cama_semilla"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/desplegable_checklist_1"
+                android:entries="@array/desplegable_cama_semilla"
+                android:layout_marginTop="@dimen/padding_small"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/lbl_cama_semilla"
-                app:layout_constraintTop_toBottomOf="@id/grupo_chequeo_aislacion" />
-
-
-            <TextView
-                android:id="@+id/lbl_cultivo_anterior"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/cultivo_anterior"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/sp_cama_semilla"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_cultivo_anterior"
-                />
-
-            <EditText
-                android:id="@+id/et_cultivo_anterior"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/sp_cama_semilla"
-                app:layout_constraintStart_toEndOf="@id/lbl_cultivo_anterior"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
+                app:layout_constraintTop_toBottomOf="@id/et_profundidad_cama_raices" />
 
             <TextView
                 android:id="@+id/lbl_estado_humedad"
@@ -361,7 +369,7 @@
                 android:text="@string/estado_humedad"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_cultivo_anterior"
+                app:layout_constraintTop_toBottomOf="@id/sp_cama_semilla"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/sp_estado_humedad"
                 />
@@ -372,31 +380,143 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_small"
                 android:entries="@array/desplegable_checklist_1"
-                app:layout_constraintTop_toBottomOf="@id/et_cultivo_anterior"
+                app:layout_constraintTop_toBottomOf="@id/sp_cama_semilla"
                 app:layout_constraintStart_toEndOf="@id/lbl_estado_humedad"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
-                android:id="@+id/lbl_compactacion"
+                android:id="@+id/lbl_temperatura_suelo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/compactacion"
+                android:text="@string/temperatura_suelo"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintTop_toBottomOf="@id/sp_estado_humedad"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/sp_compactacion"
+                app:layout_constraintEnd_toStartOf="@id/et_temperatura_suelo"
                 />
 
-            <Spinner
-                android:id="@+id/sp_compactacion"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/et_temperatura_suelo"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:entries="@array/desplegable_checklist_2"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
                 android:layout_marginTop="@dimen/padding_small"
                 app:layout_constraintTop_toBottomOf="@id/sp_estado_humedad"
-                app:layout_constraintStart_toEndOf="@id/lbl_compactacion"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintStart_toEndOf="@id/lbl_temperatura_suelo"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <!-- TICKET 2494 - 2026-09-29: nuevo apartado Aislacion, para todas las especies -->
+            <TextView
+                android:id="@+id/lbl_titulo_aislacion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/aislacion"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_temperatura_suelo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/lbl_aislacion_norte"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/aislacion_norte"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/lbl_titulo_aislacion"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_aislacion_norte"
+                />
+
+            <EditText
+                android:id="@+id/et_aislacion_norte"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:maxLength="50"
+                app:layout_constraintTop_toBottomOf="@id/lbl_titulo_aislacion"
+                app:layout_constraintStart_toEndOf="@id/lbl_aislacion_norte"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_aislacion_sur"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/aislacion_sur"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_aislacion_norte"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_aislacion_sur"
+                />
+
+            <EditText
+                android:id="@+id/et_aislacion_sur"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:maxLength="50"
+                app:layout_constraintTop_toBottomOf="@id/et_aislacion_norte"
+                app:layout_constraintStart_toEndOf="@id/lbl_aislacion_sur"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_aislacion_este"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/aislacion_este"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_aislacion_sur"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_aislacion_este"
+                />
+
+            <EditText
+                android:id="@+id/et_aislacion_este"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:maxLength="50"
+                app:layout_constraintTop_toBottomOf="@id/et_aislacion_sur"
+                app:layout_constraintStart_toEndOf="@id/lbl_aislacion_este"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_aislacion_oeste"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/aislacion_oeste"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_aislacion_este"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_aislacion_oeste"
+                />
+
+            <EditText
+                android:id="@+id/et_aislacion_oeste"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:maxLength="50"
+                app:layout_constraintTop_toBottomOf="@id/et_aislacion_este"
+                app:layout_constraintStart_toEndOf="@id/lbl_aislacion_oeste"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
 
 
 
