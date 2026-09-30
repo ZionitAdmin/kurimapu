@@ -38,7 +38,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1476,10 +1475,7 @@ public class FragmentPrincipal extends Fragment {
                         handlerGrafico.post(() ->
                                 mostrarProgreso("guardando datos de temporada " + descTempActual + "  (" + (i + 1) + "/" + totalTemporadas + ")")
                         );
-                        // TICKET 2494 - 2026-09-30: optimizacion de indices - todo el guardado de la
-                        // temporada en una sola transaccion (un commit en vez de uno por fila).
-                        // Mismos datos y mismo orden; si algo revienta se deshace la temporada completa.
-                        boolean[] problema = MainActivity.myAppDB.runInTransaction((Callable<boolean[]>) () -> volqueoDatos(data));
+                        boolean[] problema = volqueoDatos(data);
 
                         // TICKET 2477 (extra) - 2026-09-25: listas OGM/PROPIOS y mensaje de inicio a JSON local
                         if (!problema[0] && !problema[1]) {
