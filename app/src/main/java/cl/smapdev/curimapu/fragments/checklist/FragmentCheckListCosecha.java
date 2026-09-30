@@ -1074,18 +1074,20 @@ public class FragmentCheckListCosecha extends Fragment {
             siembra.setSembradora_modelo(especie);
         }
 
-        // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora
+        // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora (DECIMAL en BD).
+        // Se reemplaza "," por "." porque el teclado numerico en español puede escribir coma como
+        // separador decimal, y la columna DECIMAL de MySQL solo entiende punto.
         if (!et_concavo_utilizado.getText().toString().isEmpty()) {
-            siembra.setConcavo_utilizado(et_concavo_utilizado.getText().toString());
+            siembra.setConcavo_utilizado(et_concavo_utilizado.getText().toString().replace(",", "."));
         }
         if (!et_bushel_plus.getText().toString().isEmpty()) {
-            siembra.setBushel_plus(et_bushel_plus.getText().toString());
+            siembra.setBushel_plus(et_bushel_plus.getText().toString().replace(",", "."));
         }
         if (!et_fast_green.getText().toString().isEmpty()) {
-            siembra.setFast_green(et_fast_green.getText().toString());
+            siembra.setFast_green(et_fast_green.getText().toString().replace(",", "."));
         }
         if (!et_humedad_semilla.getText().toString().isEmpty()) {
-            siembra.setHumedad_semilla(et_humedad_semilla.getText().toString());
+            siembra.setHumedad_semilla(et_humedad_semilla.getText().toString().replace(",", "."));
         }
 
         if (!et_cosecha_anterior.getText().toString().isEmpty()) {
