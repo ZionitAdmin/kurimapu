@@ -155,12 +155,32 @@ public class Descargas {
     }
 
 
+    // TICKET 2494 - 2026-09-30: helper de cronometraje por seccion, para saber cual de los
+    // ~20 bloques de volqueoDatos() se lleva el tiempo cuando el guardado demora varios minutos.
+    private static long tSeccion;
+
+    private static void iniciaSeccion() {
+        tSeccion = System.currentTimeMillis();
+    }
+
+    private static void terminaSeccion(String nombre, int cantidad) {
+        long ms = System.currentTimeMillis() - tSeccion;
+        if (cantidad > 0 || ms > 50) {
+            Log.d("TIMING_DESCARGA", "  seccion=" + nombre + " cantidad=" + cantidad + " tiempo=" + ms + "ms");
+        }
+    }
+
     public static boolean[] volqueoDatos(GsonDescargas gsonDescargas) throws RuntimeException {
 
         boolean[] problema = {false, false};
 
+        iniciaSeccion();
+        int cantFechasAnexos = (gsonDescargas.getArray_fechas_anexos() != null) ? gsonDescargas.getArray_fechas_anexos().size() : 0;
         if (gsonDescargas.getArray_fechas_anexos() != null && !gsonDescargas.getArray_fechas_anexos().isEmpty()) {
             try {
+                // TICKET 2494 - 2026-09-30: mismo patron que en visitas - una consulta+escritura por
+                // cada anexo sin transaccion. Se agrupa en una transaccion propia de esta seccion.
+                MainActivity.myAppDB.runInTransaction(() -> {
                 for (AnexoCorreoFechas fch : gsonDescargas.getArray_fechas_anexos()) {
                     AnexoCorreoFechas f = MainActivity.myAppDB.DaoAnexosFechas().getAnexoCorreoFechasByAnexo(fch.getId_ac_corr_fech());
                     if (f != null) {
@@ -209,20 +229,27 @@ public class Descargas {
                         MainActivity.myAppDB.DaoAnexosFechas().insertFechasAnexos(fch);
                     }
                 }
+                });
             } catch (SQLiteException e) {
                 Log.e("SQLITE", e.getMessage());
                 problema[0] = true;
             }
         }
+        terminaSeccion("fechas_anexos", cantFechasAnexos);
 
 //        MainActivity.myAppDB.myDao().deleteProCliMat();
+        iniciaSeccion();
+        int cantProCliMat = (gsonDescargas.getPro_cli_matList() != null) ? gsonDescargas.getPro_cli_matList().size() : 0;
         if (gsonDescargas.getPro_cli_matList() != null && !gsonDescargas.getPro_cli_matList().isEmpty()) {
             try {
                 MainActivity.myAppDB.myDao().insertInterfaz(gsonDescargas.getPro_cli_matList());
             } catch (SQLiteException ignored) {
             }
         }
+        terminaSeccion("pro_cli_mat", cantProCliMat);
 
+        iniciaSeccion();
+        int cantDevSemilla = (gsonDescargas.getChecklistDevolucionSemillas() != null) ? gsonDescargas.getChecklistDevolucionSemillas().size() : 0;
         if (gsonDescargas.getChecklistDevolucionSemillas() != null && !gsonDescargas.getChecklistDevolucionSemillas().isEmpty()) {
             try {
                 for (ChecklistDevolucionSemilla ck : gsonDescargas.getChecklistDevolucionSemillas()) {
@@ -237,7 +264,10 @@ public class Descargas {
             } catch (SQLiteException ignored) {
             }
         }
+        terminaSeccion("checklist_devolucion_semilla", cantDevSemilla);
 
+        iniciaSeccion();
+        int cantClSiembra = (gsonDescargas.getCheckListSiembras() != null) ? gsonDescargas.getCheckListSiembras().size() : 0;
         if (gsonDescargas.getCheckListSiembras() != null && !gsonDescargas.getCheckListSiembras().isEmpty()) {
             try {
                 for (CheckListSiembra ck : gsonDescargas.getCheckListSiembras()) {
@@ -267,7 +297,10 @@ public class Descargas {
             } catch (SQLiteException ignored) {
             }
         }
+        terminaSeccion("checklist_siembra_eventos", cantClSiembra);
 
+        iniciaSeccion();
+        int cantClCosecha = (gsonDescargas.getCheckListCosecha() != null) ? gsonDescargas.getCheckListCosecha().size() : 0;
         if (gsonDescargas.getCheckListCosecha() != null && !gsonDescargas.getCheckListCosecha().isEmpty()) {
             try {
                 for (CheckListCosecha ck : gsonDescargas.getCheckListCosecha()) {
@@ -284,8 +317,10 @@ public class Descargas {
             }
 
         }
+        terminaSeccion("checklist_cosecha", cantClCosecha);
 
-
+        iniciaSeccion();
+        int cantLimpiezaCamiones = (gsonDescargas.getCheckListLimpiezaCamionesCompletos() != null) ? gsonDescargas.getCheckListLimpiezaCamionesCompletos().size() : 0;
         if (gsonDescargas.getCheckListLimpiezaCamionesCompletos() != null && !gsonDescargas.getCheckListLimpiezaCamionesCompletos().isEmpty()) {
             for (CheckListLimpiezaCamionesCompleto ck : gsonDescargas.getCheckListLimpiezaCamionesCompletos()) {
                 CheckListLimpiezaCamiones chk = MainActivity.myAppDB
@@ -348,8 +383,10 @@ public class Descargas {
 
             }
         }
+        terminaSeccion("checklist_limpieza_camiones", cantLimpiezaCamiones);
 
-
+        iniciaSeccion();
+        int cantCapSiembra = (gsonDescargas.getCheckListCapCompletos() != null) ? gsonDescargas.getCheckListCapCompletos().size() : 0;
         if (gsonDescargas.getCheckListCapCompletos() != null && !gsonDescargas.getCheckListCapCompletos().isEmpty()) {
             for (CheckListCapCompleto ck : gsonDescargas.getCheckListCapCompletos()) {
                 CheckListCapacitacionSiembra chk = MainActivity.myAppDB
@@ -386,8 +423,10 @@ public class Descargas {
                 }
             }
         }
+        terminaSeccion("checklist_capacitacion_siembra", cantCapSiembra);
 
-
+        iniciaSeccion();
+        int cantEvaluaciones = (gsonDescargas.getEvaluaciones() != null) ? gsonDescargas.getEvaluaciones().size() : 0;
         if (gsonDescargas.getEvaluaciones() != null && !gsonDescargas.getEvaluaciones().isEmpty()) {
 
             for (Evaluaciones ck : gsonDescargas.getEvaluaciones()) {
@@ -400,36 +439,52 @@ public class Descargas {
                 }
             }
         }
+        terminaSeccion("evaluaciones", cantEvaluaciones);
 
 
 //        MainActivity.myAppDB.myDao().deleteDetalle();
+        iniciaSeccion();
+        int cantDetalleVisita = (gsonDescargas.getDetalle_visita_props() != null) ? gsonDescargas.getDetalle_visita_props().size() : 0;
         if (gsonDescargas.getDetalle_visita_props() != null && !gsonDescargas.getDetalle_visita_props().isEmpty()) {
             try {
                 MainActivity.myAppDB.myDao().insertDetalle(gsonDescargas.getDetalle_visita_props());
             } catch (SQLiteException ignored) {
             }
         }
+        terminaSeccion("detalle_visita_prop", cantDetalleVisita);
 
 
 //        MainActivity.myAppDB.myDao().deleteVisitas();
+        // TICKET 2494 - 2026-09-30: la lectura+escritura de cada visita se hacia sin transaccion
+        // (un commit por visita). Con miles de visitas eso era el cuello de botella real del
+        // guardado (confirmado con timing_descarga.log). Se envuelve SOLO este loop en una
+        // transaccion propia -no todo volqueoDatos() como se probo antes y se reviertio- para que
+        // si algo falla aca se deshaga nada mas esta seccion, sin afectar el resto de la temporada.
+        iniciaSeccion();
+        int cantVisitas = (gsonDescargas.getVisitasList() != null) ? gsonDescargas.getVisitasList().size() : 0;
         if (gsonDescargas.getVisitasList() != null && !gsonDescargas.getVisitasList().isEmpty()) {
             try {
-                for (Visitas ln : gsonDescargas.getVisitasList()) {
-                    Visitas viCU = MainActivity.myAppDB.myDao().getVisitasByClaveUnica(ln.getClave_unica_visita());
-                    Visitas viId = MainActivity.myAppDB.myDao().getVisitaById(ln.getId_visita(), ln.getClave_unica_visita());
-                    if (viId == null && viCU != null) {
-                        MainActivity.myAppDB.myDao().deleteVisitaDescarga(viCU);
+                MainActivity.myAppDB.runInTransaction(() -> {
+                    for (Visitas ln : gsonDescargas.getVisitasList()) {
+                        Visitas viCU = MainActivity.myAppDB.myDao().getVisitasByClaveUnica(ln.getClave_unica_visita());
+                        Visitas viId = MainActivity.myAppDB.myDao().getVisitaById(ln.getId_visita(), ln.getClave_unica_visita());
+                        if (viId == null && viCU != null) {
+                            MainActivity.myAppDB.myDao().deleteVisitaDescarga(viCU);
+                        }
+                        MainActivity.myAppDB.myDao().updateFotos(ln.getId_visita(), ln.getId_visita_local(), ln.getId_dispo());
                     }
-                    MainActivity.myAppDB.myDao().updateFotos(ln.getId_visita(), ln.getId_visita_local(), ln.getId_dispo());
-                }
-                MainActivity.myAppDB.myDao().setVisita(gsonDescargas.getVisitasList());
+                    MainActivity.myAppDB.myDao().setVisita(gsonDescargas.getVisitasList());
+                });
             } catch (SQLiteException e) {
                 Log.e("SQLITE", e.getMessage());
                 problema[0] = true;
             }
         }
+        terminaSeccion("visitas", cantVisitas);
 
 //        MainActivity.myAppDB.myDao().deleteAnexos();
+        iniciaSeccion();
+        int cantAnexos = (gsonDescargas.getAnexoContratoList() != null) ? gsonDescargas.getAnexoContratoList().size() : 0;
         if (gsonDescargas.getAnexoContratoList() != null && !gsonDescargas.getAnexoContratoList().isEmpty()) {
             try {
                 MainActivity.myAppDB.myDao().insertAnexo(gsonDescargas.getAnexoContratoList());
@@ -438,6 +493,7 @@ public class Descargas {
                 problema[0] = true;
             }
         }
+        terminaSeccion("anexos", cantAnexos);
 
 
 //        MainActivity.myAppDB.myDao().deleteQuotation();
@@ -461,6 +517,8 @@ public class Descargas {
         }
 
 //        MainActivity.myAppDB.myDao().deleteFichas();
+        iniciaSeccion();
+        int cantFichas = (gsonDescargas.getFichasList() != null) ? gsonDescargas.getFichasList().size() : 0;
         if (gsonDescargas.getFichasList() != null && !gsonDescargas.getFichasList().isEmpty()) {
             try {
 
@@ -477,8 +535,11 @@ public class Descargas {
                 Log.e("SQLITE", e.getMessage());
             }
         }
+        terminaSeccion("fichas", cantFichas);
 
 //        MainActivity.myAppDB.myDao().deleteProspectos();
+        iniciaSeccion();
+        int cantProspectos = (gsonDescargas.getProspectosList() != null) ? gsonDescargas.getProspectosList().size() : 0;
         if (gsonDescargas.getProspectosList() != null && !gsonDescargas.getProspectosList().isEmpty()) {
             try {
                 MainActivity.myAppDB.myDao().insertProsectos(gsonDescargas.getProspectosList());
@@ -487,8 +548,9 @@ public class Descargas {
                 Log.e("SQLITE", e.getMessage());
             }
         }
+        terminaSeccion("prospectos", cantProspectos);
 
-
+        iniciaSeccion();
         try {
 
             if (gsonDescargas.getPred_agr_temp() != null && !gsonDescargas.getPred_agr_temp().isEmpty()) {
@@ -589,6 +651,7 @@ public class Descargas {
         } catch (SQLiteException ignored) {
             problema[0] = true;
         }
+        terminaSeccion("catalogos_varios", 1);
 
 
         Config config = MainActivity.myAppDB.myDao().getConfig();

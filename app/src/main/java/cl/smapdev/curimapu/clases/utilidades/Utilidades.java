@@ -764,6 +764,22 @@ public class Utilidades {
 
     }
 
+    // TICKET 2494 - 2026-09-30: log de tiempos de descarga/guardado por temporada, para medir donde
+    // se va el tiempo (red vs guardado local). Queda en un archivo de texto revisable sin logcat.
+    public static void logTiempoDescarga(Context context, String linea) {
+        String registro = fechaActualConHora() + " | " + linea;
+        Log.d("TIMING_DESCARGA", registro);
+        try {
+            File dir = context.getExternalFilesDir(null);
+            if (dir == null) return;
+            File archivo = new File(dir, "timing_descarga.log");
+            FileOutputStream fos = new FileOutputStream(archivo, true);
+            fos.write((registro + "\n").getBytes());
+            fos.close();
+        } catch (IOException e) {
+            Log.e("TIMING_DESCARGA", "No se pudo escribir el log: " + e.getMessage());
+        }
+    }
 
 }
 

@@ -1420,10 +1420,14 @@ public class FragmentPrincipal extends Fragment {
         final int totalTemporadas = tempIds.size();
         final AtomicInteger index = new AtomicInteger(0);
         final Runnable[] descargarSiguiente = new Runnable[1];
+        final long tDescargaCompletaStart = System.currentTimeMillis(); // TICKET 2494 - 2026-09-30
 
         descargarSiguiente[0] = () -> {
             int i = index.getAndIncrement();
             if (i >= totalTemporadas) {
+
+                Utilidades.logTiempoDescarga(activity, "=== DESCARGA COMPLETA: " + totalTemporadas + " temporada(s), total="
+                        + (System.currentTimeMillis() - tDescargaCompletaStart) + "ms ===");
 
                 handlerGrafico.post(() -> {
                     ocultarProgreso();
@@ -1448,6 +1452,11 @@ public class FragmentPrincipal extends Fragment {
                     mostrarProgreso("Descargando temporada " + descTempActual + "  (" + (i + 1) + "/" + totalTemporadas + ")")
             );
 
+            // TICKET 2494 - 2026-09-30: medir cuanto se demora la red vs el guardado local por
+            // temporada, para saber donde se va el tiempo. Log a Logcat (TIMING_DESCARGA) y a
+            // timing_descarga.log en el almacenamiento externo de la app, revisable sin logcat.
+            final long tNetStart = System.currentTimeMillis();
+
             Call<GsonDescargas> call = apiService.descargarDatos(
                     cnf.getId(),
                     cnf.getId_usuario_suplandato(),
@@ -1459,9 +1468,12 @@ public class FragmentPrincipal extends Fragment {
             call.enqueue(new Callback<GsonDescargas>() {
                 @Override
                 public void onResponse(@NonNull Call<GsonDescargas> call, @NonNull Response<GsonDescargas> response) {
+                    long tNetMs = System.currentTimeMillis() - tNetStart;
                     GsonDescargas data = response.body();
 
                     if (data == null) {
+
+                        Utilidades.logTiempoDescarga(activity, "temporada=" + descTempActual + " (" + temporadaActual + ") red=" + tNetMs + "ms -> respuesta nula");
 
                         handlerGrafico.post(() -> {
                             ocultarProgreso();
@@ -1475,7 +1487,13 @@ public class FragmentPrincipal extends Fragment {
                         handlerGrafico.post(() ->
                                 mostrarProgreso("guardando datos de temporada " + descTempActual + "  (" + (i + 1) + "/" + totalTemporadas + ")")
                         );
+                        long tSaveStart = System.currentTimeMillis();
                         boolean[] problema = volqueoDatos(data);
+                        long tSaveMs = System.currentTimeMillis() - tSaveStart;
+
+                        Utilidades.logTiempoDescarga(activity,
+                                "temporada=" + descTempActual + " (" + temporadaActual + ") red=" + tNetMs + "ms guardado=" + tSaveMs + "ms total=" + (tNetMs + tSaveMs) + "ms"
+                                        + (problema[0] || problema[1] ? " -> CON ERROR" : ""));
 
                         // TICKET 2477 (extra) - 2026-09-25: listas OGM/PROPIOS y mensaje de inicio a JSON local
                         if (!problema[0] && !problema[1]) {
