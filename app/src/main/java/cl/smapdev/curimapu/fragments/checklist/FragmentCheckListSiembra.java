@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -351,6 +353,25 @@ public class FragmentCheckListSiembra extends Fragment {
         Utilidades.setToolbar(activity, view, getResources().getString(R.string.app_name), "CHECKLIST SIEMBRA");
     }
 
+    // TICKET 2494 - 2026-09-29: colores pedidos en la reunion para Medicion de compactacion.
+    // Reutiliza colores ya existentes en colors.xml (colorGreenLight, colorGold, colorRedLight)
+    // en vez de crear colores nuevos.
+    private void aplicarColorMedicionCompactacion(View itemView, String valor) {
+        if (!(itemView instanceof TextView) || valor == null) {
+            return;
+        }
+        TextView textView = (TextView) itemView;
+        if (valor.equalsIgnoreCase("BUENO")) {
+            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorGreenLight));
+        } else if (valor.equalsIgnoreCase("REGULAR")) {
+            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorGold));
+        } else if (valor.equalsIgnoreCase("MALO")) {
+            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorRedLight));
+        } else {
+            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorOnBackground));
+        }
+    }
+
     private void levantarDatos() {
 
 
@@ -363,6 +384,16 @@ public class FragmentCheckListSiembra extends Fragment {
         if (checkListSiembra.getMedicion_compactacion() != null && !checkListSiembra.getMedicion_compactacion().isEmpty()) {
             int d = chk_1.indexOf(checkListSiembra.getMedicion_compactacion());
             sp_medicion_compactacion.setSelection(d);
+            // TICKET 2494 - 2026-09-29: no depender solo del listener (setSelection en la carga
+            // inicial no siempre lo dispara, y getSelectedView() puede ser null hasta que termine
+            // el layout) - se aplica el color en un post() para asegurar que la vista ya exista.
+            final String medicionCompactacionCargada = checkListSiembra.getMedicion_compactacion();
+            sp_medicion_compactacion.post(new Runnable() {
+                @Override
+                public void run() {
+                    aplicarColorMedicionCompactacion(sp_medicion_compactacion.getSelectedView(), medicionCompactacionCargada);
+                }
+            });
         }
 
         if (checkListSiembra.getProfundidad_cama_raices() != null && !checkListSiembra.getProfundidad_cama_raices().isEmpty()) {
@@ -775,6 +806,20 @@ public class FragmentCheckListSiembra extends Fragment {
         //suelo - TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
         sp_cama_raices = view.findViewById(R.id.sp_cama_raices);
         sp_medicion_compactacion = view.findViewById(R.id.sp_medicion_compactacion);
+        // TICKET 2494 - 2026-09-29: pedido explicito de la reunion ("en la aplicacion debera
+        // mostrar esos colores") - Bueno=verde, Regular=amarillo, Malo=rojo. Se aplica tanto al
+        // seleccionar manualmente como al cargar un valor ya guardado (levantarDatos hace
+        // setSelection, que dispara este mismo listener).
+        sp_medicion_compactacion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View itemView, int position, long id) {
+                aplicarColorMedicionCompactacion(itemView, (String) parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         et_profundidad_cama_raices = view.findViewById(R.id.et_profundidad_cama_raices);
         sp_cama_semilla = view.findViewById(R.id.sp_cama_semilla);
         sp_estado_humedad = view.findViewById(R.id.sp_estado_humedad);
