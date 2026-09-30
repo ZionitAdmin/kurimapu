@@ -71,6 +71,19 @@ public class CheckListCosecha {
     @Expose
     private String nombre_operario_maquina;
 
+    // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora
+    @Expose
+    private String concavo_utilizado;
+
+    @Expose
+    private String bushel_plus;
+
+    @Expose
+    private String fast_green;
+
+    @Expose
+    private String humedad_semilla;
+
     @Expose
     private String cosecha_anterior;
 
@@ -278,6 +291,38 @@ public class CheckListCosecha {
 
     public void setNombre_operario_maquina(String nombre_operario_maquina) {
         this.nombre_operario_maquina = nombre_operario_maquina;
+    }
+
+    public String getConcavo_utilizado() {
+        return concavo_utilizado;
+    }
+
+    public void setConcavo_utilizado(String concavo_utilizado) {
+        this.concavo_utilizado = concavo_utilizado;
+    }
+
+    public String getBushel_plus() {
+        return bushel_plus;
+    }
+
+    public void setBushel_plus(String bushel_plus) {
+        this.bushel_plus = bushel_plus;
+    }
+
+    public String getFast_green() {
+        return fast_green;
+    }
+
+    public void setFast_green(String fast_green) {
+        this.fast_green = fast_green;
+    }
+
+    public String getHumedad_semilla() {
+        return humedad_semilla;
+    }
+
+    public void setHumedad_semilla(String humedad_semilla) {
+        this.humedad_semilla = humedad_semilla;
     }
 
     public int getId_usuario() {

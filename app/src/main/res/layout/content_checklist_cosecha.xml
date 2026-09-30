@@ -732,6 +732,99 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />
 
+            <!-- TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora -->
+            <TextView
+                android:id="@+id/lbl_concavo_utilizado"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="CONCAVO UTILIZADO"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_modelo_maquina"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_concavo_utilizado"
+                />
+
+            <EditText
+                android:id="@+id/et_concavo_utilizado"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_modelo_maquina"
+                app:layout_constraintStart_toEndOf="@id/lbl_concavo_utilizado"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_bushel_plus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="BUSHELPLUS (KG/HA)"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_concavo_utilizado"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_bushel_plus"
+                />
+
+            <EditText
+                android:id="@+id/et_bushel_plus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_concavo_utilizado"
+                app:layout_constraintStart_toEndOf="@id/lbl_bushel_plus"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_fast_green"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="FAST GREEN (%)"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_bushel_plus"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_fast_green"
+                />
+
+            <EditText
+                android:id="@+id/et_fast_green"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_bushel_plus"
+                app:layout_constraintStart_toEndOf="@id/lbl_fast_green"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_humedad_semilla"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="HUMEDAD DE SEMILLA (%)"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_fast_green"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_humedad_semilla"
+                />
+
+            <EditText
+                android:id="@+id/et_humedad_semilla"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_fast_green"
+                app:layout_constraintStart_toEndOf="@id/lbl_humedad_semilla"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
             <TextView
                 android:id="@+id/lbl_cosecha_anterior"
                 android:layout_width="0dp"
@@ -739,7 +832,7 @@
                 android:text="COSECHA ANTERIOR"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_modelo_maquina"
+                app:layout_constraintTop_toBottomOf="@id/et_humedad_semilla"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/et_cosecha_anterior"
                 />
@@ -750,7 +843,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_modelo_maquina"
+                app:layout_constraintTop_toBottomOf="@id/et_humedad_semilla"
                 app:layout_constraintStart_toEndOf="@id/lbl_cosecha_anterior"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />

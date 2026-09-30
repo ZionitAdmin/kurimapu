@@ -84,7 +84,7 @@ import cl.smapdev.curimapu.clases.temporales.TempVisitas;
         ChecklistLimpiezaCamionesDetalle.class, ChecklistDevolucionSemilla.class, AnexoVilab.class,
         EstacionFloracion.class, EstacionFloracionDetalle.class, EstacionFloracionEstaciones.class, MuestraHumedad.class,
         PrimeraPrioridad.class, SitiosNoVisitados.class
-}, version = 20) // TICKET 2494 - 2026-09-30: version 19 -> 20, ver Migrations.MIGRATION_19_TO_20
+}, version = 21) // TICKET 2494 - 2026-09-30: version 20 -> 21, ver Migrations.MIGRATION_20_TO_21
 public abstract class MyAppBD extends RoomDatabase {
     public abstract MyDao myDao();
 

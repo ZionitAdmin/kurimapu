@@ -86,6 +86,11 @@ public class FragmentCheckListCosecha extends Fragment {
     private EditText et_operador_maquina;
     private EditText et_marca_maquina;
     private EditText et_modelo_maquina;
+    // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora
+    private EditText et_concavo_utilizado;
+    private EditText et_bushel_plus;
+    private EditText et_fast_green;
+    private EditText et_humedad_semilla;
     private EditText et_cosecha_anterior;
 
 
@@ -422,6 +427,19 @@ public class FragmentCheckListCosecha extends Fragment {
         if (checkListSiembra.getSembradora_modelo() != null && !checkListSiembra.getSembradora_modelo().isEmpty()) {
             et_modelo_maquina.setText(checkListSiembra.getSembradora_modelo());
         }
+        // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora
+        if (checkListSiembra.getConcavo_utilizado() != null && !checkListSiembra.getConcavo_utilizado().isEmpty()) {
+            et_concavo_utilizado.setText(checkListSiembra.getConcavo_utilizado());
+        }
+        if (checkListSiembra.getBushel_plus() != null && !checkListSiembra.getBushel_plus().isEmpty()) {
+            et_bushel_plus.setText(checkListSiembra.getBushel_plus());
+        }
+        if (checkListSiembra.getFast_green() != null && !checkListSiembra.getFast_green().isEmpty()) {
+            et_fast_green.setText(checkListSiembra.getFast_green());
+        }
+        if (checkListSiembra.getHumedad_semilla() != null && !checkListSiembra.getHumedad_semilla().isEmpty()) {
+            et_humedad_semilla.setText(checkListSiembra.getHumedad_semilla());
+        }
         if (checkListSiembra.getCosecha_anterior() != null && !checkListSiembra.getCosecha_anterior().isEmpty()) {
             et_cosecha_anterior.setText(checkListSiembra.getCosecha_anterior());
         }
@@ -553,6 +571,11 @@ public class FragmentCheckListCosecha extends Fragment {
         et_operador_maquina = view.findViewById(R.id.et_operador_maquina);
         et_marca_maquina = view.findViewById(R.id.et_marca_maquina);
         et_modelo_maquina = view.findViewById(R.id.et_modelo_maquina);
+        // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora
+        et_concavo_utilizado = view.findViewById(R.id.et_concavo_utilizado);
+        et_bushel_plus = view.findViewById(R.id.et_bushel_plus);
+        et_fast_green = view.findViewById(R.id.et_fast_green);
+        et_humedad_semilla = view.findViewById(R.id.et_humedad_semilla);
         et_cosecha_anterior = view.findViewById(R.id.et_cosecha_anterior);
         et_fecha_ingreso = view.findViewById(R.id.et_fecha_ingreso);
         grupo_cabezal_ingreso = view.findViewById(R.id.grupo_cabezal_ingreso);
@@ -1049,6 +1072,20 @@ public class FragmentCheckListCosecha extends Fragment {
         if (!et_modelo_maquina.getText().toString().isEmpty()) {
             String especie = et_modelo_maquina.getText().toString();
             siembra.setSembradora_modelo(especie);
+        }
+
+        // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora
+        if (!et_concavo_utilizado.getText().toString().isEmpty()) {
+            siembra.setConcavo_utilizado(et_concavo_utilizado.getText().toString());
+        }
+        if (!et_bushel_plus.getText().toString().isEmpty()) {
+            siembra.setBushel_plus(et_bushel_plus.getText().toString());
+        }
+        if (!et_fast_green.getText().toString().isEmpty()) {
+            siembra.setFast_green(et_fast_green.getText().toString());
+        }
+        if (!et_humedad_semilla.getText().toString().isEmpty()) {
+            siembra.setHumedad_semilla(et_humedad_semilla.getText().toString());
         }
 
         if (!et_cosecha_anterior.getText().toString().isEmpty()) {
