@@ -91,7 +91,8 @@ public class FragmentCreaFicha extends Fragment {
             et_tel_admin_agricultor, et_oferta_neg_agricultor, et_localidad_agricultor, et_has_disp_agricultor,
             et_obs_agricultor, ti_easting, ti_norting, ti_easting_manual, ti_norting_manual,
             et_predio, et_potrero, et_rotacion_1, et_rotacion_2, et_rotacion_3, et_rotacion_4, et_rotacion_5, et_carga_maleza,
-            et_estado_general, et_fecha_limite_siembra, et_obs_negocio;
+            et_estado_general, et_fecha_limite_siembra, et_obs_negocio,
+            et_aisla_norte, et_aisla_sur, et_aisla_este, et_aisla_oeste; // TICKET 2494 - 2026-09-30
 
     private RecyclerView lista_fotos_ficha;
     private FloatingActionButton floating_picture_fichas;
@@ -568,6 +569,11 @@ public class FragmentCreaFicha extends Fragment {
             et_obs_negocio.setText(fichasCompletas.getFichas().getObservacion_negocio_ficha());
             et_carga_maleza.setText(fichasCompletas.getFichas().getMaleza());
             et_estado_general.setText(fichasCompletas.getFichas().getEstado_general_ficha());
+            // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+            et_aisla_norte.setText(fichasCompletas.getFichas().getAisla_norte());
+            et_aisla_sur.setText(fichasCompletas.getFichas().getAisla_sur());
+            et_aisla_este.setText(fichasCompletas.getFichas().getAisla_este());
+            et_aisla_oeste.setText(fichasCompletas.getFichas().getAisla_oeste());
 
 
             if (!TextUtils.isEmpty(fichasCompletas.getFichas().getFecha_limite_siembra_ficha())) {
@@ -689,6 +695,11 @@ public class FragmentCreaFicha extends Fragment {
                 et_carga_maleza.setEnabled(false);
                 et_estado_general.setEnabled(false);
                 et_fecha_limite_siembra.setEnabled(false);
+                // TICKET 2494 - 2026-09-30
+                et_aisla_norte.setEnabled(false);
+                et_aisla_sur.setEnabled(false);
+                et_aisla_este.setEnabled(false);
+                et_aisla_oeste.setEnabled(false);
                 sp_especie.setEnabled(false);
                 sp_tipo_suelo.setEnabled(false);
                 sp_tipo_riego.setEnabled(false);
@@ -734,6 +745,11 @@ public class FragmentCreaFicha extends Fragment {
                 et_carga_maleza.setEnabled(false);
                 et_estado_general.setEnabled(false);
                 et_fecha_limite_siembra.setEnabled(false);
+                // TICKET 2494 - 2026-09-30
+                et_aisla_norte.setEnabled(false);
+                et_aisla_sur.setEnabled(false);
+                et_aisla_este.setEnabled(false);
+                et_aisla_oeste.setEnabled(false);
                 sp_especie.setEnabled(false);
                 sp_tipo_suelo.setEnabled(false);
                 sp_tipo_riego.setEnabled(false);
@@ -833,6 +849,12 @@ public class FragmentCreaFicha extends Fragment {
         String estadoGeneral = et_estado_general.getText().toString().toUpperCase();
         String observacionNegocio = et_obs_negocio.getText().toString().toUpperCase();
 
+        // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+        String aislaNorte = et_aisla_norte.getText().toString().toUpperCase();
+        String aislaSur = et_aisla_sur.getText().toString().toUpperCase();
+        String aislaEste = et_aisla_este.getText().toString().toUpperCase();
+        String aislaOeste = et_aisla_oeste.getText().toString().toUpperCase();
+
         String fechaLimite = et_fecha_limite_siembra.getText().toString();
 
 
@@ -879,6 +901,10 @@ public class FragmentCreaFicha extends Fragment {
             cargaMaleza = cargaMaleza.replace(forbiddenWords[i], forbiddenReplacement[i]);
             estadoGeneral = estadoGeneral.replace(forbiddenWords[i], forbiddenReplacement[i]);
             observacionNegocio = observacionNegocio.replace(forbiddenWords[i], forbiddenReplacement[i]);
+            aislaNorte = aislaNorte.replace(forbiddenWords[i], forbiddenReplacement[i]);
+            aislaSur = aislaSur.replace(forbiddenWords[i], forbiddenReplacement[i]);
+            aislaEste = aislaEste.replace(forbiddenWords[i], forbiddenReplacement[i]);
+            aislaOeste = aislaOeste.replace(forbiddenWords[i], forbiddenReplacement[i]);
 
         }
 
@@ -906,6 +932,11 @@ public class FragmentCreaFicha extends Fragment {
         fichas.setObservacion_negocio_ficha(observacionNegocio);
         fichas.setPredio_ficha(predio);
         fichas.setPotrero_ficha(potrero);
+        // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+        fichas.setAisla_norte(aislaNorte);
+        fichas.setAisla_sur(aislaSur);
+        fichas.setAisla_este(aislaEste);
+        fichas.setAisla_oeste(aislaOeste);
 
         fichas.setEspecie_ficha(idEspecies.get(sp_especie.getSelectedItemPosition()));
 
@@ -964,6 +995,11 @@ public class FragmentCreaFicha extends Fragment {
             fichas2.setObservacion_negocio_ficha(fichas.getObservacion_negocio_ficha());
             fichas2.setPredio_ficha(fichas.getPredio_ficha());
             fichas2.setPotrero_ficha(fichas.getPotrero_ficha());
+            // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+            fichas2.setAisla_norte(fichas.getAisla_norte());
+            fichas2.setAisla_sur(fichas.getAisla_sur());
+            fichas2.setAisla_este(fichas.getAisla_este());
+            fichas2.setAisla_oeste(fichas.getAisla_oeste());
 
             fichas2.setFecha_limite_siembra_ficha(fichas.getFecha_limite_siembra_ficha());
             fichas2.setEspecie_ficha(fichas.getEspecie_ficha());
@@ -1060,6 +1096,12 @@ public class FragmentCreaFicha extends Fragment {
         String estadoGeneral = et_estado_general.getText().toString().toUpperCase();
         String observacionNegocio = et_obs_negocio.getText().toString().toUpperCase();
 
+        // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+        String aislaNorte = et_aisla_norte.getText().toString().toUpperCase();
+        String aislaSur = et_aisla_sur.getText().toString().toUpperCase();
+        String aislaEste = et_aisla_este.getText().toString().toUpperCase();
+        String aislaOeste = et_aisla_oeste.getText().toString().toUpperCase();
+
         String fechaLimite = et_fecha_limite_siembra.getText().toString();
 
         String norting = ti_norting.getText().toString();
@@ -1104,6 +1146,10 @@ public class FragmentCreaFicha extends Fragment {
                 cargaMaleza = cargaMaleza.replace(forbiddenWords[i], forbiddenReplacement[i]);
                 estadoGeneral = estadoGeneral.replace(forbiddenWords[i], forbiddenReplacement[i]);
                 observacionNegocio = observacionNegocio.replace(forbiddenWords[i], forbiddenReplacement[i]);
+                aislaNorte = aislaNorte.replace(forbiddenWords[i], forbiddenReplacement[i]);
+                aislaSur = aislaSur.replace(forbiddenWords[i], forbiddenReplacement[i]);
+                aislaEste = aislaEste.replace(forbiddenWords[i], forbiddenReplacement[i]);
+                aislaOeste = aislaOeste.replace(forbiddenWords[i], forbiddenReplacement[i]);
             }
 //            oferta = oferta.replace()
 
@@ -1124,6 +1170,11 @@ public class FragmentCreaFicha extends Fragment {
             fichas.setObservacion_negocio_ficha(observacionNegocio);
             fichas.setPredio_ficha(predio);
             fichas.setPotrero_ficha(potrero);
+            // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+            fichas.setAisla_norte(aislaNorte);
+            fichas.setAisla_sur(aislaSur);
+            fichas.setAisla_este(aislaEste);
+            fichas.setAisla_oeste(aislaOeste);
 
             fichas.setEspecie_ficha(idEspecies.get(sp_especie.getSelectedItemPosition()));
 
@@ -1835,6 +1886,11 @@ public class FragmentCreaFicha extends Fragment {
         et_carga_maleza = (EditText) view.findViewById(R.id.et_carga_maleza);
         et_estado_general = (EditText) view.findViewById(R.id.et_estado_general);
         et_fecha_limite_siembra = (EditText) view.findViewById(R.id.et_fecha_limite_siembra);
+        // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto
+        et_aisla_norte = (EditText) view.findViewById(R.id.et_aisla_norte);
+        et_aisla_sur = (EditText) view.findViewById(R.id.et_aisla_sur);
+        et_aisla_este = (EditText) view.findViewById(R.id.et_aisla_este);
+        et_aisla_oeste = (EditText) view.findViewById(R.id.et_aisla_oeste);
 
         et_fecha_limite_siembra.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

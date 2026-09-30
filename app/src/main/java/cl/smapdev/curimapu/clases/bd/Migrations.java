@@ -290,4 +290,16 @@ public class Migrations {
             database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN aislacion_oeste TEXT;");
         }
     };
+
+    // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto (tabla "ficha" = prospecto web).
+    // Columnas reales en BD son aisla_norte/sur/este/oeste (sin "cion").
+    public static final Migration MIGRATION_19_TO_20 = new Migration(19, 20) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE ficha ADD COLUMN aisla_norte TEXT;");
+            database.execSQL("ALTER TABLE ficha ADD COLUMN aisla_sur TEXT;");
+            database.execSQL("ALTER TABLE ficha ADD COLUMN aisla_este TEXT;");
+            database.execSQL("ALTER TABLE ficha ADD COLUMN aisla_oeste TEXT;");
+        }
+    };
 }

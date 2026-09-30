@@ -126,6 +126,23 @@ public class Fichas  implements Serializable {
     @Expose
     private String maleza;
 
+    // TICKET 2494 - 2026-09-30: apartado Aislacion del Prospecto, se queda solo en el prospecto
+    @SerializedName("aisla_norte")
+    @Expose
+    private String aisla_norte;
+
+    @SerializedName("aisla_sur")
+    @Expose
+    private String aisla_sur;
+
+    @SerializedName("aisla_este")
+    @Expose
+    private String aisla_este;
+
+    @SerializedName("aisla_oeste")
+    @Expose
+    private String aisla_oeste;
+
     @SerializedName("cabecera")
     @Expose
     private int cabecera_ficha;
@@ -332,6 +349,38 @@ public class Fichas  implements Serializable {
 
     public void setMaleza(String maleza) {
         this.maleza = maleza;
+    }
+
+    public String getAisla_norte() {
+        return aisla_norte;
+    }
+
+    public void setAisla_norte(String aisla_norte) {
+        this.aisla_norte = aisla_norte;
+    }
+
+    public String getAisla_sur() {
+        return aisla_sur;
+    }
+
+    public void setAisla_sur(String aisla_sur) {
+        this.aisla_sur = aisla_sur;
+    }
+
+    public String getAisla_este() {
+        return aisla_este;
+    }
+
+    public void setAisla_este(String aisla_este) {
+        this.aisla_este = aisla_este;
+    }
+
+    public String getAisla_oeste() {
+        return aisla_oeste;
+    }
+
+    public void setAisla_oeste(String aisla_oeste) {
+        this.aisla_oeste = aisla_oeste;
     }
 
     public String getAnno() {

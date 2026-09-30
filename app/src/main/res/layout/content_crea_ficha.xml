@@ -762,6 +762,98 @@
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- TICKET 2494 - 2026-09-30: apartado Aislacion, se queda solo en el prospecto -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cont_aisla_norte"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintHorizontal_weight="0.25"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintEnd_toStartOf="@id/cont_aisla_sur"
+            android:hint="Aislación Norte"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aisla_norte"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textNoSuggestions"
+                android:maxLength="50"
+                android:maxLines="1"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cont_aisla_sur"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintHorizontal_weight="0.25"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toEndOf="@id/cont_aisla_norte"
+            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintEnd_toStartOf="@id/cont_aisla_este"
+            android:hint="Aislación Sur"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aisla_sur"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textNoSuggestions"
+                android:maxLength="50"
+                android:maxLines="1"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cont_aisla_este"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintHorizontal_weight="0.25"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toEndOf="@id/cont_aisla_sur"
+            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintEnd_toStartOf="@id/cont_aisla_oeste"
+            android:hint="Aislación Este"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aisla_este"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textNoSuggestions"
+                android:maxLength="50"
+                android:maxLines="1"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cont_aisla_oeste"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintHorizontal_weight="0.25"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toEndOf="@id/cont_aisla_este"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            android:hint="Aislación Oeste"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_aisla_oeste"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textNoSuggestions"
+                android:maxLength="50"
+                android:maxLines="1"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -775,7 +867,7 @@
 
             app:counterEnabled="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cont_carga_maleza">
+            app:layout_constraintTop_toBottomOf="@id/cont_aisla_norte">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_obs_agricultor"
