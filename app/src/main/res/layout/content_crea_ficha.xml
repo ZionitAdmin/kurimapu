@@ -763,6 +763,19 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- TICKET 2494 - 2026-09-30: apartado Aislacion, se queda solo en el prospecto -->
+        <TextView
+            android:id="@+id/lbl_aislacion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Aislación"
+            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/cont_aisla_norte"
             android:layout_width="0dp"
@@ -771,9 +784,9 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
             android:layout_margin="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintTop_toBottomOf="@id/lbl_aislacion"
             app:layout_constraintEnd_toStartOf="@id/cont_aisla_sur"
-            android:hint="Aislación Norte"
+            android:hint="Norte"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -794,9 +807,9 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
             android:layout_margin="10dp"
             app:layout_constraintStart_toEndOf="@id/cont_aisla_norte"
-            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintTop_toBottomOf="@id/lbl_aislacion"
             app:layout_constraintEnd_toStartOf="@id/cont_aisla_este"
-            android:hint="Aislación Sur"
+            android:hint="Sur"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -817,9 +830,9 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
             android:layout_margin="10dp"
             app:layout_constraintStart_toEndOf="@id/cont_aisla_sur"
-            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
+            app:layout_constraintTop_toBottomOf="@id/lbl_aislacion"
             app:layout_constraintEnd_toStartOf="@id/cont_aisla_oeste"
-            android:hint="Aislación Este"
+            android:hint="Este"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -841,8 +854,8 @@
             android:layout_margin="10dp"
             app:layout_constraintStart_toEndOf="@id/cont_aisla_este"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cont_fecha_limite_siembra"
-            android:hint="Aislación Oeste"
+            app:layout_constraintTop_toBottomOf="@id/lbl_aislacion"
+            android:hint="Oeste"
             >
 
             <com.google.android.material.textfield.TextInputEditText
