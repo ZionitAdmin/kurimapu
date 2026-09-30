@@ -10,6 +10,7 @@ import androidx.room.Update;
 import java.util.List;
 
 import cl.smapdev.curimapu.clases.tablas.CheckListSiembra;
+import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 
 @Dao
 public interface DaoCheckListSiembra {
@@ -43,5 +44,25 @@ public interface DaoCheckListSiembra {
 
     @Query("SELECT * FROM anexo_checklist_siembra WHERE id_cl_siembra = :id AND estado_sincronizacion = :estado_sinc ;")
     CheckListSiembra getClSiembraById( int id , int estado_sinc);
+
+    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) del checklist
+
+    @Query("SELECT * FROM anexo_checklist_siembra_evento WHERE clave_unica_cl_siembra = :clave_unica_cl_siembra ORDER BY id_evento ASC ")
+    List<CheckListSiembraEvento> getEventosByClaveUnicaClSiembra(String clave_unica_cl_siembra);
+
+    @Query("SELECT * FROM anexo_checklist_siembra_evento WHERE clave_unica_evento = :clave_unica_evento ")
+    CheckListSiembraEvento getEventoByClaveUnica(String clave_unica_evento);
+
+    @Query("SELECT * FROM anexo_checklist_siembra_evento WHERE estado_sincronizacion = 0; ")
+    List<CheckListSiembraEvento> getEventosToSync();
+
+    @Insert
+    long insertEvento(CheckListSiembraEvento evento);
+
+    @Update
+    int updateEvento(CheckListSiembraEvento evento);
+
+    @Delete
+    void deleteEvento(CheckListSiembraEvento evento);
 
 }

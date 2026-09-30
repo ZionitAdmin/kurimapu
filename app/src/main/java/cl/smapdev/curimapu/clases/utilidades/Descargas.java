@@ -22,6 +22,7 @@ import cl.smapdev.curimapu.clases.tablas.CheckListCapacitacionSiembraDetalle;
 import cl.smapdev.curimapu.clases.tablas.CheckListCosecha;
 import cl.smapdev.curimapu.clases.tablas.CheckListLimpiezaCamiones;
 import cl.smapdev.curimapu.clases.tablas.CheckListSiembra;
+import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 import cl.smapdev.curimapu.clases.tablas.ChecklistDevolucionSemilla;
 import cl.smapdev.curimapu.clases.tablas.ChecklistLimpiezaCamionesDetalle;
 import cl.smapdev.curimapu.clases.tablas.Config;
@@ -246,6 +247,21 @@ public class Descargas {
                         MainActivity.myAppDB.DaoClSiembra().updateClSiembra(ck);
                     } else {
                         MainActivity.myAppDB.DaoClSiembra().insertClSiembra(ck);
+                    }
+
+                    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) del checklist
+                    if (ck.getEventos_siembra() != null) {
+                        for (CheckListSiembraEvento evento : ck.getEventos_siembra()) {
+                            CheckListSiembraEvento eventoLocal = MainActivity.myAppDB
+                                    .DaoClSiembra()
+                                    .getEventoByClaveUnica(evento.getClave_unica_evento());
+                            if (eventoLocal != null) {
+                                evento.setId_evento(eventoLocal.getId_evento());
+                                MainActivity.myAppDB.DaoClSiembra().updateEvento(evento);
+                            } else {
+                                MainActivity.myAppDB.DaoClSiembra().insertEvento(evento);
+                            }
+                        }
                     }
                 }
             } catch (SQLiteException ignored) {

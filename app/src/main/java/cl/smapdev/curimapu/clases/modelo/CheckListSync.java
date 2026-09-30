@@ -22,6 +22,7 @@ import cl.smapdev.curimapu.clases.retrofit.RetrofitClient;
 import cl.smapdev.curimapu.clases.tablas.CheckListCapacitacionSiembraDetalle;
 import cl.smapdev.curimapu.clases.tablas.CheckListCosecha;
 import cl.smapdev.curimapu.clases.tablas.CheckListSiembra;
+import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 import cl.smapdev.curimapu.clases.tablas.ChecklistDevolucionSemilla;
 import cl.smapdev.curimapu.clases.tablas.ChecklistLimpiezaCamionesDetalle;
 import cl.smapdev.curimapu.clases.tablas.Config;
@@ -148,6 +149,60 @@ public class CheckListSync {
                     String stringed =  Utilidades.imageToString(chk.getFirma_operario_maquina_termino());
                     chk.setStringed_operario_maquina_termino( stringed.isEmpty() ? "" : stringed );
 
+                }
+
+                // TICKET 2494 - 2026-09-30: convertir a base64 las firmas de cada evento de siembra
+                if (chk.getEventos_siembra() != null) {
+                    for (CheckListSiembraEvento evento : chk.getEventos_siembra()) {
+
+                        if (evento.getFirma_responsable_aso_pre_siembra() != null &&
+                                !evento.getFirma_responsable_aso_pre_siembra().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_responsable_aso_pre_siembra());
+                            evento.setStringed_responsable_aso_pre_siembra(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_revision_limpieza_pre_siembra() != null &&
+                                !evento.getFirma_revision_limpieza_pre_siembra().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_revision_limpieza_pre_siembra());
+                            evento.setStringed_revision_limpieza_pre_siembra(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_responsable_aseo_post_siembra() != null &&
+                                !evento.getFirma_responsable_aseo_post_siembra().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_responsable_aseo_post_siembra());
+                            evento.setStringed_responsable_aseo_post_siembra(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_revision_limpieza_post_siembra() != null &&
+                                !evento.getFirma_revision_limpieza_post_siembra().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_revision_limpieza_post_siembra());
+                            evento.setStringed_revision_limpieza_post_siembra(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_responsable_campo() != null &&
+                                !evento.getFirma_responsable_campo().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_responsable_campo());
+                            evento.setStringed_responsable_campo(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_operario_maquina() != null &&
+                                !evento.getFirma_operario_maquina().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_operario_maquina());
+                            evento.setStringed_operario_maquina(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_responsable_campo_termino() != null &&
+                                !evento.getFirma_responsable_campo_termino().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_responsable_campo_termino());
+                            evento.setStringed_responsable_campo_termino(stringed.isEmpty() ? "" : stringed);
+                        }
+
+                        if (evento.getFirma_operario_maquina_termino() != null &&
+                                !evento.getFirma_operario_maquina_termino().isEmpty()) {
+                            String stringed = Utilidades.imageToString(evento.getFirma_operario_maquina_termino());
+                            evento.setStringed_operario_maquina_termino(stringed.isEmpty() ? "" : stringed);
+                        }
+                    }
                 }
 
                 chkS.add(chk);
@@ -312,6 +367,20 @@ public class CheckListSync {
                                             .updateClSiembra(chk)).get();
                                 } catch (ExecutionException | InterruptedException e) {
                                     e.printStackTrace();
+                                }
+
+                                // TICKET 2494 - 2026-09-30: marcar sincronizados los eventos de siembra subidos
+                                if (chk.getEventos_siembra() != null) {
+                                    for (CheckListSiembraEvento evento : chk.getEventos_siembra()) {
+                                        evento.setEstado_sincronizacion(1);
+                                        try {
+                                            executor.submit(() -> MainActivity.myAppDB
+                                                    .DaoClSiembra()
+                                                    .updateEvento(evento)).get();
+                                        } catch (ExecutionException | InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         }

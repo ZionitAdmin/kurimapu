@@ -1,9 +1,13 @@
 package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 @Entity(tableName = "anexo_checklist_siembra")
 public class CheckListSiembra {
@@ -1027,5 +1031,21 @@ public class CheckListSiembra {
 
     public void setFirma_operario_maquina_termino(String firma_operario_maquina_termino) {
         this.firma_operario_maquina_termino = firma_operario_maquina_termino;
+    }
+
+    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3). @Ignore porque no es columna de
+    // esta tabla (viven en anexo_checklist_siembra_evento); solo se usa para viajar en el JSON de
+    // subida/bajada, poblado a mano en FragmentCheckList (subida) y consumido en Descargas (bajada).
+    @Ignore
+    @SerializedName("eventos_siembra")
+    @Expose
+    private List<CheckListSiembraEvento> eventos_siembra;
+
+    public List<CheckListSiembraEvento> getEventos_siembra() {
+        return eventos_siembra;
+    }
+
+    public void setEventos_siembra(List<CheckListSiembraEvento> eventos_siembra) {
+        this.eventos_siembra = eventos_siembra;
     }
 }

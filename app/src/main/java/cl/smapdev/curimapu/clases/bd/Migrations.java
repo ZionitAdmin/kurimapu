@@ -313,4 +313,66 @@ public class Migrations {
             database.execSQL("ALTER TABLE anexo_checklist_cosecha ADD COLUMN humedad_semilla TEXT;");
         }
     };
+
+    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3), uno por fecha+tipo, ligados
+    // al checklist de siembra via clave_unica_cl_siembra
+    public static final Migration MIGRATION_21_TO_22 = new Migration(21, 22) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE anexo_checklist_siembra_evento ( " +
+                    " id_evento INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                    " clave_unica_evento TEXT, " +
+                    " clave_unica_cl_siembra TEXT, " +
+                    " fecha_evento TEXT, " +
+                    " tipo_evento TEXT, " +
+                    " prestador_servicio TEXT, " +
+                    " estado_discos TEXT, " +
+                    " profundidad_siembra TEXT, " +
+                    " distancia_fertilizante_semilla TEXT, " +
+                    " tarros_semilla_pre_siembra TEXT, " +
+                    " discos_sembradores_pre_siembra TEXT, " +
+                    " estructura_maquinaria_pre_siembra TEXT, " +
+                    " lugar_limpieza_pre_siembra TEXT, " +
+                    " responsable_aseo_pre_siembra TEXT, " +
+                    " rut_responsable_aseo_pre_siembra TEXT, " +
+                    " responsable_revision_limpieza_pre_siembra TEXT, " +
+                    " firma_responsable_aso_pre_siembra TEXT, " +
+                    " stringed_responsable_aso_pre_siembra TEXT, " +
+                    " firma_revision_limpieza_pre_siembra TEXT, " +
+                    " stringed_revision_limpieza_pre_siembra TEXT, " +
+                    " tarros_semilla_post_siembra TEXT, " +
+                    " discos_sembradores_post_siembra TEXT, " +
+                    " estructura_maquinaria_post_cosecha TEXT, " +
+                    " lugar_limpieza_post_siembra TEXT, " +
+                    " responsable_aseo_post_siembra TEXT, " +
+                    " rut_responsable_aseo_post_siembra TEXT, " +
+                    " encargado_revision_limpieza_post_siembra TEXT, " +
+                    " firma_responsable_aseo_post_siembra TEXT, " +
+                    " stringed_responsable_aseo_post_siembra TEXT, " +
+                    " firma_revision_limpieza_post_siembra TEXT, " +
+                    " stringed_revision_limpieza_post_siembra TEXT, " +
+                    " desempeno_siembra TEXT, " +
+                    " observacion_general TEXT, " +
+                    " fecha_ingreso TEXT, " +
+                    " hora_ingreso TEXT, " +
+                    " nombre_supervisor_siembra TEXT, " +
+                    " nombre_responsable_campo TEXT, " +
+                    " nombre_operario_maquina TEXT, " +
+                    " firma_responsable_campo TEXT, " +
+                    " stringed_responsable_campo TEXT, " +
+                    " firma_operario_maquina TEXT, " +
+                    " stringed_operario_maquina TEXT, " +
+                    " fecha_termino TEXT, " +
+                    " hora_termino TEXT, " +
+                    " nombre_supervisor_siembra_termino TEXT, " +
+                    " nombre_responsable_campo_termino TEXT, " +
+                    " nombre_operario_maquina_termino TEXT, " +
+                    " firma_responsable_campo_termino TEXT, " +
+                    " stringed_responsable_campo_termino TEXT, " +
+                    " firma_operario_maquina_termino TEXT, " +
+                    " stringed_operario_maquina_termino TEXT, " +
+                    " estado_sincronizacion INTEGER NOT NULL DEFAULT 0 " +
+                    ");");
+        }
+    };
 }

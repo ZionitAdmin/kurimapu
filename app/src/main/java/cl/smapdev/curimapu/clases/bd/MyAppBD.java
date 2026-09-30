@@ -26,6 +26,7 @@ import cl.smapdev.curimapu.clases.tablas.CardViewsResumen;
 import cl.smapdev.curimapu.clases.tablas.CheckListCapacitacionSiembra;
 import cl.smapdev.curimapu.clases.tablas.CheckListCapacitacionSiembraDetalle;
 import cl.smapdev.curimapu.clases.tablas.CheckListCosecha;
+import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 import cl.smapdev.curimapu.clases.tablas.CheckListLimpiezaCamiones;
 import cl.smapdev.curimapu.clases.tablas.CheckListSiembra;
 import cl.smapdev.curimapu.clases.tablas.ChecklistDevolucionSemilla;
@@ -83,8 +84,8 @@ import cl.smapdev.curimapu.clases.temporales.TempVisitas;
         CheckListCapacitacionSiembraDetalle.class, CheckListLimpiezaCamiones.class,
         ChecklistLimpiezaCamionesDetalle.class, ChecklistDevolucionSemilla.class, AnexoVilab.class,
         EstacionFloracion.class, EstacionFloracionDetalle.class, EstacionFloracionEstaciones.class, MuestraHumedad.class,
-        PrimeraPrioridad.class, SitiosNoVisitados.class
-}, version = 21) // TICKET 2494 - 2026-09-30: version 20 -> 21, ver Migrations.MIGRATION_20_TO_21
+        PrimeraPrioridad.class, SitiosNoVisitados.class, CheckListSiembraEvento.class
+}, version = 22) // TICKET 2494 - 2026-09-30: version 21 -> 22, ver Migrations.MIGRATION_21_TO_22 (eventos de siembra)
 public abstract class MyAppBD extends RoomDatabase {
     public abstract MyDao myDao();
 

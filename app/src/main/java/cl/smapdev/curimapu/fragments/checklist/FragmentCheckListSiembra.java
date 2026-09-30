@@ -12,9 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -43,6 +45,7 @@ import cl.smapdev.curimapu.MainActivity;
 import cl.smapdev.curimapu.R;
 import cl.smapdev.curimapu.clases.relaciones.AnexoCompleto;
 import cl.smapdev.curimapu.clases.tablas.CheckListSiembra;
+import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.Usuario;
 import cl.smapdev.curimapu.clases.temporales.TempFirmas;
@@ -246,6 +249,15 @@ public class FragmentCheckListSiembra extends Fragment {
     private Config config;
 
     private CheckListSiembra checkListSiembra;
+
+    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3). Cada evento carga sus datos en
+    // los mismos campos de Regulacion/Aseo/General/Ingreso/Salida (ver seleccionarEventoSiembra).
+    private static final String[] TIPOS_EVENTO_SIEMBRA = {"H", "M1", "M2", "M3"};
+    private LinearLayout cont_tabs_eventos_siembra;
+    private Button btn_agregar_evento_siembra;
+    private final List<CheckListSiembraEvento> eventosSiembra = new ArrayList<>();
+    private CheckListSiembraEvento eventoActualSiembra = null;
+    private String snapshotEventoActualCargado = "";
 
     private final ArrayList<String> chk_1 = new ArrayList<>();
     private final ArrayList<String> chk_2 = new ArrayList<>();
@@ -702,7 +714,9 @@ public class FragmentCheckListSiembra extends Fragment {
             et_nombre_responsable_campo_ingreso.setText(checkListSiembra.getNombre_responsable_campo());
         }
 
-        if (checkListSiembra.getFirma_responsable_campo_termino() != null && !checkListSiembra.getFirma_responsable_campo_termino().isEmpty()) {
+        // TICKET 2494 - 2026-09-30: bug preexistente corregido, comparaba firma_responsable_campo_termino
+        // en vez de firma_responsable_campo para habilitar/deshabilitar el boton de INGRESO
+        if (checkListSiembra.getFirma_responsable_campo() != null && !checkListSiembra.getFirma_responsable_campo().isEmpty()) {
             btn_firma_responsable_campo_ingreso.setEnabled(false);
             check_firma_responsable_campo_ingreso.setVisibility(View.VISIBLE);
         }
@@ -747,6 +761,9 @@ public class FragmentCheckListSiembra extends Fragment {
         }
 
         btn_guardar_cl_siembra.setText("EDITAR");
+
+        // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) del checklist
+        cargarEventosSiembraDesdeBD();
     }
 
 
@@ -861,6 +878,11 @@ public class FragmentCheckListSiembra extends Fragment {
         btn_ogm_si = view.findViewById(R.id.btn_ogm_si);
         btn_ogm_no = view.findViewById(R.id.btn_ogm_no);
         et_anexo_curimapu = view.findViewById(R.id.et_anexo_curimapu);
+
+        // TICKET 2494 - 2026-09-30: tira de eventos de siembra
+        cont_tabs_eventos_siembra = view.findViewById(R.id.cont_tabs_eventos_siembra);
+        btn_agregar_evento_siembra = view.findViewById(R.id.btn_agregar_evento_siembra);
+        btn_agregar_evento_siembra.setOnClickListener(view1 -> mostrarDialogoNuevoEventoSiembra());
 
         //regulacion de siembra
         et_prestador_servicio = view.findViewById(R.id.et_prestador_servicio);
@@ -1049,6 +1071,10 @@ public class FragmentCheckListSiembra extends Fragment {
 
 
         btn_firma_responsable_aseo_ingreso.setOnClickListener(view1 -> {
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_responsable_aseo.getText().toString().isEmpty() ||
                     et_rut_responsable_aseo.getText().toString().isEmpty()) {
                 Toasty.warning(
@@ -1058,10 +1084,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_INGRESO);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_INGRESO);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1085,19 +1113,25 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_INGRESO,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_responsable_aseo_ingreso.setVisibility(View.VISIBLE);
+                            btn_firma_responsable_aseo_ingreso.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_responsable_aso_pre_siembra(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_INGRESO);
+            dialogo.show(ft, tagEvento);
         });
 
         btn_firma_responsable_revision_limpieza_ingreso.setOnClickListener(view1 -> {
 
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_responsable_revision_limpieza_ingreso.getText().toString().isEmpty()) {
                 Toasty.warning(
                         requireActivity(),
@@ -1106,10 +1140,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_INGRESO);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_INGRESO);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1133,22 +1169,28 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_INGRESO,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_responsable_revision_limpieza_ingreso
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_responsable_revision_limpieza_ingreso.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_revision_limpieza_pre_siembra(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_INGRESO);
+            dialogo.show(ft, tagEvento);
 
         });
 
 
         btn_firma_responsable_aseo_ingreso_post_siembra.setOnClickListener(view1 -> {
 
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_responsable_aseo_post_siembra.getText().toString().isEmpty() ||
                     et_rut_responsable_aseo_post_siembra.getText().toString().isEmpty()) {
                 Toasty.warning(
@@ -1158,10 +1200,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_SALIDA);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_SALIDA);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1185,20 +1229,26 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_SALIDA,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_responsable_aseo_ingreso_post_siembra
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_responsable_aseo_ingreso_post_siembra.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_responsable_aseo_post_siembra(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_SALIDA);
+            dialogo.show(ft, tagEvento);
         });
 
         btn_firma_responsable_revision_limpieza_ingreso_post_siembra.setOnClickListener(view1 -> {
 
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_responsable_revision_limpieza_ingreso_post_siembra.getText().toString().isEmpty()) {
                 Toasty.warning(
                         requireActivity(),
@@ -1207,10 +1257,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_SALIDA);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_SALIDA);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1234,20 +1286,26 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_SALIDA,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_responsable_revision_limpieza_ingreso_post_siembra
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_responsable_revision_limpieza_ingreso_post_siembra.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_revision_limpieza_post_siembra(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_SALIDA);
+            dialogo.show(ft, tagEvento);
         });
 
 
         btn_firma_responsable_campo_ingreso.setOnClickListener(view1 -> {
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_nombre_responsable_campo_ingreso.getText().toString().isEmpty()) {
                 Toasty.warning(
                         requireActivity(),
@@ -1256,10 +1314,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_INGRESO);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_INGRESO);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1283,19 +1343,25 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_INGRESO,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_responsable_campo_ingreso
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_responsable_campo_ingreso.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_responsable_campo(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_INGRESO);
+            dialogo.show(ft, tagEvento);
         });
 
         btn_firma_operario_maquina_ingreso.setOnClickListener(view1 -> {
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_operador_maquina_ingreso.getText().toString().isEmpty()) {
                 Toasty.warning(
                         requireActivity(),
@@ -1304,10 +1370,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_INGRESO);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_INGRESO);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1331,19 +1399,25 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_INGRESO,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_operario_maquina_ingreso
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_operario_maquina_ingreso.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_operario_maquina(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_INGRESO);
+            dialogo.show(ft, tagEvento);
         });
 
         btn_firma_operario_maquina_termino.setOnClickListener(view1 -> {
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_operador_maquina_termino.getText().toString().isEmpty()) {
                 Toasty.warning(
                         requireActivity(),
@@ -1351,10 +1425,13 @@ public class FragmentCheckListSiembra extends Fragment {
                         Toast.LENGTH_LONG, true).show();
                 return;
             }
+
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_TERMINO);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_TERMINO);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1378,20 +1455,26 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_TERMINO,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_operario_maquina_termino
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_operario_maquina_termino.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_operario_maquina_termino(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_TERMINO);
+            dialogo.show(ft, tagEvento);
         });
 
         btn_firma_responsable_campo_termino.setOnClickListener(view1 -> {
 
+            if (eventoActualSiembra == null) {
+                Toasty.warning(requireActivity(), "Selecciona o crea un evento de siembra antes de firmar", Toast.LENGTH_LONG, true).show();
+                return;
+            }
             if (et_nombre_responsable_campo_termino.getText().toString().isEmpty()) {
                 Toasty.warning(
                         requireActivity(),
@@ -1400,10 +1483,12 @@ public class FragmentCheckListSiembra extends Fragment {
                 return;
             }
 
+            String tagEvento = tagFirmaEvento(Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_TERMINO);
+
             FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
             Fragment prev = requireActivity()
                     .getSupportFragmentManager()
-                    .findFragmentByTag(Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_TERMINO);
+                    .findFragmentByTag(tagEvento);
             if (prev != null) {
                 ft.remove(prev);
             }
@@ -1427,16 +1512,18 @@ public class FragmentCheckListSiembra extends Fragment {
             DialogFirma dialogo = DialogFirma.newInstance(
                     Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA,
                     etRA,
-                    Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_TERMINO,
+                    tagEvento,
                     (isSaved, path) -> {
                         if (isSaved) {
                             check_firma_responsable_campo_termino
                                     .setVisibility(View.VISIBLE);
+                            btn_firma_responsable_campo_termino.setEnabled(false);
+                            if (eventoActualSiembra != null) eventoActualSiembra.setFirma_responsable_campo_termino(path);
                         }
                     }
             );
 
-            dialogo.show(ft, Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_TERMINO);
+            dialogo.show(ft, tagEvento);
 
         });
 
@@ -1944,6 +2031,11 @@ public class FragmentCheckListSiembra extends Fragment {
             Toasty.warning(requireActivity(), "Error al guardar ->" + e.getMessage(), Toast.LENGTH_LONG, true).show();
         }
 
+        // TICKET 2494 - 2026-09-30: si hay un evento de siembra activo, se guarda junto con la cabecera
+        if (eventoActualSiembra != null) {
+            guardarEventoSiembraActual(siembra.getClave_unica());
+        }
+
         return true;
     }
 
@@ -1955,6 +2047,420 @@ public class FragmentCheckListSiembra extends Fragment {
                 .deleteFirmasByDoc(Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA));
         executorService.shutdown();
         activity.onBackPressed();
+    }
+
+    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3). Cada evento reutiliza los mismos
+    // campos de pantalla de Regulacion/Aseo Pre/Aseo Post/General/Ingreso/Salida; al cambiar de tab
+    // se cargan/guardan esos campos contra el CheckListSiembraEvento seleccionado en vez de la cabecera.
+
+    private String tagFirmaEvento(String tagBase) {
+        return tagBase + "_EV_" + (eventoActualSiembra != null ? eventoActualSiembra.getClave_unica_evento() : "0");
+    }
+
+    private void cargarEventosSiembraDesdeBD() {
+        if (checkListSiembra == null) return;
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<List<CheckListSiembraEvento>> future = executor.submit(() ->
+                MainActivity.myAppDB.DaoClSiembra().getEventosByClaveUnicaClSiembra(checkListSiembra.getClave_unica()));
+
+        try {
+            List<CheckListSiembraEvento> eventos = future.get();
+            eventosSiembra.clear();
+            if (eventos != null) eventosSiembra.addAll(eventos);
+            pintarTabsEventosSiembra();
+            if (!eventosSiembra.isEmpty()) {
+                seleccionarEventoSiembra(eventosSiembra.get(0));
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        executor.shutdown();
+    }
+
+    private void pintarTabsEventosSiembra() {
+        cont_tabs_eventos_siembra.removeAllViews();
+
+        for (CheckListSiembraEvento evento : eventosSiembra) {
+            Button tab = new Button(requireContext());
+            tab.setText(evento.getTipo_evento() + "\n" + evento.getFecha_evento());
+            tab.setAllCaps(false);
+            tab.setTextSize(12);
+
+            boolean esActual = eventoActualSiembra != null
+                    && evento.getClave_unica_evento() != null
+                    && evento.getClave_unica_evento().equals(eventoActualSiembra.getClave_unica_evento());
+            tab.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                    esActual ? R.color.colorPrimary : R.color.colorOnBackground));
+
+            tab.setOnClickListener(v -> seleccionarEventoSiembra(evento));
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.setMarginEnd(16);
+            tab.setLayoutParams(lp);
+
+            cont_tabs_eventos_siembra.addView(tab);
+        }
+
+        cont_tabs_eventos_siembra.addView(btn_agregar_evento_siembra);
+    }
+
+    private void seleccionarEventoSiembra(CheckListSiembraEvento evento) {
+        if (eventoActualSiembra != null && !snapshotCamposEventoSiembra().equals(snapshotEventoActualCargado)) {
+            Toasty.warning(requireActivity(), "Tienes cambios sin guardar en el evento actual", Toast.LENGTH_LONG, true).show();
+        }
+        eventoActualSiembra = evento;
+        cargarCamposDesdeEventoSiembra(evento);
+        pintarTabsEventosSiembra();
+    }
+
+    private void cargarCamposDesdeEventoSiembra(CheckListSiembraEvento evento) {
+
+        et_prestador_servicio.setText(evento.getPrestador_servicio() != null ? evento.getPrestador_servicio() : "");
+        if (evento.getEstado_discos() != null && !evento.getEstado_discos().isEmpty()) {
+            int d = chk_1.indexOf(evento.getEstado_discos());
+            sp_estado_discos.setSelection(Math.max(d, 0));
+        } else {
+            sp_estado_discos.setSelection(0);
+        }
+        et_profundidad_siembra.setText(evento.getProfundidad_siembra() != null ? evento.getProfundidad_siembra() : "");
+        et_dist_entre_fert_semilla.setText(evento.getDistancia_fertilizante_semilla() != null ? evento.getDistancia_fertilizante_semilla() : "");
+
+        btn_tarros_semilla_si.setChecked("1".equals(evento.getTarros_semilla_pre_siembra()));
+        btn_tarros_semilla_no.setChecked("2".equals(evento.getTarros_semilla_pre_siembra()));
+        btn_discos_sembradores_si.setChecked("1".equals(evento.getDiscos_sembradores_pre_siembra()));
+        btn_discos_sembradores_no.setChecked("2".equals(evento.getDiscos_sembradores_pre_siembra()));
+        btn_estructura_maquinaria_si.setChecked("1".equals(evento.getEstructura_maquinaria_pre_siembra()));
+        btn_estructura_maquinaria_no.setChecked("2".equals(evento.getEstructura_maquinaria_pre_siembra()));
+        et_lugar_limpieza.setText(evento.getLugar_limpieza_pre_siembra() != null ? evento.getLugar_limpieza_pre_siembra() : "");
+        et_responsable_aseo.setText(evento.getResponsable_aseo_pre_siembra() != null ? evento.getResponsable_aseo_pre_siembra() : "");
+        et_rut_responsable_aseo.setText(evento.getRut_responsable_aseo_pre_siembra() != null ? evento.getRut_responsable_aseo_pre_siembra() : "");
+        et_responsable_revision_limpieza_ingreso.setText(evento.getResponsable_revision_limpieza_pre_siembra() != null ? evento.getResponsable_revision_limpieza_pre_siembra() : "");
+
+        btn_tarros_semilla_post_siembra_si.setChecked("1".equals(evento.getTarros_semilla_post_siembra()));
+        btn_tarros_semilla_post_siembra_no.setChecked("2".equals(evento.getTarros_semilla_post_siembra()));
+        btn_discos_sembradores_post_siembra_si.setChecked("1".equals(evento.getDiscos_sembradores_post_siembra()));
+        btn_discos_sembradores_post_siembra_no.setChecked("2".equals(evento.getDiscos_sembradores_post_siembra()));
+        btn_estructura_maquinaria_post_siembra_si.setChecked("1".equals(evento.getEstructura_maquinaria_post_cosecha()));
+        btn_estructura_maquinaria_post_siembra_no.setChecked("2".equals(evento.getEstructura_maquinaria_post_cosecha()));
+        et_lugar_limpieza_post_siembra.setText(evento.getLugar_limpieza_post_siembra() != null ? evento.getLugar_limpieza_post_siembra() : "");
+        et_responsable_aseo_post_siembra.setText(evento.getResponsable_aseo_post_siembra() != null ? evento.getResponsable_aseo_post_siembra() : "");
+        et_rut_responsable_aseo_post_siembra.setText(evento.getRut_responsable_aseo_post_siembra() != null ? evento.getRut_responsable_aseo_post_siembra() : "");
+        et_responsable_revision_limpieza_ingreso_post_siembra.setText(evento.getEncargado_revision_limpieza_post_siembra() != null ? evento.getEncargado_revision_limpieza_post_siembra() : "");
+
+        if (evento.getDesempeno_siembra() != null && !evento.getDesempeno_siembra().isEmpty()) {
+            int d = chk_1.indexOf(evento.getDesempeno_siembra());
+            sp_desempeno_siembra.setSelection(Math.max(d, 0));
+        } else {
+            sp_desempeno_siembra.setSelection(0);
+        }
+        et_observaciones_general.setText(evento.getObservacion_general() != null ? evento.getObservacion_general() : "");
+
+        et_fecha_ingreso.setText(evento.getFecha_ingreso() != null ? evento.getFecha_ingreso() : "");
+        et_hora_ingreso.setText(evento.getHora_ingreso() != null ? evento.getHora_ingreso() : "");
+        et_nombre_supervisor_ingreso_siembra.setText(evento.getNombre_supervisor_siembra() != null ? evento.getNombre_supervisor_siembra() : "");
+        et_nombre_responsable_campo_ingreso.setText(evento.getNombre_responsable_campo() != null ? evento.getNombre_responsable_campo() : "");
+        et_operador_maquina_ingreso.setText(evento.getNombre_operario_maquina() != null ? evento.getNombre_operario_maquina() : "");
+
+        et_fecha_termino.setText(evento.getFecha_termino() != null ? evento.getFecha_termino() : "");
+        et_hora_termino.setText(evento.getHora_termino() != null ? evento.getHora_termino() : "");
+        et_nombre_supervisor_termino_siembra.setText(evento.getNombre_supervisor_siembra_termino() != null ? evento.getNombre_supervisor_siembra_termino() : "");
+        et_nombre_responsable_campo_termino.setText(evento.getNombre_responsable_campo_termino() != null ? evento.getNombre_responsable_campo_termino() : "");
+        et_operador_maquina_termino.setText(evento.getNombre_operario_maquina_termino() != null ? evento.getNombre_operario_maquina_termino() : "");
+
+        // TICKET 2494 - 2026-09-30: las 8 firmas ahora son por evento, no por cabecera. El
+        // boton/check se habilita o deshabilita segun tenga o no firma el evento seleccionado.
+        aplicarEstadoFirmaEvento(evento.getFirma_responsable_aso_pre_siembra(), btn_firma_responsable_aseo_ingreso, check_firma_responsable_aseo_ingreso);
+        aplicarEstadoFirmaEvento(evento.getFirma_revision_limpieza_pre_siembra(), btn_firma_responsable_revision_limpieza_ingreso, check_firma_responsable_revision_limpieza_ingreso);
+        aplicarEstadoFirmaEvento(evento.getFirma_responsable_aseo_post_siembra(), btn_firma_responsable_aseo_ingreso_post_siembra, check_firma_responsable_aseo_ingreso_post_siembra);
+        aplicarEstadoFirmaEvento(evento.getFirma_revision_limpieza_post_siembra(), btn_firma_responsable_revision_limpieza_ingreso_post_siembra, check_firma_responsable_revision_limpieza_ingreso_post_siembra);
+        aplicarEstadoFirmaEvento(evento.getFirma_responsable_campo(), btn_firma_responsable_campo_ingreso, check_firma_responsable_campo_ingreso);
+        aplicarEstadoFirmaEvento(evento.getFirma_operario_maquina(), btn_firma_operario_maquina_ingreso, check_firma_operario_maquina_ingreso);
+        aplicarEstadoFirmaEvento(evento.getFirma_operario_maquina_termino(), btn_firma_operario_maquina_termino, check_firma_operario_maquina_termino);
+        aplicarEstadoFirmaEvento(evento.getFirma_responsable_campo_termino(), btn_firma_responsable_campo_termino, check_firma_responsable_campo_termino);
+
+        snapshotEventoActualCargado = snapshotCamposEventoSiembra();
+    }
+
+    private void aplicarEstadoFirmaEvento(String firma, Button btnFirma, ImageView checkFirma) {
+        boolean tieneFirma = firma != null && !firma.isEmpty();
+        btnFirma.setEnabled(!tieneFirma);
+        checkFirma.setVisibility(tieneFirma ? View.VISIBLE : View.GONE);
+    }
+
+    private void leerCamposHaciaEventoSiembra(CheckListSiembraEvento evento) {
+        String comparaSpinner = "--Seleccione--";
+
+        if (!et_prestador_servicio.getText().toString().isEmpty()) {
+            evento.setPrestador_servicio(et_prestador_servicio.getText().toString());
+        }
+        if (!sp_estado_discos.getSelectedItem().toString().equals(comparaSpinner)) {
+            evento.setEstado_discos(sp_estado_discos.getSelectedItem().toString());
+        }
+        if (!et_profundidad_siembra.getText().toString().isEmpty()) {
+            evento.setProfundidad_siembra(et_profundidad_siembra.getText().toString());
+        }
+        if (!et_dist_entre_fert_semilla.getText().toString().isEmpty()) {
+            evento.setDistancia_fertilizante_semilla(et_dist_entre_fert_semilla.getText().toString());
+        }
+
+        if (btn_tarros_semilla_si.isChecked() || btn_tarros_semilla_no.isChecked()) {
+            evento.setTarros_semilla_pre_siembra(btn_tarros_semilla_si.isChecked() ? "1" : "2");
+        }
+        if (btn_discos_sembradores_si.isChecked() || btn_discos_sembradores_no.isChecked()) {
+            evento.setDiscos_sembradores_pre_siembra(btn_discos_sembradores_si.isChecked() ? "1" : "2");
+        }
+        if (btn_estructura_maquinaria_si.isChecked() || btn_estructura_maquinaria_no.isChecked()) {
+            evento.setEstructura_maquinaria_pre_siembra(btn_estructura_maquinaria_si.isChecked() ? "1" : "2");
+        }
+        if (!et_lugar_limpieza.getText().toString().isEmpty()) {
+            evento.setLugar_limpieza_pre_siembra(et_lugar_limpieza.getText().toString());
+        }
+        if (!et_responsable_aseo.getText().toString().isEmpty()) {
+            evento.setResponsable_aseo_pre_siembra(et_responsable_aseo.getText().toString());
+        }
+        if (!et_rut_responsable_aseo.getText().toString().isEmpty()) {
+            evento.setRut_responsable_aseo_pre_siembra(et_rut_responsable_aseo.getText().toString());
+        }
+        if (!et_responsable_revision_limpieza_ingreso.getText().toString().isEmpty()) {
+            evento.setResponsable_revision_limpieza_pre_siembra(et_responsable_revision_limpieza_ingreso.getText().toString());
+        }
+
+        if (btn_tarros_semilla_post_siembra_si.isChecked() || btn_tarros_semilla_post_siembra_no.isChecked()) {
+            evento.setTarros_semilla_post_siembra(btn_tarros_semilla_post_siembra_si.isChecked() ? "1" : "2");
+        }
+        if (btn_discos_sembradores_post_siembra_si.isChecked() || btn_discos_sembradores_post_siembra_no.isChecked()) {
+            evento.setDiscos_sembradores_post_siembra(btn_discos_sembradores_post_siembra_si.isChecked() ? "1" : "2");
+        }
+        if (btn_estructura_maquinaria_post_siembra_si.isChecked() || btn_estructura_maquinaria_post_siembra_no.isChecked()) {
+            evento.setEstructura_maquinaria_post_cosecha(btn_estructura_maquinaria_post_siembra_si.isChecked() ? "1" : "2");
+        }
+        if (!et_lugar_limpieza_post_siembra.getText().toString().isEmpty()) {
+            evento.setLugar_limpieza_post_siembra(et_lugar_limpieza_post_siembra.getText().toString());
+        }
+        if (!et_responsable_aseo_post_siembra.getText().toString().isEmpty()) {
+            evento.setResponsable_aseo_post_siembra(et_responsable_aseo_post_siembra.getText().toString());
+        }
+        if (!et_rut_responsable_aseo_post_siembra.getText().toString().isEmpty()) {
+            evento.setRut_responsable_aseo_post_siembra(et_rut_responsable_aseo_post_siembra.getText().toString());
+        }
+        if (!et_responsable_revision_limpieza_ingreso_post_siembra.getText().toString().isEmpty()) {
+            evento.setEncargado_revision_limpieza_post_siembra(et_responsable_revision_limpieza_ingreso_post_siembra.getText().toString());
+        }
+
+        if (!sp_desempeno_siembra.getSelectedItem().toString().equals(comparaSpinner)) {
+            evento.setDesempeno_siembra(sp_desempeno_siembra.getSelectedItem().toString());
+        }
+        if (!et_observaciones_general.getText().toString().isEmpty()) {
+            evento.setObservacion_general(et_observaciones_general.getText().toString());
+        }
+
+        if (!et_fecha_ingreso.getText().toString().isEmpty()) {
+            evento.setFecha_ingreso(et_fecha_ingreso.getText().toString());
+        }
+        if (!et_hora_ingreso.getText().toString().isEmpty()) {
+            evento.setHora_ingreso(et_hora_ingreso.getText().toString());
+        }
+        if (!et_nombre_supervisor_ingreso_siembra.getText().toString().isEmpty()) {
+            evento.setNombre_supervisor_siembra(et_nombre_supervisor_ingreso_siembra.getText().toString());
+        }
+        if (!et_nombre_responsable_campo_ingreso.getText().toString().isEmpty()) {
+            evento.setNombre_responsable_campo(et_nombre_responsable_campo_ingreso.getText().toString());
+        }
+        if (!et_operador_maquina_ingreso.getText().toString().isEmpty()) {
+            evento.setNombre_operario_maquina(et_operador_maquina_ingreso.getText().toString());
+        }
+
+        if (!et_fecha_termino.getText().toString().isEmpty()) {
+            evento.setFecha_termino(et_fecha_termino.getText().toString());
+        }
+        if (!et_hora_termino.getText().toString().isEmpty()) {
+            evento.setHora_termino(et_hora_termino.getText().toString());
+        }
+        if (!et_nombre_supervisor_termino_siembra.getText().toString().isEmpty()) {
+            evento.setNombre_supervisor_siembra_termino(et_nombre_supervisor_termino_siembra.getText().toString());
+        }
+        if (!et_nombre_responsable_campo_termino.getText().toString().isEmpty()) {
+            evento.setNombre_responsable_campo_termino(et_nombre_responsable_campo_termino.getText().toString());
+        }
+        if (!et_operador_maquina_termino.getText().toString().isEmpty()) {
+            evento.setNombre_operario_maquina_termino(et_operador_maquina_termino.getText().toString());
+        }
+    }
+
+    private String snapshotCamposEventoSiembra() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(et_prestador_servicio.getText().toString());
+        sb.append("|").append(sp_estado_discos.getSelectedItem() != null ? sp_estado_discos.getSelectedItem().toString() : "");
+        sb.append("|").append(et_profundidad_siembra.getText().toString());
+        sb.append("|").append(et_dist_entre_fert_semilla.getText().toString());
+        sb.append("|").append(btn_tarros_semilla_si.isChecked()).append(btn_tarros_semilla_no.isChecked());
+        sb.append("|").append(btn_discos_sembradores_si.isChecked()).append(btn_discos_sembradores_no.isChecked());
+        sb.append("|").append(btn_estructura_maquinaria_si.isChecked()).append(btn_estructura_maquinaria_no.isChecked());
+        sb.append("|").append(et_lugar_limpieza.getText().toString());
+        sb.append("|").append(et_responsable_aseo.getText().toString());
+        sb.append("|").append(et_rut_responsable_aseo.getText().toString());
+        sb.append("|").append(et_responsable_revision_limpieza_ingreso.getText().toString());
+        sb.append("|").append(btn_tarros_semilla_post_siembra_si.isChecked()).append(btn_tarros_semilla_post_siembra_no.isChecked());
+        sb.append("|").append(btn_discos_sembradores_post_siembra_si.isChecked()).append(btn_discos_sembradores_post_siembra_no.isChecked());
+        sb.append("|").append(btn_estructura_maquinaria_post_siembra_si.isChecked()).append(btn_estructura_maquinaria_post_siembra_no.isChecked());
+        sb.append("|").append(et_lugar_limpieza_post_siembra.getText().toString());
+        sb.append("|").append(et_responsable_aseo_post_siembra.getText().toString());
+        sb.append("|").append(et_rut_responsable_aseo_post_siembra.getText().toString());
+        sb.append("|").append(et_responsable_revision_limpieza_ingreso_post_siembra.getText().toString());
+        sb.append("|").append(sp_desempeno_siembra.getSelectedItem() != null ? sp_desempeno_siembra.getSelectedItem().toString() : "");
+        sb.append("|").append(et_observaciones_general.getText().toString());
+        sb.append("|").append(et_fecha_ingreso.getText().toString());
+        sb.append("|").append(et_hora_ingreso.getText().toString());
+        sb.append("|").append(et_nombre_supervisor_ingreso_siembra.getText().toString());
+        sb.append("|").append(et_nombre_responsable_campo_ingreso.getText().toString());
+        sb.append("|").append(et_operador_maquina_ingreso.getText().toString());
+        sb.append("|").append(et_fecha_termino.getText().toString());
+        sb.append("|").append(et_hora_termino.getText().toString());
+        sb.append("|").append(et_nombre_supervisor_termino_siembra.getText().toString());
+        sb.append("|").append(et_nombre_responsable_campo_termino.getText().toString());
+        sb.append("|").append(et_operador_maquina_termino.getText().toString());
+        return sb.toString();
+    }
+
+    private void mostrarDialogoNuevoEventoSiembra() {
+        if (checkListSiembra == null) {
+            Toasty.warning(requireActivity(), "Guarda el checklist primero para poder agregar eventos de siembra", Toast.LENGTH_LONG, true).show();
+            return;
+        }
+
+        List<String> tiposUsados = new ArrayList<>();
+        for (CheckListSiembraEvento evento : eventosSiembra) {
+            tiposUsados.add(evento.getTipo_evento());
+        }
+        final List<String> tiposDisponibles = new ArrayList<>();
+        for (String tipo : TIPOS_EVENTO_SIEMBRA) {
+            if (!tiposUsados.contains(tipo)) tiposDisponibles.add(tipo);
+        }
+
+        if (tiposDisponibles.isEmpty()) {
+            Toasty.warning(requireActivity(), "Ya existen eventos H, M1, M2 y M3 para este checklist", Toast.LENGTH_LONG, true).show();
+            return;
+        }
+
+        LinearLayout cont = new LinearLayout(requireContext());
+        cont.setOrientation(LinearLayout.VERTICAL);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        cont.setPadding(padding, padding, padding, padding);
+
+        TextView lblTipo = new TextView(requireContext());
+        lblTipo.setText("Tipo de evento");
+        cont.addView(lblTipo);
+
+        Spinner spTipo = new Spinner(requireContext());
+        ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, tiposDisponibles);
+        spTipo.setAdapter(adapterTipo);
+        cont.addView(spTipo);
+
+        TextView lblFecha = new TextView(requireContext());
+        lblFecha.setText("Fecha del evento");
+        cont.addView(lblFecha);
+
+        final EditText etFecha = new EditText(requireContext());
+        etFecha.setFocusable(false);
+        etFecha.setOnClickListener(v -> levantarFecha(etFecha));
+        cont.addView(etFecha);
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireActivity())
+                .setTitle("Nuevo evento de siembra")
+                .setView(cont)
+                .setPositiveButton("Crear", (dialog, which) -> {
+                    if (etFecha.getText().toString().isEmpty()) {
+                        Toasty.error(requireActivity(), "Debes seleccionar una fecha", Toast.LENGTH_LONG, true).show();
+                        return;
+                    }
+
+                    if (eventoActualSiembra != null && !snapshotCamposEventoSiembra().equals(snapshotEventoActualCargado)) {
+                        Toasty.warning(requireActivity(), "Tienes cambios sin guardar en el evento actual", Toast.LENGTH_LONG, true).show();
+                    }
+
+                    String claveUnicaEvento = config.getId()
+                            + "" + config.getId_usuario()
+                            + "" + Utilidades.fechaActualConHora()
+                            .replaceAll(" ", "")
+                            .replaceAll("-", "")
+                            .replaceAll(":", "")
+                            + "EV";
+
+                    CheckListSiembraEvento nuevoEvento = new CheckListSiembraEvento();
+                    nuevoEvento.setClave_unica_evento(claveUnicaEvento);
+                    nuevoEvento.setClave_unica_cl_siembra(checkListSiembra.getClave_unica());
+                    nuevoEvento.setFecha_evento(etFecha.getText().toString());
+                    nuevoEvento.setTipo_evento((String) spTipo.getSelectedItem());
+                    nuevoEvento.setEstado_sincronizacion(0);
+
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    Future<Long> idFuture = executor.submit(() -> MainActivity.myAppDB.DaoClSiembra().insertEvento(nuevoEvento));
+                    try {
+                        idFuture.get();
+                    } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    executor.shutdown();
+
+                    eventosSiembra.add(nuevoEvento);
+                    seleccionarEventoSiembra(nuevoEvento);
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void guardarEventoSiembraActual(String claveUnicaClSiembra) {
+        if (eventoActualSiembra == null) return;
+
+        leerCamposHaciaEventoSiembra(eventoActualSiembra);
+        eventoActualSiembra.setClave_unica_cl_siembra(claveUnicaClSiembra);
+        eventoActualSiembra.setEstado_sincronizacion(0);
+
+        // TICKET 2494 - 2026-09-30: las firmas de este evento quedan en TempFirmas con un tag
+        // dinamico (tagFirmaEvento). Se consumen aca, hacia el evento, nunca hacia la cabecera.
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<List<TempFirmas>> firmasF = executor.submit(() ->
+                MainActivity.myAppDB.DaoFirmas().getFirmasByDocum(Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA));
+
+        try {
+            List<TempFirmas> firmas = firmasF.get();
+            String sufijoEvento = "_EV_" + eventoActualSiembra.getClave_unica_evento();
+
+            for (TempFirmas ff : firmas) {
+                String lugar = ff.getLugar_firma();
+                if (lugar == null || !lugar.endsWith(sufijoEvento)) continue;
+
+                String tagBase = lugar.substring(0, lugar.length() - sufijoEvento.length());
+
+                if (tagBase.equals(Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_INGRESO)) {
+                    eventoActualSiembra.setFirma_responsable_aso_pre_siembra(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_INGRESO)) {
+                    eventoActualSiembra.setFirma_revision_limpieza_pre_siembra(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_RESPONSABLE_ASEO_SALIDA)) {
+                    eventoActualSiembra.setFirma_responsable_aseo_post_siembra(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_REVISOR_LIMPIEZA_SALIDA)) {
+                    eventoActualSiembra.setFirma_revision_limpieza_post_siembra(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_INGRESO)) {
+                    eventoActualSiembra.setFirma_responsable_campo(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_INGRESO)) {
+                    eventoActualSiembra.setFirma_operario_maquina(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_RESPONSABLE_OPERARIO_TERMINO)) {
+                    eventoActualSiembra.setFirma_operario_maquina_termino(ff.getPath());
+                } else if (tagBase.equals(Utilidades.DIALOG_TAG_RESPONSABLE_CAMPO_TERMINO)) {
+                    eventoActualSiembra.setFirma_responsable_campo_termino(ff.getPath());
+                }
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CheckListSiembraEvento eventoAGuardar = eventoActualSiembra;
+        executor.submit(() -> MainActivity.myAppDB.DaoClSiembra().updateEvento(eventoAGuardar));
+        executor.shutdown();
+
+        snapshotEventoActualCargado = snapshotCamposEventoSiembra();
     }
 
     private void showAlertForConfirmarGuardar() {

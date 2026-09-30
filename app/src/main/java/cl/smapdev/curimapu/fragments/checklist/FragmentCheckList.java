@@ -45,6 +45,7 @@ import cl.smapdev.curimapu.clases.tablas.CheckListCosecha;
 import cl.smapdev.curimapu.clases.tablas.CheckListDetails;
 import cl.smapdev.curimapu.clases.tablas.CheckListLimpiezaCamiones;
 import cl.smapdev.curimapu.clases.tablas.CheckListSiembra;
+import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 import cl.smapdev.curimapu.clases.tablas.CheckLists;
 import cl.smapdev.curimapu.clases.tablas.ChecklistDevolucionSemilla;
 import cl.smapdev.curimapu.clases.tablas.ChecklistLimpiezaCamionesDetalle;
@@ -141,8 +142,33 @@ public class FragmentCheckList extends Fragment {
 
                     ejecutarSeguro(() -> {
 
-                        List<CheckListSiembra> chk = MainActivity.myAppDB.DaoClSiembra()
-                                .getClSiembraToSync();
+                        List<CheckListSiembra> chk = new ArrayList<>(MainActivity.myAppDB.DaoClSiembra()
+                                .getClSiembraToSync());
+
+                        // TICKET 2494 - 2026-09-30: un checklist ya sincronizado puede tener eventos
+                        // nuevos/editados sin sincronizar (se guardan al tiro al crearlos en Room, sin
+                        // esperar al boton GUARDAR de la cabecera) - hay que incluirlo igual en la subida
+                        List<CheckListSiembraEvento> eventosPendientes = MainActivity.myAppDB.DaoClSiembra().getEventosToSync();
+                        if (!eventosPendientes.isEmpty()) {
+                            List<String> clavesYaIncluidas = new ArrayList<>();
+                            for (CheckListSiembra c : chk) {
+                                clavesYaIncluidas.add(c.getClave_unica());
+                            }
+                            List<String> clavesConEventoPendiente = new ArrayList<>();
+                            for (CheckListSiembraEvento evento : eventosPendientes) {
+                                if (!clavesConEventoPendiente.contains(evento.getClave_unica_cl_siembra())) {
+                                    clavesConEventoPendiente.add(evento.getClave_unica_cl_siembra());
+                                }
+                            }
+                            for (String claveUnica : clavesConEventoPendiente) {
+                                if (!clavesYaIncluidas.contains(claveUnica)) {
+                                    CheckListSiembra header = MainActivity.myAppDB.DaoClSiembra().getCLSiembraByClaveUnica(claveUnica);
+                                    if (header != null) {
+                                        chk.add(header);
+                                    }
+                                }
+                            }
+                        }
 
 
                         List<CheckListCosecha> chkC = MainActivity.myAppDB.DaoCheckListCosecha()
@@ -233,6 +259,14 @@ public class FragmentCheckList extends Fragment {
                         }
 
                         if (!chk.isEmpty()) {
+                            // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) van adjuntos
+                            // a cada checklist como una lista @Ignore (no es columna de la tabla)
+                            for (CheckListSiembra clSiembra : chk) {
+                                List<CheckListSiembraEvento> eventos = MainActivity.myAppDB
+                                        .DaoClSiembra()
+                                        .getEventosByClaveUnicaClSiembra(clSiembra.getClave_unica());
+                                clSiembra.setEventos_siembra(eventos);
+                            }
                             chkS.setCheckListSiembras(chk);
                         }
 

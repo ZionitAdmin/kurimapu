@@ -1083,11 +1083,53 @@
 
 
 
+        <!-- TICKET 2494 - 2026-09-30: tira de eventos de siembra (H/M1/M2/M3). Cada evento carga
+             sus datos en los MISMOS campos de Regulacion/Aseo/General/Ingreso/Salida de mas abajo. -->
+        <TextView
+            android:id="@+id/lbl_eventos_siembra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/cont_siembra_anterior"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="@string/eventos_de_siembra"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            />
+
+        <HorizontalScrollView
+            android:id="@+id/scroll_tabs_eventos_siembra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@id/lbl_eventos_siembra"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:id="@+id/cont_tabs_eventos_siembra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <Button
+                    android:id="@+id/btn_agregar_evento_siembra"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/agregar_evento"
+                    android:textAllCaps="false"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
         <TextView
             android:id="@+id/lbl_regulacion_siembra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cont_siembra_anterior"
+            app:layout_constraintTop_toBottomOf="@id/scroll_tabs_eventos_siembra"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="@dimen/padding_small"
             android:text="@string/regulacion_de_siembra"
@@ -1099,7 +1141,7 @@
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_expand_down"
-            app:layout_constraintTop_toBottomOf="@id/cont_siembra_anterior"
+            app:layout_constraintTop_toBottomOf="@id/scroll_tabs_eventos_siembra"
             app:layout_constraintStart_toEndOf="@id/lbl_siembra_anterior"
             app:layout_constraintEnd_toEndOf="parent"
             app:tint="@color/colorOnBackground" />
