@@ -2,12 +2,14 @@ package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "visita")
+// TICKET 2494 - 2026-09-30: optimizacion de indices (busquedas de la descarga), ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "visita", indices = {@Index("clave_unica_visita"), @Index("id_anexo_visita")})
 public class Visitas {
     /* AGREGAR ID LOCAL E ID DISPOSITIVO */
 

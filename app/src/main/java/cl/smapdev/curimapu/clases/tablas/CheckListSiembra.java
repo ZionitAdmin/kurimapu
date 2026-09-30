@@ -1,6 +1,7 @@
 package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
@@ -9,7 +10,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-@Entity(tableName = "anexo_checklist_siembra")
+// TICKET 2494 - 2026-09-30: optimizacion de indices (busquedas de la descarga), ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "anexo_checklist_siembra", indices = {@Index("clave_unica")})
 public class CheckListSiembra {
 
     @PrimaryKey(autoGenerate = true)

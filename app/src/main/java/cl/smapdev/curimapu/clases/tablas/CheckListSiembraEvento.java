@@ -1,6 +1,7 @@
 package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
@@ -8,7 +9,8 @@ import com.google.gson.annotations.SerializedName;
 
 // TICKET 2494 - 2026-09-30: evento de siembra (H/M1/M2/M3), uno por fecha+tipo, asociado a un
 // CheckListSiembra via clave_unica_cl_siembra (mismo patron que ChecklistLimpiezaCamionesDetalle)
-@Entity(tableName = "anexo_checklist_siembra_evento")
+// TICKET 2494 - 2026-09-30: optimizacion de indices (busquedas de la descarga), ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "anexo_checklist_siembra_evento", indices = {@Index("clave_unica_evento")})
 public class CheckListSiembraEvento {
 
     @SerializedName("id_evento")

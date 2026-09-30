@@ -1,12 +1,14 @@
 package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "detalle_visita_prop")
+// TICKET 2494 - 2026-09-30: optimizacion de indices, ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "detalle_visita_prop", indices = {@Index("id_visita_detalle")})
 public class detalle_visita_prop {
 
     @PrimaryKey(autoGenerate = true)

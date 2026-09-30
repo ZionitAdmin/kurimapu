@@ -1,9 +1,11 @@
 package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "cli_pcm")
+// TICKET 2494 - 2026-09-30: optimizacion de indices, ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "cli_pcm", indices = {@Index("id_prop_mat_cli")})
 public class cli_pcm {
 
     @PrimaryKey

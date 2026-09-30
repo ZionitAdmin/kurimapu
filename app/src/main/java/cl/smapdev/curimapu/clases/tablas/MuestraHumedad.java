@@ -1,11 +1,13 @@
 package cl.smapdev.curimapu.clases.tablas;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "muestra_humedad")
+// TICKET 2494 - 2026-09-30: optimizacion de indices (busquedas de la descarga), ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "muestra_humedad", indices = {@Index("clave_unica_muestra")})
 public class MuestraHumedad {
 
     @PrimaryKey(autoGenerate = true)

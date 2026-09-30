@@ -2,12 +2,14 @@ package cl.smapdev.curimapu.clases.tablas;
 
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "anexo_checklist_devolucion_semilla")
+// TICKET 2494 - 2026-09-30: optimizacion de indices (busquedas de la descarga), ver Migrations.MIGRATION_22_TO_23
+@Entity(tableName = "anexo_checklist_devolucion_semilla", indices = {@Index("clave_unica")})
 public class ChecklistDevolucionSemilla {
 
     @PrimaryKey(autoGenerate = true)

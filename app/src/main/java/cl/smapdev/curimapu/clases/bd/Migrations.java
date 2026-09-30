@@ -375,4 +375,33 @@ public class Migrations {
                     ");");
         }
     };
+
+    // TICKET 2494 - 2026-09-30: optimizacion de indices. Indices normales (no UNIQUE) en las
+    // columnas que la descarga usa para buscar; no cambian datos ni consultas. Los nombres
+    // deben ser exactamente los que genera Room (index_<tabla>_<columnas>) o la app se cae
+    // al validar el esquema.
+    public static final Migration MIGRATION_22_TO_23 = new Migration(22, 23) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_correo_fechas_id_ac_corr_fech` ON `anexo_correo_fechas` (`id_ac_corr_fech`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_capacitacion_siembra_clave_unica` ON `anexo_checklist_capacitacion_siembra` (`clave_unica`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_capacitacion_siembra_detalle_clave_unica_cl_cap_siembra_detalle` ON `anexo_checklist_capacitacion_siembra_detalle` (`clave_unica_cl_cap_siembra_detalle`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_cosecha_clave_unica` ON `anexo_checklist_cosecha` (`clave_unica`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_devolucion_semilla_clave_unica` ON `anexo_checklist_devolucion_semilla` (`clave_unica`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_limpieza_camiones_clave_unica` ON `anexo_checklist_limpieza_camiones` (`clave_unica`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_limpieza_camiones_detalle_clave_unica_cl_limpieza_camiones_detalle` ON `anexo_checklist_limpieza_camiones_detalle` (`clave_unica_cl_limpieza_camiones_detalle`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_siembra_clave_unica` ON `anexo_checklist_siembra` (`clave_unica`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_siembra_evento_clave_unica_evento` ON `anexo_checklist_siembra_evento` (`clave_unica_evento`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_recomendaciones_clave_unica_recomendacion` ON `anexo_recomendaciones` (`clave_unica_recomendacion`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_muestra_humedad_clave_unica_muestra` ON `muestra_humedad` (`clave_unica_muestra`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_recomendaciones_id_ac` ON `anexo_recomendaciones` (`id_ac`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_visita_clave_unica_visita` ON `visita` (`clave_unica_visita`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_visita_id_anexo_visita` ON `visita` (`id_anexo_visita`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_fotos_id_visita_foto` ON `fotos` (`id_visita_foto`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_fotos_fichas_id_ficha_fotos_local` ON `fotos_fichas` (`id_ficha_fotos_local`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_detalle_visita_prop_id_visita_detalle` ON `detalle_visita_prop` (`id_visita_detalle`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_pro_cli_mat_id_materiales` ON `pro_cli_mat` (`id_materiales`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_cli_pcm_id_prop_mat_cli` ON `cli_pcm` (`id_prop_mat_cli`)");
+        }
+    };
 }
