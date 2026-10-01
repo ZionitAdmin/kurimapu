@@ -801,26 +801,201 @@
 
             </RadioGroup>
 
+            <!-- TICKET 2494 - 2026-10-01: Mezcla se abre a 8 campos de fertilizacion (Carta A del
+                 correo del ticket). et_mezcla queda sin uso (campo en desuso, se deja historico). -->
             <TextView
-                android:id="@+id/lbl_mezcla"
-                android:layout_width="0dp"
+                android:id="@+id/lbl_titulo_mezcla"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/mezcla"
+                android:text="@string/fertilizacion_mezcla"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@id/grupo_foto_semilla"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_mezcla"
+                />
+
+            <TextView
+                android:id="@+id/lbl_cal_kg_ha"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/cal_kg_ha"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/lbl_titulo_mezcla"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_cal_kg_ha"
                 />
 
             <EditText
-                android:id="@+id/et_mezcla"
+                android:id="@+id/et_cal_kg_ha"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="numberDecimal"
                 android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/grupo_foto_semilla"
-                app:layout_constraintStart_toEndOf="@id/lbl_mezcla"
+                app:layout_constraintTop_toBottomOf="@id/lbl_titulo_mezcla"
+                app:layout_constraintStart_toEndOf="@id/lbl_cal_kg_ha"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_nitrogeno_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/nitrogeno_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_cal_kg_ha"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_nitrogeno_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_nitrogeno_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_cal_kg_ha"
+                app:layout_constraintStart_toEndOf="@id/lbl_nitrogeno_pct"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_fosforo_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/fosforo_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_nitrogeno_pct"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_fosforo_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_fosforo_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_nitrogeno_pct"
+                app:layout_constraintStart_toEndOf="@id/lbl_fosforo_pct"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_potasio_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/potasio_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_fosforo_pct"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_potasio_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_potasio_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_fosforo_pct"
+                app:layout_constraintStart_toEndOf="@id/lbl_potasio_pct"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_magnesio_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/magnesio_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_potasio_pct"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_magnesio_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_magnesio_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_potasio_pct"
+                app:layout_constraintStart_toEndOf="@id/lbl_magnesio_pct"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_azufre_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/azufre_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_magnesio_pct"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_azufre_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_azufre_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_magnesio_pct"
+                app:layout_constraintStart_toEndOf="@id/lbl_azufre_pct"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_zinc_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/zinc_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_azufre_pct"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_zinc_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_zinc_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_azufre_pct"
+                app:layout_constraintStart_toEndOf="@id/lbl_zinc_pct"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_boro_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/boro_pct"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_zinc_pct"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_boro_pct"
+                />
+
+            <EditText
+                android:id="@+id/et_boro_pct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_zinc_pct"
+                app:layout_constraintStart_toEndOf="@id/lbl_boro_pct"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />
 
@@ -831,7 +1006,7 @@
                 android:text="@string/cantidad_aplicada_de_fertilizante_kg_ha"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_mezcla"
+                app:layout_constraintTop_toBottomOf="@id/et_boro_pct"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/et_cantidad_fertilizante"
                 />
@@ -842,7 +1017,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_mezcla"
+                app:layout_constraintTop_toBottomOf="@id/et_boro_pct"
                 app:layout_constraintStart_toEndOf="@id/lbl_cantidad_fertilizante"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />

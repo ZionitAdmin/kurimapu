@@ -115,7 +115,15 @@ public class FragmentCheckListSiembra extends Fragment {
     private RadioGroup grupo_foto_semilla;
     private RadioButton btn_foto_semilla_si;
     private RadioButton btn_foto_semilla_no;
-    private EditText et_mezcla;
+    // TICKET 2494 - 2026-10-01: Mezcla abierta a 8 campos de fertilizacion (et_mezcla ya no existe)
+    private EditText et_cal_kg_ha;
+    private EditText et_nitrogeno_pct;
+    private EditText et_fosforo_pct;
+    private EditText et_potasio_pct;
+    private EditText et_magnesio_pct;
+    private EditText et_azufre_pct;
+    private EditText et_zinc_pct;
+    private EditText et_boro_pct;
     private EditText et_cantidad_fertilizante;
     private EditText et_cantidad_envases_h;
     private EditText et_lote_hembra;
@@ -475,8 +483,30 @@ public class FragmentCheckListSiembra extends Fragment {
             btn_foto_semilla_no.setChecked((checkListSiembra.getFoto_semilla() == 2));
         }
 
-        if (checkListSiembra.getMezcla() != null && !checkListSiembra.getMezcla().isEmpty()) {
-            et_mezcla.setText(checkListSiembra.getMezcla());
+        // TICKET 2494 - 2026-10-01: Mezcla abierta a 8 campos de fertilizacion
+        if (checkListSiembra.getCal_kg_ha() > 0) {
+            et_cal_kg_ha.setText(String.valueOf(checkListSiembra.getCal_kg_ha()));
+        }
+        if (checkListSiembra.getNitrogeno_pct() > 0) {
+            et_nitrogeno_pct.setText(String.valueOf(checkListSiembra.getNitrogeno_pct()));
+        }
+        if (checkListSiembra.getFosforo_pct() > 0) {
+            et_fosforo_pct.setText(String.valueOf(checkListSiembra.getFosforo_pct()));
+        }
+        if (checkListSiembra.getPotasio_pct() > 0) {
+            et_potasio_pct.setText(String.valueOf(checkListSiembra.getPotasio_pct()));
+        }
+        if (checkListSiembra.getMagnesio_pct() > 0) {
+            et_magnesio_pct.setText(String.valueOf(checkListSiembra.getMagnesio_pct()));
+        }
+        if (checkListSiembra.getAzufre_pct() > 0) {
+            et_azufre_pct.setText(String.valueOf(checkListSiembra.getAzufre_pct()));
+        }
+        if (checkListSiembra.getZinc_pct() > 0) {
+            et_zinc_pct.setText(String.valueOf(checkListSiembra.getZinc_pct()));
+        }
+        if (checkListSiembra.getBoro_pct() > 0) {
+            et_boro_pct.setText(String.valueOf(checkListSiembra.getBoro_pct()));
         }
 
         if (checkListSiembra.getCantidad_aplicada() > 0) {
@@ -873,7 +903,14 @@ public class FragmentCheckListSiembra extends Fragment {
         grupo_foto_semilla = view.findViewById(R.id.grupo_foto_semilla);
         btn_foto_semilla_si = view.findViewById(R.id.btn_foto_semilla_si);
         btn_foto_semilla_no = view.findViewById(R.id.btn_foto_semilla_no);
-        et_mezcla = view.findViewById(R.id.et_mezcla);
+        et_cal_kg_ha = view.findViewById(R.id.et_cal_kg_ha);
+        et_nitrogeno_pct = view.findViewById(R.id.et_nitrogeno_pct);
+        et_fosforo_pct = view.findViewById(R.id.et_fosforo_pct);
+        et_potasio_pct = view.findViewById(R.id.et_potasio_pct);
+        et_magnesio_pct = view.findViewById(R.id.et_magnesio_pct);
+        et_azufre_pct = view.findViewById(R.id.et_azufre_pct);
+        et_zinc_pct = view.findViewById(R.id.et_zinc_pct);
+        et_boro_pct = view.findViewById(R.id.et_boro_pct);
         et_cantidad_fertilizante = view.findViewById(R.id.et_cantidad_fertilizante);
         et_cantidad_envases_h = view.findViewById(R.id.et_cantidad_envases_h);
         et_lote_hembra = view.findViewById(R.id.et_lote_hembra);
@@ -1650,9 +1687,30 @@ public class FragmentCheckListSiembra extends Fragment {
             siembra.setFoto_semilla(fotoSemilla);
         }
 
-        if (!et_mezcla.getText().toString().isEmpty()) {
-            String mezcla = et_mezcla.getText().toString();
-            siembra.setMezcla(mezcla);
+        // TICKET 2494 - 2026-10-01: Mezcla abierta a 8 campos de fertilizacion
+        if (!et_cal_kg_ha.getText().toString().isEmpty()) {
+            siembra.setCal_kg_ha(Double.parseDouble(et_cal_kg_ha.getText().toString()));
+        }
+        if (!et_nitrogeno_pct.getText().toString().isEmpty()) {
+            siembra.setNitrogeno_pct(Double.parseDouble(et_nitrogeno_pct.getText().toString()));
+        }
+        if (!et_fosforo_pct.getText().toString().isEmpty()) {
+            siembra.setFosforo_pct(Double.parseDouble(et_fosforo_pct.getText().toString()));
+        }
+        if (!et_potasio_pct.getText().toString().isEmpty()) {
+            siembra.setPotasio_pct(Double.parseDouble(et_potasio_pct.getText().toString()));
+        }
+        if (!et_magnesio_pct.getText().toString().isEmpty()) {
+            siembra.setMagnesio_pct(Double.parseDouble(et_magnesio_pct.getText().toString()));
+        }
+        if (!et_azufre_pct.getText().toString().isEmpty()) {
+            siembra.setAzufre_pct(Double.parseDouble(et_azufre_pct.getText().toString()));
+        }
+        if (!et_zinc_pct.getText().toString().isEmpty()) {
+            siembra.setZinc_pct(Double.parseDouble(et_zinc_pct.getText().toString()));
+        }
+        if (!et_boro_pct.getText().toString().isEmpty()) {
+            siembra.setBoro_pct(Double.parseDouble(et_boro_pct.getText().toString()));
         }
 
         if (!et_cantidad_fertilizante.getText().toString().isEmpty()) {

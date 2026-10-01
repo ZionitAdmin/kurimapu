@@ -78,7 +78,25 @@ public class CheckListSiembra {
     @Expose
     private int foto_semilla;
     @Expose
-    private String mezcla;
+    private String mezcla; // TICKET 2494 - 2026-10-01: en desuso, abierto a los 8 campos de abajo
+    // TICKET 2494 - 2026-10-01: Mezcla abierta a 8 campos de fertilizacion (Carta A del correo del
+    // ticket), tambien se copian a Libro de Campo (identificadores 56,57,58,59,61,62,63,64)
+    @Expose
+    private double cal_kg_ha;
+    @Expose
+    private double nitrogeno_pct;
+    @Expose
+    private double fosforo_pct;
+    @Expose
+    private double potasio_pct;
+    @Expose
+    private double magnesio_pct;
+    @Expose
+    private double azufre_pct;
+    @Expose
+    private double zinc_pct;
+    @Expose
+    private double boro_pct;
     @Expose
     private double cantidad_aplicada;
     @Expose
@@ -529,6 +547,70 @@ public class CheckListSiembra {
 
     public void setMezcla(String mezcla) {
         this.mezcla = mezcla;
+    }
+
+    public double getCal_kg_ha() {
+        return cal_kg_ha;
+    }
+
+    public void setCal_kg_ha(double cal_kg_ha) {
+        this.cal_kg_ha = cal_kg_ha;
+    }
+
+    public double getNitrogeno_pct() {
+        return nitrogeno_pct;
+    }
+
+    public void setNitrogeno_pct(double nitrogeno_pct) {
+        this.nitrogeno_pct = nitrogeno_pct;
+    }
+
+    public double getFosforo_pct() {
+        return fosforo_pct;
+    }
+
+    public void setFosforo_pct(double fosforo_pct) {
+        this.fosforo_pct = fosforo_pct;
+    }
+
+    public double getPotasio_pct() {
+        return potasio_pct;
+    }
+
+    public void setPotasio_pct(double potasio_pct) {
+        this.potasio_pct = potasio_pct;
+    }
+
+    public double getMagnesio_pct() {
+        return magnesio_pct;
+    }
+
+    public void setMagnesio_pct(double magnesio_pct) {
+        this.magnesio_pct = magnesio_pct;
+    }
+
+    public double getAzufre_pct() {
+        return azufre_pct;
+    }
+
+    public void setAzufre_pct(double azufre_pct) {
+        this.azufre_pct = azufre_pct;
+    }
+
+    public double getZinc_pct() {
+        return zinc_pct;
+    }
+
+    public void setZinc_pct(double zinc_pct) {
+        this.zinc_pct = zinc_pct;
+    }
+
+    public double getBoro_pct() {
+        return boro_pct;
+    }
+
+    public void setBoro_pct(double boro_pct) {
+        this.boro_pct = boro_pct;
     }
 
     public double getCantidad_aplicada() {

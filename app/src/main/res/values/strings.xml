@@ -402,6 +402,16 @@
     <string name="foto_envase">FOTO ENVASE</string>
     <string name="foto_semilla">FOTO SEMILLA</string>
     <string name="mezcla">MEZCLA</string>
+    <!-- TICKET 2494 - 2026-10-01: Mezcla abierta a 8 campos de fertilizacion -->
+    <string name="fertilizacion_mezcla">FERTILIZACIÓN (MEZCLA)</string>
+    <string name="cal_kg_ha">CAL (CaCO3) KG/HA</string>
+    <string name="nitrogeno_pct">NITRÓGENO (N) %</string>
+    <string name="fosforo_pct">FÓSFORO (P2O5) %</string>
+    <string name="potasio_pct">POTASIO (K2O) %</string>
+    <string name="magnesio_pct">MAGNESIO (MgO) %</string>
+    <string name="azufre_pct">AZUFRE (S) %</string>
+    <string name="zinc_pct">ZINC (Zn) %</string>
+    <string name="boro_pct">BORO (B) %</string>
     <string name="cantidad_aplicada_de_fertilizante_kg_ha">CANTIDAD APLICADA DE FERTILIZANTE (KG/HA)</string>
     <string name="cantidad_envases_h">CANTIDAD ENVASES H</string>
     <string name="lote_hembra">LOTE HEMBRA</string>

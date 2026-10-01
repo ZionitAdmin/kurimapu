@@ -416,4 +416,20 @@ public class Migrations {
             database.execSQL("ALTER TABLE anexo_checklist_siembra_evento ADD COLUMN anexo_curimapu TEXT;");
         }
     };
+
+    // TICKET 2494 - 2026-10-01: Mezcla se abre a 8 campos de fertilizacion (Carta A del correo del
+    // ticket). mezcla queda en desuso (no se borra, se deja historico).
+    public static final Migration MIGRATION_24_TO_25 = new Migration(24, 25) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN cal_kg_ha REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN nitrogeno_pct REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN fosforo_pct REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN potasio_pct REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN magnesio_pct REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN azufre_pct REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN zinc_pct REAL NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN boro_pct REAL NOT NULL DEFAULT 0;");
+        }
+    };
 }
