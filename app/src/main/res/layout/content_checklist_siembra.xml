@@ -1096,6 +1096,22 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             />
 
+        <!-- TICKET 2494 - 2026-10-01: boton "+" en la misma fila del titulo, a la derecha -->
+        <Button
+            android:id="@+id/btn_agregar_evento_siembra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/agregar_evento"
+            android:textAllCaps="false"
+            app:layout_constraintTop_toTopOf="@id/lbl_eventos_siembra"
+            app:layout_constraintBottom_toBottomOf="@id/lbl_eventos_siembra"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="@style/Widget.AppCompat.Button.Colored" />
+
         <HorizontalScrollView
             android:id="@+id/scroll_tabs_eventos_siembra"
             android:layout_width="match_parent"
@@ -1113,17 +1129,27 @@
                 android:paddingTop="@dimen/padding_small"
                 android:paddingBottom="@dimen/padding_small">
 
-                <Button
-                    android:id="@+id/btn_agregar_evento_siembra"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/agregar_evento"
-                    android:textAllCaps="false"
-                    style="@style/Widget.AppCompat.Button.Colored" />
-
             </LinearLayout>
 
         </HorizontalScrollView>
+
+        <!-- TICKET 2494 - 2026-10-01: agrupa SOLO los campos/secciones que son por evento, para
+             ocultarlos cuando no hay un evento de siembra seleccionado. "Regulacion de siembra"
+             mezcla 4 campos por evento con ~15 de configuracion de maquina (siempre visibles); por
+             eso aca se listan esos 4 campos puntuales, y de Siembra Anterior, Aseo Pre/Post,
+             General, Ingreso y Salida SOLO el titulo+flechita (no el contenedor de contenido):
+             cada seccion tiene su propio acordeon que empieza colapsado, y si el grupo tambien
+             controlara el contenedor, forzaria a VISIBLE esas secciones de golpe cada vez que se
+             selecciona un evento, pisando el colapsado manual y mostrando todos los campos de una
+             sola vez. Nota: "Siembra Anterior" esta ANTES del titulo "Eventos de Siembra" en la
+             pantalla, asi que sin evento seleccionado el usuario ve Suelo/Siembra/Chequeo de
+             Envases y despues el titulo "Eventos de Siembra" con el boton "+" para crear el primero. -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_campos_evento_siembra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="lbl_siembra_anterior,btn_oculta_siembra_anterior,lbl_prestador_servicio,et_prestador_servicio,lbl_estado_discos,sp_estado_discos,lbl_profundidad_siembra,et_profundidad_siembra,lbl_dist_entre_fert_semilla,et_dist_entre_fert_semilla,lbl_aseo_maquinaria_pre_siembra,btn_oculta_aseo_maquinaria_pre_siembra,lbl_aseo_maquinaria_post_siembra,btn_oculta_aseo_maquinaria_post_siembra,lbl_titulo_general,btn_oculta_general,lbl_titulo_ingreso,btn_oculta_ingreso,lbl_titulo_salida,btn_oculta_salida" />
 
         <TextView
             android:id="@+id/lbl_regulacion_siembra"

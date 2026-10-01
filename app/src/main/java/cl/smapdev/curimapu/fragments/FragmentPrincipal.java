@@ -1488,7 +1488,7 @@ public class FragmentPrincipal extends Fragment {
                                 mostrarProgreso("guardando datos de temporada " + descTempActual + "  (" + (i + 1) + "/" + totalTemporadas + ")")
                         );
                         long tSaveStart = System.currentTimeMillis();
-                        boolean[] problema = volqueoDatos(data);
+                        boolean[] problema = volqueoDatos(data, activity);
                         long tSaveMs = System.currentTimeMillis() - tSaveStart;
 
                         Utilidades.logTiempoDescarga(activity,

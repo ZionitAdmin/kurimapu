@@ -1,6 +1,7 @@
 package cl.smapdev.curimapu.clases.utilidades;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
@@ -157,7 +158,10 @@ public class Descargas {
 
     // TICKET 2494 - 2026-09-30: helper de cronometraje por seccion, para saber cual de los
     // ~20 bloques de volqueoDatos() se lleva el tiempo cuando el guardado demora varios minutos.
+    // TICKET 2494 - 2026-10-01: bug corregido - esto solo escribia a Logcat (Log.d), por eso no
+    // aparecia en timing_descarga.log. Ahora usa Utilidades.logTiempoDescarga() igual que el resto.
     private static long tSeccion;
+    private static Context contextTiming;
 
     private static void iniciaSeccion() {
         tSeccion = System.currentTimeMillis();
@@ -166,11 +170,17 @@ public class Descargas {
     private static void terminaSeccion(String nombre, int cantidad) {
         long ms = System.currentTimeMillis() - tSeccion;
         if (cantidad > 0 || ms > 50) {
-            Log.d("TIMING_DESCARGA", "  seccion=" + nombre + " cantidad=" + cantidad + " tiempo=" + ms + "ms");
+            String linea = "  seccion=" + nombre + " cantidad=" + cantidad + " tiempo=" + ms + "ms";
+            if (contextTiming != null) {
+                Utilidades.logTiempoDescarga(contextTiming, linea);
+            } else {
+                Log.d("TIMING_DESCARGA", linea);
+            }
         }
     }
 
-    public static boolean[] volqueoDatos(GsonDescargas gsonDescargas) throws RuntimeException {
+    public static boolean[] volqueoDatos(GsonDescargas gsonDescargas, Context context) throws RuntimeException {
+        contextTiming = context;
 
         boolean[] problema = {false, false};
 

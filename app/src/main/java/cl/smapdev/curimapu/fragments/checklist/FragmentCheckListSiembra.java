@@ -255,6 +255,7 @@ public class FragmentCheckListSiembra extends Fragment {
     private static final String[] TIPOS_EVENTO_SIEMBRA = {"H", "M1", "M2", "M3"};
     private LinearLayout cont_tabs_eventos_siembra;
     private Button btn_agregar_evento_siembra;
+    private androidx.constraintlayout.widget.Group group_campos_evento_siembra;
     private final List<CheckListSiembraEvento> eventosSiembra = new ArrayList<>();
     private CheckListSiembraEvento eventoActualSiembra = null;
     private String snapshotEventoActualCargado = "";
@@ -498,22 +499,8 @@ public class FragmentCheckListSiembra extends Fragment {
             et_lote_macho.setText(checkListSiembra.getLote_macho());
         }
 
-        if (checkListSiembra.getEspecie() != null && !checkListSiembra.getEspecie().isEmpty()) {
-            et_especie.setText(checkListSiembra.getEspecie());
-        }
-
-        if (checkListSiembra.getVariedad() != null && !checkListSiembra.getVariedad().isEmpty()) {
-            et_variedad.setText(checkListSiembra.getVariedad());
-        }
-
-        if (checkListSiembra.getOgm() > 0) {
-            btn_ogm_si.setChecked((checkListSiembra.getOgm() == 1));
-            btn_ogm_no.setChecked((checkListSiembra.getOgm() == 2));
-        }
-
-        if (checkListSiembra.getAnexo_curimapu() != null && !checkListSiembra.getAnexo_curimapu().isEmpty()) {
-            et_anexo_curimapu.setText(checkListSiembra.getAnexo_curimapu());
-        }
+        // TICKET 2494 - 2026-10-01: especie/variedad/ogm/anexo_curimapu (Siembra Anterior) ya no
+        // se cargan desde la cabecera - ahora son por evento, ver cargarCamposDesdeEventoSiembra().
 
         if (checkListSiembra.getPrestador_servicio() != null && !checkListSiembra.getPrestador_servicio().isEmpty()) {
             et_prestador_servicio.setText(checkListSiembra.getPrestador_servicio());
@@ -774,6 +761,28 @@ public class FragmentCheckListSiembra extends Fragment {
         cargarDatosPrevios();
     }
 
+    // TICKET 2494 - 2026-10-01: red de seguridad - Android llama onPause() cuando la pantalla deja
+    // de estar en primer plano (boton atras, se bloquea el telefono, cambia de app, etc). Si hay un
+    // evento activo con cambios que no pasaron por un cambio de tab ni por GUARDAR, se guardan aca.
+    // OJO: onPause() debe ser rapido y no bloqueante (Android lo espera para completar la
+    // transicion), por eso aca NO se usa guardarEventoSiembraActual() -que hace una consulta
+    // bloqueante (.get()) para recoger firmas pendientes-, solo se guardan campos de texto/combos
+    // en segundo plano sin esperar respuesta. Las firmas no se pierden: ya quedaron en TempFirmas
+    // desde que se dibujaron, y se recogen en el proximo cambio de tab o GUARDAR.
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (eventoActualSiembra != null && checkListSiembra != null) {
+            leerCamposHaciaEventoSiembra(eventoActualSiembra);
+            eventoActualSiembra.setClave_unica_cl_siembra(checkListSiembra.getClave_unica());
+            eventoActualSiembra.setEstado_sincronizacion(0);
+            final CheckListSiembraEvento eventoAGuardar = eventoActualSiembra;
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(() -> MainActivity.myAppDB.DaoClSiembra().updateEvento(eventoAGuardar));
+            executor.shutdown();
+        }
+    }
+
     private void cargarDatosPrevios() {
         if (anexoCompleto == null) {
             Toasty.error(requireActivity(), "No se pudo obtener informacion del anexo", Toast.LENGTH_LONG, true).show();
@@ -883,6 +892,7 @@ public class FragmentCheckListSiembra extends Fragment {
         cont_tabs_eventos_siembra = view.findViewById(R.id.cont_tabs_eventos_siembra);
         btn_agregar_evento_siembra = view.findViewById(R.id.btn_agregar_evento_siembra);
         btn_agregar_evento_siembra.setOnClickListener(view1 -> mostrarDialogoNuevoEventoSiembra());
+        group_campos_evento_siembra = view.findViewById(R.id.group_campos_evento_siembra);
 
         //regulacion de siembra
         et_prestador_servicio = view.findViewById(R.id.et_prestador_servicio);
@@ -1674,25 +1684,8 @@ public class FragmentCheckListSiembra extends Fragment {
 
         //siembra anterior
 
-        if (!et_especie.getText().toString().isEmpty()) {
-            String especie = et_especie.getText().toString();
-            siembra.setEspecie(especie);
-        }
-
-        if (!et_variedad.getText().toString().isEmpty()) {
-            String variedad = et_variedad.getText().toString();
-            siembra.setVariedad(variedad);
-        }
-
-        if (btn_ogm_si.isChecked() || btn_ogm_no.isChecked()) {
-            int ogm = (btn_ogm_si.isChecked()) ? 1 : 2;
-            siembra.setOgm(ogm);
-        }
-
-        if (!et_anexo_curimapu.getText().toString().isEmpty()) {
-            String anexoCurimapu = et_anexo_curimapu.getText().toString();
-            siembra.setAnexo_curimapu(anexoCurimapu);
-        }
+        // TICKET 2494 - 2026-10-01: especie/variedad/ogm/anexo_curimapu (Siembra Anterior) ya no se
+        // guardan en la cabecera - ahora son por evento, ver leerCamposHaciaEventoSiembra().
 
         //regulacion de siembra
 
@@ -2012,8 +2005,14 @@ public class FragmentCheckListSiembra extends Fragment {
             if (checkListSiembra == null && newIdFuture != null) {
                 long newId = newIdFuture.get();
                 if (newId > 0) {
+                    // TICKET 2494 - 2026-10-01: al crear el checklist por primera vez, quedarse en
+                    // el mismo formulario (en vez de cancelar()/salir) para poder agregar eventos
+                    // de siembra al tiro, sin tener que volver a entrar.
+                    siembra.setId_cl_siembra((int) newId);
+                    checkListSiembra = siembra;
+                    btn_guardar_cl_siembra.setText("EDITAR");
+                    cargarEventosSiembraDesdeBD();
                     Toasty.success(requireActivity(), "Guardado con exito", Toast.LENGTH_LONG, true).show();
-                    cancelar();
                 } else {
                     Toasty.error(requireActivity(), "No se pudo guardar con exito", Toast.LENGTH_LONG, true).show();
                 }
@@ -2090,8 +2089,13 @@ public class FragmentCheckListSiembra extends Fragment {
             boolean esActual = eventoActualSiembra != null
                     && evento.getClave_unica_evento() != null
                     && evento.getClave_unica_evento().equals(eventoActualSiembra.getClave_unica_evento());
+            // TICKET 2494 - 2026-10-01: colorOnBackground es negro y estaba puesto como FONDO del
+            // boton no seleccionado (por eso no se leia el texto). Fondo gris claro + texto oscuro
+            // para el no seleccionado, morado + texto blanco para el seleccionado.
             tab.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                    esActual ? R.color.colorPrimary : R.color.colorOnBackground));
+                    esActual ? R.color.colorPrimary : R.color.colorGrey));
+            tab.setTextColor(ContextCompat.getColor(requireContext(),
+                    esActual ? R.color.colorOnPrimary : R.color.colorOnBackground));
 
             tab.setOnClickListener(v -> seleccionarEventoSiembra(evento));
 
@@ -2102,13 +2106,25 @@ public class FragmentCheckListSiembra extends Fragment {
 
             cont_tabs_eventos_siembra.addView(tab);
         }
-
-        cont_tabs_eventos_siembra.addView(btn_agregar_evento_siembra);
     }
 
     private void seleccionarEventoSiembra(CheckListSiembraEvento evento) {
-        if (eventoActualSiembra != null && !snapshotCamposEventoSiembra().equals(snapshotEventoActualCargado)) {
-            Toasty.warning(requireActivity(), "Tienes cambios sin guardar en el evento actual", Toast.LENGTH_LONG, true).show();
+        // TICKET 2494 - 2026-10-01: si tocas el mismo evento en el que ya estas (doble toque), no
+        // se hace nada - recargar desde el objeto en memoria descartaria lo que recien tipeaste
+        // sin haber cambiado de tab.
+        boolean esElMismoEvento = eventoActualSiembra != null
+                && evento.getClave_unica_evento() != null
+                && evento.getClave_unica_evento().equals(eventoActualSiembra.getClave_unica_evento());
+        if (esElMismoEvento) {
+            return;
+        }
+
+        // Antes solo se avisaba "tienes cambios sin guardar" pero el cambio de tab igual
+        // descartaba lo editado (nunca se escribia en el evento ni en Room). Ahora se guarda de
+        // una vez el evento que se esta dejando (campos + firmas pendientes) antes de cargar el
+        // siguiente, para que nunca se pierda ni se mezcle con el otro evento.
+        if (eventoActualSiembra != null && checkListSiembra != null) {
+            guardarEventoSiembraActual(checkListSiembra.getClave_unica());
         }
         eventoActualSiembra = evento;
         cargarCamposDesdeEventoSiembra(evento);
@@ -2116,6 +2132,17 @@ public class FragmentCheckListSiembra extends Fragment {
     }
 
     private void cargarCamposDesdeEventoSiembra(CheckListSiembraEvento evento) {
+
+        // TICKET 2494 - 2026-10-01: los campos/secciones por evento solo se muestran cuando hay
+        // un evento seleccionado - evita que se piense que hay que llenarlos sin haber creado uno.
+        group_campos_evento_siembra.setVisibility(View.VISIBLE);
+
+        // TICKET 2494 - 2026-10-01: Siembra Anterior (especie/variedad/ogm/anexo_curimapu) por evento
+        et_especie.setText(evento.getEspecie() != null ? evento.getEspecie() : "");
+        et_variedad.setText(evento.getVariedad() != null ? evento.getVariedad() : "");
+        btn_ogm_si.setChecked(evento.getOgm() == 1);
+        btn_ogm_no.setChecked(evento.getOgm() == 2);
+        et_anexo_curimapu.setText(evento.getAnexo_curimapu() != null ? evento.getAnexo_curimapu() : "");
 
         et_prestador_servicio.setText(evento.getPrestador_servicio() != null ? evento.getPrestador_servicio() : "");
         if (evento.getEstado_discos() != null && !evento.getEstado_discos().isEmpty()) {
@@ -2191,6 +2218,20 @@ public class FragmentCheckListSiembra extends Fragment {
 
     private void leerCamposHaciaEventoSiembra(CheckListSiembraEvento evento) {
         String comparaSpinner = "--Seleccione--";
+
+        // TICKET 2494 - 2026-10-01: Siembra Anterior (especie/variedad/ogm/anexo_curimapu) por evento
+        if (!et_especie.getText().toString().isEmpty()) {
+            evento.setEspecie(et_especie.getText().toString());
+        }
+        if (!et_variedad.getText().toString().isEmpty()) {
+            evento.setVariedad(et_variedad.getText().toString());
+        }
+        if (btn_ogm_si.isChecked() || btn_ogm_no.isChecked()) {
+            evento.setOgm(btn_ogm_si.isChecked() ? 1 : 2);
+        }
+        if (!et_anexo_curimapu.getText().toString().isEmpty()) {
+            evento.setAnexo_curimapu(et_anexo_curimapu.getText().toString());
+        }
 
         if (!et_prestador_servicio.getText().toString().isEmpty()) {
             evento.setPrestador_servicio(et_prestador_servicio.getText().toString());
@@ -2376,9 +2417,8 @@ public class FragmentCheckListSiembra extends Fragment {
                         return;
                     }
 
-                    if (eventoActualSiembra != null && !snapshotCamposEventoSiembra().equals(snapshotEventoActualCargado)) {
-                        Toasty.warning(requireActivity(), "Tienes cambios sin guardar en el evento actual", Toast.LENGTH_LONG, true).show();
-                    }
+                    // TICKET 2494 - 2026-10-01: el evento que se esta dejando se guarda dentro de
+                    // seleccionarEventoSiembra() mas abajo, ya no hace falta avisar ni chequear aca.
 
                     String claveUnicaEvento = config.getId()
                             + "" + config.getId_usuario()
@@ -2398,7 +2438,14 @@ public class FragmentCheckListSiembra extends Fragment {
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     Future<Long> idFuture = executor.submit(() -> MainActivity.myAppDB.DaoClSiembra().insertEvento(nuevoEvento));
                     try {
-                        idFuture.get();
+                        // TICKET 2494 - 2026-10-01: bug critico corregido - el id autogenerado por
+                        // Room nunca se guardaba de vuelta en nuevoEvento (quedaba en 0). Como
+                        // @Update de Room busca la fila por ese id, cualquier guardado posterior de
+                        // este evento (cambio de tab, GUARDAR) fallaba en silencio (0 filas
+                        // afectadas) porque no existe una fila con id_evento = 0, perdiendose todo
+                        // lo que se editara despues de crear el evento.
+                        long newIdEvento = idFuture.get();
+                        nuevoEvento.setId_evento((int) newIdEvento);
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     }

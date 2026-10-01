@@ -404,4 +404,16 @@ public class Migrations {
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_cli_pcm_id_prop_mat_cli` ON `cli_pcm` (`id_prop_mat_cli`)");
         }
     };
+
+    // TICKET 2494 - 2026-10-01: seccion Siembra Anterior (especie/variedad/ogm/anexo_curimapu)
+    // pasa de la cabecera a ser por evento, igual que Regulacion/Aseo/General/Ingreso/Salida
+    public static final Migration MIGRATION_23_TO_24 = new Migration(23, 24) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE anexo_checklist_siembra_evento ADD COLUMN especie TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra_evento ADD COLUMN variedad TEXT;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra_evento ADD COLUMN ogm INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra_evento ADD COLUMN anexo_curimapu TEXT;");
+        }
+    };
 }

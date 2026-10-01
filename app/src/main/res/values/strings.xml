@@ -413,7 +413,7 @@
     <string name="anexo_curimapu">ANEXO CURIMAPU</string>
     <!-- TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) -->
     <string name="eventos_de_siembra">EVENTOS DE SIEMBRA</string>
-    <string name="agregar_evento">+ AGREGAR EVENTO</string>
+    <string name="agregar_evento">+</string>
     <string name="regulacion_de_siembra">REGULACION DE SIEMBRA</string>
     <string name="prestador_de_servicio">PRESTADOR DE SERVICIO</string>
     <string name="estado_de_discos">ESTADO DE DISCOS</string>

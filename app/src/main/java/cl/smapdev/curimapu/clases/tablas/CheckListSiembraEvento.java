@@ -34,6 +34,21 @@ public class CheckListSiembraEvento {
     @Expose
     private String tipo_evento;
 
+    // TICKET 2494 - 2026-10-01: seccion Siembra Anterior, tambien por evento (cada H/M1/M2/M3
+    // puede venir de un cultivo anterior distinto)
+    @SerializedName("especie")
+    @Expose
+    private String especie;
+    @SerializedName("variedad")
+    @Expose
+    private String variedad;
+    @SerializedName("ogm")
+    @Expose
+    private int ogm;
+    @SerializedName("anexo_curimapu")
+    @Expose
+    private String anexo_curimapu;
+
     @SerializedName("prestador_servicio")
     @Expose
     private String prestador_servicio;
@@ -220,6 +235,38 @@ public class CheckListSiembraEvento {
 
     public void setTipo_evento(String tipo_evento) {
         this.tipo_evento = tipo_evento;
+    }
+
+    public String getEspecie() {
+        return especie;
+    }
+
+    public void setEspecie(String especie) {
+        this.especie = especie;
+    }
+
+    public String getVariedad() {
+        return variedad;
+    }
+
+    public void setVariedad(String variedad) {
+        this.variedad = variedad;
+    }
+
+    public int getOgm() {
+        return ogm;
+    }
+
+    public void setOgm(int ogm) {
+        this.ogm = ogm;
+    }
+
+    public String getAnexo_curimapu() {
+        return anexo_curimapu;
+    }
+
+    public void setAnexo_curimapu(String anexo_curimapu) {
+        this.anexo_curimapu = anexo_curimapu;
     }
 
     public String getPrestador_servicio() {
