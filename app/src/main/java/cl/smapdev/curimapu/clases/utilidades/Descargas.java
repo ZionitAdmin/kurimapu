@@ -262,15 +262,17 @@ public class Descargas {
         int cantDevSemilla = (gsonDescargas.getChecklistDevolucionSemillas() != null) ? gsonDescargas.getChecklistDevolucionSemillas().size() : 0;
         if (gsonDescargas.getChecklistDevolucionSemillas() != null && !gsonDescargas.getChecklistDevolucionSemillas().isEmpty()) {
             try {
-                for (ChecklistDevolucionSemilla ck : gsonDescargas.getChecklistDevolucionSemillas()) {
-                    ChecklistDevolucionSemilla chk = MainActivity.myAppDB.DaoCheckListDevolucionSemilla().getCLDevolucionSemillaByClaveUnica(ck.getClave_unica());
-                    if (chk != null) {
-                        ck.setId_cl_devolucion_semilla(chk.getId_cl_devolucion_semilla());
-                        MainActivity.myAppDB.DaoCheckListDevolucionSemilla().updateClDevolucionSemilla(ck);
-                    } else {
-                        MainActivity.myAppDB.DaoCheckListDevolucionSemilla().insertClDevolucionSemilla(ck);
+                MainActivity.myAppDB.runInTransaction(() -> {
+                    for (ChecklistDevolucionSemilla ck : gsonDescargas.getChecklistDevolucionSemillas()) {
+                        ChecklistDevolucionSemilla chk = MainActivity.myAppDB.DaoCheckListDevolucionSemilla().getCLDevolucionSemillaByClaveUnica(ck.getClave_unica());
+                        if (chk != null) {
+                            ck.setId_cl_devolucion_semilla(chk.getId_cl_devolucion_semilla());
+                            MainActivity.myAppDB.DaoCheckListDevolucionSemilla().updateClDevolucionSemilla(ck);
+                        } else {
+                            MainActivity.myAppDB.DaoCheckListDevolucionSemilla().insertClDevolucionSemilla(ck);
+                        }
                     }
-                }
+                });
             } catch (SQLiteException ignored) {
             }
         }
@@ -280,30 +282,32 @@ public class Descargas {
         int cantClSiembra = (gsonDescargas.getCheckListSiembras() != null) ? gsonDescargas.getCheckListSiembras().size() : 0;
         if (gsonDescargas.getCheckListSiembras() != null && !gsonDescargas.getCheckListSiembras().isEmpty()) {
             try {
-                for (CheckListSiembra ck : gsonDescargas.getCheckListSiembras()) {
-                    CheckListSiembra chk = MainActivity.myAppDB.DaoClSiembra().getCLSiembraByClaveUnica(ck.getClave_unica());
-                    if (chk != null) {
-                        ck.setId_cl_siembra(chk.getId_cl_siembra());
-                        MainActivity.myAppDB.DaoClSiembra().updateClSiembra(ck);
-                    } else {
-                        MainActivity.myAppDB.DaoClSiembra().insertClSiembra(ck);
-                    }
+                MainActivity.myAppDB.runInTransaction(() -> {
+                    for (CheckListSiembra ck : gsonDescargas.getCheckListSiembras()) {
+                        CheckListSiembra chk = MainActivity.myAppDB.DaoClSiembra().getCLSiembraByClaveUnica(ck.getClave_unica());
+                        if (chk != null) {
+                            ck.setId_cl_siembra(chk.getId_cl_siembra());
+                            MainActivity.myAppDB.DaoClSiembra().updateClSiembra(ck);
+                        } else {
+                            MainActivity.myAppDB.DaoClSiembra().insertClSiembra(ck);
+                        }
 
-                    // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) del checklist
-                    if (ck.getEventos_siembra() != null) {
-                        for (CheckListSiembraEvento evento : ck.getEventos_siembra()) {
-                            CheckListSiembraEvento eventoLocal = MainActivity.myAppDB
-                                    .DaoClSiembra()
-                                    .getEventoByClaveUnica(evento.getClave_unica_evento());
-                            if (eventoLocal != null) {
-                                evento.setId_evento(eventoLocal.getId_evento());
-                                MainActivity.myAppDB.DaoClSiembra().updateEvento(evento);
-                            } else {
-                                MainActivity.myAppDB.DaoClSiembra().insertEvento(evento);
+                        // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3) del checklist
+                        if (ck.getEventos_siembra() != null) {
+                            for (CheckListSiembraEvento evento : ck.getEventos_siembra()) {
+                                CheckListSiembraEvento eventoLocal = MainActivity.myAppDB
+                                        .DaoClSiembra()
+                                        .getEventoByClaveUnica(evento.getClave_unica_evento());
+                                if (eventoLocal != null) {
+                                    evento.setId_evento(eventoLocal.getId_evento());
+                                    MainActivity.myAppDB.DaoClSiembra().updateEvento(evento);
+                                } else {
+                                    MainActivity.myAppDB.DaoClSiembra().insertEvento(evento);
+                                }
                             }
                         }
                     }
-                }
+                });
             } catch (SQLiteException ignored) {
             }
         }
@@ -313,25 +317,30 @@ public class Descargas {
         int cantClCosecha = (gsonDescargas.getCheckListCosecha() != null) ? gsonDescargas.getCheckListCosecha().size() : 0;
         if (gsonDescargas.getCheckListCosecha() != null && !gsonDescargas.getCheckListCosecha().isEmpty()) {
             try {
-                for (CheckListCosecha ck : gsonDescargas.getCheckListCosecha()) {
-                    CheckListCosecha chk = MainActivity.myAppDB.DaoCheckListCosecha().getCLCosechaByClaveUnica(ck.getClave_unica());
+                MainActivity.myAppDB.runInTransaction(() -> {
+                    for (CheckListCosecha ck : gsonDescargas.getCheckListCosecha()) {
+                        CheckListCosecha chk = MainActivity.myAppDB.DaoCheckListCosecha().getCLCosechaByClaveUnica(ck.getClave_unica());
 
-                    if (chk != null) {
-                        ck.setId_cl_siembra(chk.getId_cl_siembra());
-                        MainActivity.myAppDB.DaoCheckListCosecha().updateClCosecha(ck);
-                    } else {
-                        MainActivity.myAppDB.DaoCheckListCosecha().insertClCosecha(ck);
+                        if (chk != null) {
+                            ck.setId_cl_siembra(chk.getId_cl_siembra());
+                            MainActivity.myAppDB.DaoCheckListCosecha().updateClCosecha(ck);
+                        } else {
+                            MainActivity.myAppDB.DaoCheckListCosecha().insertClCosecha(ck);
+                        }
                     }
-                }
+                });
             } catch (SQLiteException ignored) {
             }
 
         }
         terminaSeccion("checklist_cosecha", cantClCosecha);
 
+        // TICKET 2494 - 2026-10-01: mismo patron sin transaccion que evaluaciones/visitas (consulta
+        // + escritura por cabecera y por cada detalle), envuelto en una transaccion propia.
         iniciaSeccion();
         int cantLimpiezaCamiones = (gsonDescargas.getCheckListLimpiezaCamionesCompletos() != null) ? gsonDescargas.getCheckListLimpiezaCamionesCompletos().size() : 0;
         if (gsonDescargas.getCheckListLimpiezaCamionesCompletos() != null && !gsonDescargas.getCheckListLimpiezaCamionesCompletos().isEmpty()) {
+            MainActivity.myAppDB.runInTransaction(() -> {
             for (CheckListLimpiezaCamionesCompleto ck : gsonDescargas.getCheckListLimpiezaCamionesCompletos()) {
                 CheckListLimpiezaCamiones chk = MainActivity.myAppDB
                         .DaoCheckListLimpiezaCamiones()
@@ -392,12 +401,16 @@ public class Descargas {
                 }
 
             }
+            });
         }
         terminaSeccion("checklist_limpieza_camiones", cantLimpiezaCamiones);
 
+        // TICKET 2494 - 2026-10-01: mismo patron sin transaccion que evaluaciones/visitas,
+        // envuelto en una transaccion propia.
         iniciaSeccion();
         int cantCapSiembra = (gsonDescargas.getCheckListCapCompletos() != null) ? gsonDescargas.getCheckListCapCompletos().size() : 0;
         if (gsonDescargas.getCheckListCapCompletos() != null && !gsonDescargas.getCheckListCapCompletos().isEmpty()) {
+            MainActivity.myAppDB.runInTransaction(() -> {
             for (CheckListCapCompleto ck : gsonDescargas.getCheckListCapCompletos()) {
                 CheckListCapacitacionSiembra chk = MainActivity.myAppDB
                         .DaoCheckListCapSiembra()
@@ -432,22 +445,28 @@ public class Descargas {
                     }
                 }
             }
+            });
         }
         terminaSeccion("checklist_capacitacion_siembra", cantCapSiembra);
 
+        // TICKET 2494 - 2026-10-01: medido con timing_descarga.log - esta seccion sola se llevaba
+        // 124 de 201 segundos del guardado total (18455 registros, 1 consulta + 1 escritura cada
+        // uno sin transaccion). Mismo arreglo que en visitas/fechas_anexos: una transaccion propia
+        // de esta seccion, para no repetir el bug del intento anterior de envolver todo el metodo.
         iniciaSeccion();
         int cantEvaluaciones = (gsonDescargas.getEvaluaciones() != null) ? gsonDescargas.getEvaluaciones().size() : 0;
         if (gsonDescargas.getEvaluaciones() != null && !gsonDescargas.getEvaluaciones().isEmpty()) {
-
-            for (Evaluaciones ck : gsonDescargas.getEvaluaciones()) {
-                Evaluaciones chk = MainActivity.myAppDB.DaoEvaluaciones().getEvaluacionesByClaveUnica(ck.getClave_unica_recomendacion());
-                if (chk != null) {
-                    ck.setId_ac_recom(chk.getId_ac_recom());
-                    MainActivity.myAppDB.DaoEvaluaciones().updateEvaluaciones(ck);
-                } else {
-                    MainActivity.myAppDB.DaoEvaluaciones().insertEvaluaciones(ck);
+            MainActivity.myAppDB.runInTransaction(() -> {
+                for (Evaluaciones ck : gsonDescargas.getEvaluaciones()) {
+                    Evaluaciones chk = MainActivity.myAppDB.DaoEvaluaciones().getEvaluacionesByClaveUnica(ck.getClave_unica_recomendacion());
+                    if (chk != null) {
+                        ck.setId_ac_recom(chk.getId_ac_recom());
+                        MainActivity.myAppDB.DaoEvaluaciones().updateEvaluaciones(ck);
+                    } else {
+                        MainActivity.myAppDB.DaoEvaluaciones().insertEvaluaciones(ck);
+                    }
                 }
-            }
+            });
         }
         terminaSeccion("evaluaciones", cantEvaluaciones);
 
