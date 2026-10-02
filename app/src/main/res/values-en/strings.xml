@@ -384,6 +384,8 @@ Depending on the state, it can be edited or not.</string>
     <string name="ogm">OGM</string>
     <string name="anexo_curimapu">ANEXO CURIMAPU</string>
     <string name="regulacion_de_siembra">REGULACION DE SIEMBRA</string>
+    <!-- TICKET 2515 - 2026-10-02: la seccion de maquina por evento se llama Regulacion Sembradora -->
+    <string name="regulacion_sembradora">REGULACION SEMBRADORA</string>
     <string name="prestador_de_servicio">PRESTADOR DE SERVICIO</string>
     <string name="estado_de_discos">ESTADO DE DISCOS</string>
     <string name="sembradora_marca">SEMBRADORA MARCA</string>

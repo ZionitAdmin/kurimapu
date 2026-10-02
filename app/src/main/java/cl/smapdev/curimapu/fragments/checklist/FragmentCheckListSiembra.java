@@ -260,7 +260,11 @@ public class FragmentCheckListSiembra extends Fragment {
 
     // TICKET 2494 - 2026-09-30: eventos de siembra (H/M1/M2/M3). Cada evento carga sus datos en
     // los mismos campos de Regulacion/Aseo/General/Ingreso/Salida (ver seleccionarEventoSiembra).
-    private static final String[] TIPOS_EVENTO_SIEMBRA = {"H", "M1", "M2", "M3"};
+    // TICKET 2515 - 2026-10-02: el evento ya no tiene tipo ni fecha, se define por prestador + sembradora
+    // (marca y modelo). El tipo H/M es del checklist completo y se elige al crearlo.
+    private String tipoSiembra = null;
+    private ImageView btn_oculta_regulacion_de_siembra;
+    private ConstraintLayout cont_regulacion_de_siembra;
     private LinearLayout cont_tabs_eventos_siembra;
     private Button btn_agregar_evento_siembra;
     private androidx.constraintlayout.widget.Group group_campos_evento_siembra;
@@ -357,6 +361,9 @@ public class FragmentCheckListSiembra extends Fragment {
 
             levantarDatos();
 
+        } else {
+            // TICKET 2515 - 2026-10-02: el tipo (Hembra / Macho) se elige al comenzar un checklist nuevo
+            preguntarTipoSiembra();
         }
 
         requireActivity().addMenuProvider(new MenuProvider() {
@@ -371,7 +378,29 @@ public class FragmentCheckListSiembra extends Fragment {
             }
         }, getViewLifecycleOwner(), Lifecycle.State.CREATED);
 
-        Utilidades.setToolbar(activity, view, getResources().getString(R.string.app_name), "CHECKLIST SIEMBRA");
+        actualizarToolbarTipoSiembra();
+    }
+
+    // TICKET 2515 - 2026-10-02: el checklist de siembra es de Hembra (H) o de Macho (M)
+    private void actualizarToolbarTipoSiembra() {
+        if (getView() == null) return;
+        String sufijo = "";
+        if ("H".equals(tipoSiembra)) sufijo = " - HEMBRA";
+        else if ("M".equals(tipoSiembra)) sufijo = " - MACHO";
+        Utilidades.setToolbar(activity, getView(), getResources().getString(R.string.app_name), "CHECKLIST SIEMBRA" + sufijo);
+    }
+
+    private void preguntarTipoSiembra() {
+        final String[] opciones = {"HEMBRA", "MACHO"};
+        new androidx.appcompat.app.AlertDialog.Builder(requireActivity())
+                .setTitle("Tipo de checklist de siembra")
+                .setCancelable(false)
+                .setItems(opciones, (dialog, which) -> {
+                    tipoSiembra = (which == 0) ? "H" : "M";
+                    actualizarToolbarTipoSiembra();
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> getParentFragmentManager().popBackStack())
+                .show();
     }
 
     // TICKET 2494 - 2026-09-29: colores pedidos en la reunion para Medicion de compactacion.
@@ -532,79 +561,13 @@ public class FragmentCheckListSiembra extends Fragment {
         // TICKET 2494 - 2026-10-01: especie/variedad/ogm/anexo_curimapu (Siembra Anterior) ya no
         // se cargan desde la cabecera - ahora son por evento, ver cargarCamposDesdeEventoSiembra().
 
-        if (checkListSiembra.getPrestador_servicio() != null && !checkListSiembra.getPrestador_servicio().isEmpty()) {
-            et_prestador_servicio.setText(checkListSiembra.getPrestador_servicio());
-        }
-
-        if (checkListSiembra.getEstado_discos() != null && !checkListSiembra.getEstado_discos().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getEstado_discos());
-            sp_estado_discos.setSelection(d);
-        }
-
-        if (checkListSiembra.getSembradora_marca() != null && !checkListSiembra.getSembradora_marca().isEmpty()) {
-            et_sembradora_marca.setText(checkListSiembra.getSembradora_marca());
-        }
-
-        if (checkListSiembra.getSembradora_modelo() != null && !checkListSiembra.getSembradora_modelo().isEmpty()) {
-            et_sembradora_modelo.setText(checkListSiembra.getSembradora_modelo());
-        }
-
-        if (checkListSiembra.getTrocha() > 0) {
-            et_trocha.setText(String.valueOf(checkListSiembra.getTrocha()));
-        }
-
-
-        if (checkListSiembra.getTipo_sembradora() != null && !checkListSiembra.getTipo_sembradora().isEmpty()) {
-            int d = chk_3.indexOf(checkListSiembra.getTipo_sembradora());
-            sp_tipo_sembradora.setSelection(d);
-        }
-
-        if (checkListSiembra.getChequeo_selector() != null && !checkListSiembra.getChequeo_selector().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getChequeo_selector());
-            sp_chequeo_selector.setSelection(d);
-        }
-
-        if (checkListSiembra.getEstado_maquina() != null && !checkListSiembra.getEstado_maquina().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getEstado_maquina());
-            sp_estado_maquina.setSelection(d);
-        }
-
-
-        if (checkListSiembra.getDesterronadores() > 0) {
-            btn_desterronadores_si.setChecked((checkListSiembra.getDesterronadores() == 1));
-            btn_desterronadores_no.setChecked((checkListSiembra.getDesterronadores() == 2));
-        }
-
-        if (checkListSiembra.getPresion_neumaticos() != null && !checkListSiembra.getPresion_neumaticos().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getPresion_neumaticos());
-            sp_presion_neumaticos.setSelection(d);
-        }
-
-        if (checkListSiembra.getEspecie_lote_anterior() != null && !checkListSiembra.getEspecie_lote_anterior().isEmpty()) {
-            et_especie_lote.setText(checkListSiembra.getEspecie_lote_anterior());
-        }
-
-        if (checkListSiembra.getRueda_angosta() > 0) {
-            btn_rueda_angosta_si.setChecked((checkListSiembra.getRueda_angosta() == 1));
-            btn_rueda_angosta_no.setChecked((checkListSiembra.getRueda_angosta() == 2));
-        }
-
-        if (checkListSiembra.getLargo_guia() > 0) {
-            et_largo_guia.setText(String.valueOf(checkListSiembra.getLargo_guia()));
-        }
-
-        if (checkListSiembra.getSistema_fertilizacion() != null && !checkListSiembra.getSistema_fertilizacion().isEmpty()) {
-            et_sistema_fertilizacion.setText(checkListSiembra.getSistema_fertilizacion());
-        }
+        // TICKET 2515 - 2026-10-02: tipo del checklist (H/M) y Regulacion Sembradora (prestador, estado de
+        // discos, marca, modelo, trocha, etc.) ya no se cargan desde la cabecera: son por evento, ver
+        // cargarCamposDesdeEventoSiembra(). En la cabecera quedan solo los 5 campos de Regulacion de Siembra.
+        tipoSiembra = checkListSiembra.getTipo_siembra();
 
         if (checkListSiembra.getDistancia_hileras() > 0) {
             et_distancia_hileras.setText(String.valueOf(checkListSiembra.getDistancia_hileras()));
-        }
-
-
-        if (checkListSiembra.getCheque_caidas() > 0) {
-            btn_cheque_caidas_si.setChecked((checkListSiembra.getCheque_caidas() == 1));
-            btn_cheque_caidas_no.setChecked((checkListSiembra.getCheque_caidas() == 2));
         }
 
         if (checkListSiembra.getNumero_semillas() > 0) {
@@ -841,6 +804,7 @@ public class FragmentCheckListSiembra extends Fragment {
         btn_oculta_chequeo_envases = view.findViewById(R.id.btn_oculta_chequeo_envases);
         btn_oculta_siembra_anterior = view.findViewById(R.id.btn_oculta_siembra_anterior);
         btn_oculta_regulacion_siembra = view.findViewById(R.id.btn_oculta_regulacion_siembra);
+        btn_oculta_regulacion_de_siembra = view.findViewById(R.id.btn_oculta_regulacion_de_siembra);
         btn_oculta_aseo_maquinaria_pre_siembra = view.findViewById(R.id.btn_oculta_aseo_maquinaria_pre_siembra);
         btn_oculta_aseo_maquinaria_post_siembra = view.findViewById(R.id.btn_oculta_aseo_maquinaria_post_siembra);
         btn_oculta_general = view.findViewById(R.id.btn_oculta_general);
@@ -1031,6 +995,7 @@ public class FragmentCheckListSiembra extends Fragment {
         cont_chequeo_envases = view.findViewById(R.id.cont_chequeo_envases);
         cont_siembra_anterior = view.findViewById(R.id.cont_siembra_anterior);
         cont_regulacion_siembra = view.findViewById(R.id.cont_regulacion_siembra);
+        cont_regulacion_de_siembra = view.findViewById(R.id.cont_regulacion_de_siembra);
         cont_aseo_maquinaria_pre_siembra = view.findViewById(R.id.cont_aseo_maquinaria_pre_siembra);
         cont_aseo_maquinaria_post_siembra = view.findViewById(R.id.cont_aseo_maquinaria_post_siembra);
         cont_general = view.findViewById(R.id.cont_general);
@@ -1062,6 +1027,11 @@ public class FragmentCheckListSiembra extends Fragment {
         btn_oculta_siembra_anterior.setOnClickListener(view1 -> {
             cont_siembra_anterior.setVisibility((cont_siembra_anterior.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
             btn_oculta_siembra_anterior.setImageDrawable((cont_siembra_anterior.getVisibility() == View.VISIBLE) ? getResources().getDrawable(R.drawable.ic_expand_up) : getResources().getDrawable(R.drawable.ic_expand_down));
+        });
+        // TICKET 2515 - 2026-10-02: nueva seccion Regulacion de Siembra (cabecera, 5 campos)
+        btn_oculta_regulacion_de_siembra.setOnClickListener(view1 -> {
+            cont_regulacion_de_siembra.setVisibility((cont_regulacion_de_siembra.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
+            btn_oculta_regulacion_de_siembra.setImageDrawable((cont_regulacion_de_siembra.getVisibility() == View.VISIBLE) ? getResources().getDrawable(R.drawable.ic_expand_up) : getResources().getDrawable(R.drawable.ic_expand_down));
         });
         btn_oculta_regulacion_siembra.setOnClickListener(view1 -> {
             cont_regulacion_siembra.setVisibility((cont_regulacion_siembra.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
@@ -1745,75 +1715,12 @@ public class FragmentCheckListSiembra extends Fragment {
         // TICKET 2494 - 2026-10-01: especie/variedad/ogm/anexo_curimapu (Siembra Anterior) ya no se
         // guardan en la cabecera - ahora son por evento, ver leerCamposHaciaEventoSiembra().
 
-        //regulacion de siembra
+        // TICKET 2515 - 2026-10-02: regulacion de siembra (cabecera) = SOLO estos 5 campos. Los datos de
+        // la sembradora (prestador, estado de discos, marca, modelo, trocha, tipo, selector, estado de la
+        // maquina, desterronadores, presion, especie lote anterior, rueda angosta, largo guia, sistema de
+        // fertilizacion y cheque de caidas) son por evento, ver leerCamposHaciaEventoSiembra().
+        siembra.setTipo_siembra(tipoSiembra);
 
-        if (btn_cheque_caidas_si.isChecked() || btn_cheque_caidas_no.isChecked()) {
-            int fotoEnvase = (btn_cheque_caidas_si.isChecked()) ? 1 : 2;
-            siembra.setCheque_caidas(fotoEnvase);
-        }
-
-
-        if (!et_prestador_servicio.getText().toString().isEmpty()) {
-            String prestadorServicio = et_prestador_servicio.getText().toString();
-            siembra.setPrestador_servicio(prestadorServicio);
-        }
-
-        if (!sp_estado_discos.getSelectedItem().toString().equals(comparaSpinner)) {
-            String estadoDiscos = sp_estado_discos.getSelectedItem().toString();
-            siembra.setEstado_discos(estadoDiscos);
-        }
-
-        if (!et_sembradora_marca.getText().toString().isEmpty()) {
-            String sembradoraMarca = et_sembradora_marca.getText().toString();
-            siembra.setSembradora_marca(sembradoraMarca);
-        }
-        if (!et_sembradora_modelo.getText().toString().isEmpty()) {
-            String sembradoraModelo = et_sembradora_modelo.getText().toString();
-            siembra.setSembradora_modelo(sembradoraModelo);
-        }
-        if (!et_trocha.getText().toString().isEmpty()) {
-            String trocha = et_trocha.getText().toString();
-            siembra.setTrocha(Double.parseDouble(trocha));
-        }
-        if (!sp_tipo_sembradora.getSelectedItem().toString().equals(comparaSpinner)) {
-            String tipoSembradora = sp_tipo_sembradora.getSelectedItem().toString();
-            siembra.setTipo_sembradora(tipoSembradora);
-        }
-        if (!sp_chequeo_selector.getSelectedItem().toString().equals(comparaSpinner)) {
-            String chequeoSelector = sp_chequeo_selector.getSelectedItem().toString();
-            siembra.setChequeo_selector(chequeoSelector);
-        }
-        if (!sp_estado_maquina.getSelectedItem().toString().equals(comparaSpinner)) {
-            String estadoMaquina = sp_estado_maquina.getSelectedItem().toString();
-            siembra.setEstado_maquina(estadoMaquina);
-        }
-
-        if (btn_desterronadores_si.isChecked() || btn_desterronadores_no.isChecked()) {
-            int desterronadores = (btn_desterronadores_si.isChecked()) ? 1 : 2;
-            siembra.setDesterronadores(desterronadores);
-        }
-
-        if (!sp_presion_neumaticos.getSelectedItem().toString().equals(comparaSpinner)) {
-            String presionNeumatico = sp_presion_neumaticos.getSelectedItem().toString();
-            siembra.setPresion_neumaticos(presionNeumatico);
-        }
-
-        if (!et_especie_lote.getText().toString().isEmpty()) {
-            String especieLote = et_especie_lote.getText().toString();
-            siembra.setEspecie_lote_anterior(especieLote);
-        }
-        if (btn_rueda_angosta_si.isChecked() || btn_rueda_angosta_no.isChecked()) {
-            int ruedaAngosta = (btn_rueda_angosta_si.isChecked()) ? 1 : 2;
-            siembra.setRueda_angosta(ruedaAngosta);
-        }
-        if (!et_largo_guia.getText().toString().isEmpty()) {
-            String largoGuia = et_largo_guia.getText().toString();
-            siembra.setLargo_guia(Double.parseDouble(largoGuia));
-        }
-        if (!et_sistema_fertilizacion.getText().toString().isEmpty()) {
-            String sistemaFertilizacion = et_sistema_fertilizacion.getText().toString();
-            siembra.setSistema_fertilizacion(sistemaFertilizacion);
-        }
         if (!et_distancia_hileras.getText().toString().isEmpty()) {
             String distanciaHileras = et_distancia_hileras.getText().toString();
             siembra.setDistancia_hileras(Double.parseDouble(distanciaHileras));
@@ -2140,7 +2047,9 @@ public class FragmentCheckListSiembra extends Fragment {
 
         for (CheckListSiembraEvento evento : eventosSiembra) {
             Button tab = new Button(requireContext());
-            tab.setText(evento.getTipo_evento() + "\n" + evento.getFecha_evento());
+            // TICKET 2515 - 2026-10-02: la pestana se identifica por prestador + sembradora (marca y modelo)
+            tab.setText(textoOVacio(evento.getPrestador_servicio()) + "\n"
+                    + (textoOVacio(evento.getSembradora_marca()) + " " + textoOVacio(evento.getSembradora_modelo())).trim());
             tab.setAllCaps(false);
             tab.setTextSize(12);
 
@@ -2209,8 +2118,26 @@ public class FragmentCheckListSiembra extends Fragment {
         } else {
             sp_estado_discos.setSelection(0);
         }
-        et_profundidad_siembra.setText(evento.getProfundidad_siembra() != null ? evento.getProfundidad_siembra() : "");
-        et_dist_entre_fert_semilla.setText(evento.getDistancia_fertilizante_semilla() != null ? evento.getDistancia_fertilizante_semilla() : "");
+
+        // TICKET 2515 - 2026-10-02: Regulacion Sembradora completa por evento (los 5 campos de
+        // Regulacion de Siembra - prof. fertilizante, dist. fert-semilla, dist. hileras, N semillas/mt y
+        // prof. siembra - son de cabecera y NO se cargan aca)
+        et_sembradora_marca.setText(evento.getSembradora_marca() != null ? evento.getSembradora_marca() : "");
+        et_sembradora_modelo.setText(evento.getSembradora_modelo() != null ? evento.getSembradora_modelo() : "");
+        et_trocha.setText(evento.getTrocha() != null ? evento.getTrocha() : "");
+        sp_tipo_sembradora.setSelection(spinnerIndice(chk_3, evento.getTipo_sembradora()));
+        sp_chequeo_selector.setSelection(spinnerIndice(chk_1, evento.getChequeo_selector()));
+        sp_estado_maquina.setSelection(spinnerIndice(chk_1, evento.getEstado_maquina()));
+        btn_desterronadores_si.setChecked("1".equals(evento.getDesterronadores()));
+        btn_desterronadores_no.setChecked("2".equals(evento.getDesterronadores()));
+        sp_presion_neumaticos.setSelection(spinnerIndice(chk_1, evento.getPresion_neumaticos()));
+        et_especie_lote.setText(evento.getEspecie_lote_anterior() != null ? evento.getEspecie_lote_anterior() : "");
+        btn_rueda_angosta_si.setChecked("1".equals(evento.getRueda_angosta()));
+        btn_rueda_angosta_no.setChecked("2".equals(evento.getRueda_angosta()));
+        et_largo_guia.setText(evento.getLargo_guia() != null ? evento.getLargo_guia() : "");
+        et_sistema_fertilizacion.setText(evento.getSistema_fertilizacion() != null ? evento.getSistema_fertilizacion() : "");
+        btn_cheque_caidas_si.setChecked("1".equals(evento.getCheque_caidas()));
+        btn_cheque_caidas_no.setChecked("2".equals(evento.getCheque_caidas()));
 
         btn_tarros_semilla_si.setChecked("1".equals(evento.getTarros_semilla_pre_siembra()));
         btn_tarros_semilla_no.setChecked("2".equals(evento.getTarros_semilla_pre_siembra()));
@@ -2268,6 +2195,16 @@ public class FragmentCheckListSiembra extends Fragment {
         snapshotEventoActualCargado = snapshotCamposEventoSiembra();
     }
 
+    // TICKET 2515 - 2026-10-02: indice del valor guardado en el spinner (0 = "--Seleccione--" si no existe)
+    private int spinnerIndice(List<String> opciones, String valor) {
+        if (valor == null || valor.isEmpty()) return 0;
+        return Math.max(opciones.indexOf(valor), 0);
+    }
+
+    private String textoOVacio(String valor) {
+        return valor != null ? valor : "";
+    }
+
     private void aplicarEstadoFirmaEvento(String firma, Button btnFirma, ImageView checkFirma) {
         boolean tieneFirma = firma != null && !firma.isEmpty();
         btnFirma.setEnabled(!tieneFirma);
@@ -2297,11 +2234,45 @@ public class FragmentCheckListSiembra extends Fragment {
         if (!sp_estado_discos.getSelectedItem().toString().equals(comparaSpinner)) {
             evento.setEstado_discos(sp_estado_discos.getSelectedItem().toString());
         }
-        if (!et_profundidad_siembra.getText().toString().isEmpty()) {
-            evento.setProfundidad_siembra(et_profundidad_siembra.getText().toString());
+        // TICKET 2515 - 2026-10-02: Regulacion Sembradora completa por evento
+        if (!et_sembradora_marca.getText().toString().isEmpty()) {
+            evento.setSembradora_marca(et_sembradora_marca.getText().toString());
         }
-        if (!et_dist_entre_fert_semilla.getText().toString().isEmpty()) {
-            evento.setDistancia_fertilizante_semilla(et_dist_entre_fert_semilla.getText().toString());
+        if (!et_sembradora_modelo.getText().toString().isEmpty()) {
+            evento.setSembradora_modelo(et_sembradora_modelo.getText().toString());
+        }
+        if (!et_trocha.getText().toString().isEmpty()) {
+            evento.setTrocha(et_trocha.getText().toString());
+        }
+        if (!sp_tipo_sembradora.getSelectedItem().toString().equals(comparaSpinner)) {
+            evento.setTipo_sembradora(sp_tipo_sembradora.getSelectedItem().toString());
+        }
+        if (!sp_chequeo_selector.getSelectedItem().toString().equals(comparaSpinner)) {
+            evento.setChequeo_selector(sp_chequeo_selector.getSelectedItem().toString());
+        }
+        if (!sp_estado_maquina.getSelectedItem().toString().equals(comparaSpinner)) {
+            evento.setEstado_maquina(sp_estado_maquina.getSelectedItem().toString());
+        }
+        if (btn_desterronadores_si.isChecked() || btn_desterronadores_no.isChecked()) {
+            evento.setDesterronadores(btn_desterronadores_si.isChecked() ? "1" : "2");
+        }
+        if (!sp_presion_neumaticos.getSelectedItem().toString().equals(comparaSpinner)) {
+            evento.setPresion_neumaticos(sp_presion_neumaticos.getSelectedItem().toString());
+        }
+        if (!et_especie_lote.getText().toString().isEmpty()) {
+            evento.setEspecie_lote_anterior(et_especie_lote.getText().toString());
+        }
+        if (btn_rueda_angosta_si.isChecked() || btn_rueda_angosta_no.isChecked()) {
+            evento.setRueda_angosta(btn_rueda_angosta_si.isChecked() ? "1" : "2");
+        }
+        if (!et_largo_guia.getText().toString().isEmpty()) {
+            evento.setLargo_guia(et_largo_guia.getText().toString());
+        }
+        if (!et_sistema_fertilizacion.getText().toString().isEmpty()) {
+            evento.setSistema_fertilizacion(et_sistema_fertilizacion.getText().toString());
+        }
+        if (btn_cheque_caidas_si.isChecked() || btn_cheque_caidas_no.isChecked()) {
+            evento.setCheque_caidas(btn_cheque_caidas_si.isChecked() ? "1" : "2");
         }
 
         if (btn_tarros_semilla_si.isChecked() || btn_tarros_semilla_no.isChecked()) {
@@ -2392,8 +2363,19 @@ public class FragmentCheckListSiembra extends Fragment {
         StringBuilder sb = new StringBuilder();
         sb.append(et_prestador_servicio.getText().toString());
         sb.append("|").append(sp_estado_discos.getSelectedItem() != null ? sp_estado_discos.getSelectedItem().toString() : "");
-        sb.append("|").append(et_profundidad_siembra.getText().toString());
-        sb.append("|").append(et_dist_entre_fert_semilla.getText().toString());
+        sb.append("|").append(et_sembradora_marca.getText().toString());
+        sb.append("|").append(et_sembradora_modelo.getText().toString());
+        sb.append("|").append(et_trocha.getText().toString());
+        sb.append("|").append(sp_tipo_sembradora.getSelectedItem() != null ? sp_tipo_sembradora.getSelectedItem().toString() : "");
+        sb.append("|").append(sp_chequeo_selector.getSelectedItem() != null ? sp_chequeo_selector.getSelectedItem().toString() : "");
+        sb.append("|").append(sp_estado_maquina.getSelectedItem() != null ? sp_estado_maquina.getSelectedItem().toString() : "");
+        sb.append("|").append(btn_desterronadores_si.isChecked()).append(btn_desterronadores_no.isChecked());
+        sb.append("|").append(sp_presion_neumaticos.getSelectedItem() != null ? sp_presion_neumaticos.getSelectedItem().toString() : "");
+        sb.append("|").append(et_especie_lote.getText().toString());
+        sb.append("|").append(btn_rueda_angosta_si.isChecked()).append(btn_rueda_angosta_no.isChecked());
+        sb.append("|").append(et_largo_guia.getText().toString());
+        sb.append("|").append(et_sistema_fertilizacion.getText().toString());
+        sb.append("|").append(btn_cheque_caidas_si.isChecked()).append(btn_cheque_caidas_no.isChecked());
         sb.append("|").append(btn_tarros_semilla_si.isChecked()).append(btn_tarros_semilla_no.isChecked());
         sb.append("|").append(btn_discos_sembradores_si.isChecked()).append(btn_discos_sembradores_no.isChecked());
         sb.append("|").append(btn_estructura_maquinaria_si.isChecked()).append(btn_estructura_maquinaria_no.isChecked());
@@ -2423,23 +2405,11 @@ public class FragmentCheckListSiembra extends Fragment {
         return sb.toString();
     }
 
+    // TICKET 2515 - 2026-10-02: el evento ya no pide fecha ni tipo. Se define por prestador de servicio +
+    // sembradora (marca y modelo); no se puede repetir la misma combinacion dentro del checklist.
     private void mostrarDialogoNuevoEventoSiembra() {
         if (checkListSiembra == null) {
             Toasty.warning(requireActivity(), "Guarda el checklist primero para poder agregar eventos de siembra", Toast.LENGTH_LONG, true).show();
-            return;
-        }
-
-        List<String> tiposUsados = new ArrayList<>();
-        for (CheckListSiembraEvento evento : eventosSiembra) {
-            tiposUsados.add(evento.getTipo_evento());
-        }
-        final List<String> tiposDisponibles = new ArrayList<>();
-        for (String tipo : TIPOS_EVENTO_SIEMBRA) {
-            if (!tiposUsados.contains(tipo)) tiposDisponibles.add(tipo);
-        }
-
-        if (tiposDisponibles.isEmpty()) {
-            Toasty.warning(requireActivity(), "Ya existen eventos H, M1, M2 y M3 para este checklist", Toast.LENGTH_LONG, true).show();
             return;
         }
 
@@ -2448,31 +2418,53 @@ public class FragmentCheckListSiembra extends Fragment {
         int padding = (int) (16 * getResources().getDisplayMetrics().density);
         cont.setPadding(padding, padding, padding, padding);
 
-        TextView lblTipo = new TextView(requireContext());
-        lblTipo.setText("Tipo de evento");
-        cont.addView(lblTipo);
+        TextView lblPrestador = new TextView(requireContext());
+        lblPrestador.setText("Prestador de servicio");
+        cont.addView(lblPrestador);
 
-        Spinner spTipo = new Spinner(requireContext());
-        ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, tiposDisponibles);
-        spTipo.setAdapter(adapterTipo);
-        cont.addView(spTipo);
+        final EditText etPrestador = new EditText(requireContext());
+        etPrestador.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        etPrestador.setMaxLines(1);
+        cont.addView(etPrestador);
 
-        TextView lblFecha = new TextView(requireContext());
-        lblFecha.setText("Fecha del evento");
-        cont.addView(lblFecha);
+        TextView lblMarca = new TextView(requireContext());
+        lblMarca.setText("Sembradora marca");
+        cont.addView(lblMarca);
 
-        final EditText etFecha = new EditText(requireContext());
-        etFecha.setFocusable(false);
-        etFecha.setOnClickListener(v -> levantarFecha(etFecha));
-        cont.addView(etFecha);
+        final EditText etMarca = new EditText(requireContext());
+        etMarca.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        etMarca.setMaxLines(1);
+        cont.addView(etMarca);
+
+        TextView lblModelo = new TextView(requireContext());
+        lblModelo.setText("Sembradora modelo");
+        cont.addView(lblModelo);
+
+        final EditText etModelo = new EditText(requireContext());
+        etModelo.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        etModelo.setMaxLines(1);
+        cont.addView(etModelo);
 
         new androidx.appcompat.app.AlertDialog.Builder(requireActivity())
                 .setTitle("Nuevo evento de siembra")
                 .setView(cont)
                 .setPositiveButton("Crear", (dialog, which) -> {
-                    if (etFecha.getText().toString().isEmpty()) {
-                        Toasty.error(requireActivity(), "Debes seleccionar una fecha", Toast.LENGTH_LONG, true).show();
+                    String prestador = etPrestador.getText().toString().trim();
+                    String marca = etMarca.getText().toString().trim();
+                    String modelo = etModelo.getText().toString().trim();
+
+                    if (prestador.isEmpty() || marca.isEmpty() || modelo.isEmpty()) {
+                        Toasty.error(requireActivity(), "Debes ingresar prestador de servicio, marca y modelo de la sembradora", Toast.LENGTH_LONG, true).show();
                         return;
+                    }
+
+                    for (CheckListSiembraEvento existente : eventosSiembra) {
+                        if (prestador.equalsIgnoreCase(textoOVacio(existente.getPrestador_servicio()).trim())
+                                && marca.equalsIgnoreCase(textoOVacio(existente.getSembradora_marca()).trim())
+                                && modelo.equalsIgnoreCase(textoOVacio(existente.getSembradora_modelo()).trim())) {
+                            Toasty.error(requireActivity(), "Ya existe un evento con ese prestador y esa sembradora", Toast.LENGTH_LONG, true).show();
+                            return;
+                        }
                     }
 
                     // TICKET 2494 - 2026-10-01: el evento que se esta dejando se guarda dentro de
@@ -2489,8 +2481,9 @@ public class FragmentCheckListSiembra extends Fragment {
                     CheckListSiembraEvento nuevoEvento = new CheckListSiembraEvento();
                     nuevoEvento.setClave_unica_evento(claveUnicaEvento);
                     nuevoEvento.setClave_unica_cl_siembra(checkListSiembra.getClave_unica());
-                    nuevoEvento.setFecha_evento(etFecha.getText().toString());
-                    nuevoEvento.setTipo_evento((String) spTipo.getSelectedItem());
+                    nuevoEvento.setPrestador_servicio(prestador);
+                    nuevoEvento.setSembradora_marca(marca);
+                    nuevoEvento.setSembradora_modelo(modelo);
                     nuevoEvento.setEstado_sincronizacion(0);
 
                     ExecutorService executor = Executors.newSingleThreadExecutor();

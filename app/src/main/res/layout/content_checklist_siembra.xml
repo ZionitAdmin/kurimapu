@@ -1117,11 +1117,164 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+        <!-- TICKET 2515 - 2026-10-02: seccion REGULACION DE SIEMBRA (cabecera, va despues de Chequeo de
+             Envases). Tiene SOLO los 5 campos que no son por evento: prof. fertilizante, dist. entre
+             fertilizante y semilla, dist. entre hileras, N semillas/mt y prof. de siembra. -->
+        <TextView
+            android:id="@+id/lbl_regulacion_de_siembra"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/cont_chequeo_envases"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_oculta_regulacion_de_siembra"
+            android:layout_marginTop="@dimen/padding_small"
+            android:text="@string/regulacion_de_siembra"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            />
+
+        <ImageView
+            android:id="@+id/btn_oculta_regulacion_de_siembra"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_expand_down"
+            app:layout_constraintTop_toBottomOf="@id/cont_chequeo_envases"
+            app:layout_constraintStart_toEndOf="@id/lbl_regulacion_de_siembra"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="@color/colorOnBackground" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:visibility="gone"
+            android:id="@+id/cont_regulacion_de_siembra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/btn_oculta_regulacion_de_siembra"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+
+            <TextView
+                android:id="@+id/lbl_profundidad_fertilizante"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/prof_de_fertilizante_cm"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_profundidad_fertilizante"
+                />
+
+            <EditText
+                android:id="@+id/et_profundidad_fertilizante"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/lbl_profundidad_fertilizante"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_dist_entre_fert_semilla"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/dis_entre_fert_y_semilla_cm_n"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_profundidad_fertilizante"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_dist_entre_fert_semilla"
+                />
+
+            <EditText
+                android:id="@+id/et_dist_entre_fert_semilla"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_profundidad_fertilizante"
+                app:layout_constraintStart_toEndOf="@id/lbl_dist_entre_fert_semilla"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_distancia_hileras"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/distancia_entre_hileras_mt"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_dist_entre_fert_semilla"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_distancia_hileras"
+                />
+
+            <EditText
+                android:id="@+id/et_distancia_hileras"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_dist_entre_fert_semilla"
+                app:layout_constraintStart_toEndOf="@id/lbl_distancia_hileras"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_numero_semillas_mt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/n_semillas_mt"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_distancia_hileras"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_numero_semillas_mt"
+                />
+
+            <EditText
+                android:id="@+id/et_numero_semillas_mt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_distancia_hileras"
+                app:layout_constraintStart_toEndOf="@id/lbl_numero_semillas_mt"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+            <TextView
+                android:id="@+id/lbl_profundidad_siembra"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/profundidad_de_siembra_cm"
+                android:layout_marginTop="@dimen/padding_small"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintTop_toBottomOf="@id/et_numero_semillas_mt"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/et_profundidad_siembra"
+                />
+
+            <EditText
+                android:id="@+id/et_profundidad_siembra"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@id/et_numero_semillas_mt"
+                app:layout_constraintStart_toEndOf="@id/lbl_profundidad_siembra"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
         <TextView
             android:id="@+id/lbl_siembra_anterior"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cont_chequeo_envases"
+            app:layout_constraintTop_toBottomOf="@id/scroll_tabs_eventos_siembra"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_oculta_siembra_anterior"
             android:layout_marginTop="@dimen/padding_small"
@@ -1134,7 +1287,7 @@
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_expand_down"
-            app:layout_constraintTop_toBottomOf="@id/cont_chequeo_envases"
+            app:layout_constraintTop_toBottomOf="@id/scroll_tabs_eventos_siembra"
             app:layout_constraintStart_toEndOf="@id/lbl_siembra_anterior"
             app:layout_constraintEnd_toEndOf="parent"
             app:tint="@color/colorOnBackground" />
@@ -1258,13 +1411,16 @@
 
 
 
+        <!-- TICKET 2515 - 2026-10-02: Siembra Anterior ahora va DENTRO de los eventos, debajo de las
+             pestañas (antes quedaba arriba del titulo Eventos de Siembra). Orden final: Eventos de
+             Siembra > Siembra Anterior > Regulacion Sembradora > Aseo > General > Ingreso > Salida. -->
         <!-- TICKET 2494 - 2026-09-30: tira de eventos de siembra (H/M1/M2/M3). Cada evento carga
              sus datos en los MISMOS campos de Regulacion/Aseo/General/Ingreso/Salida de mas abajo. -->
         <TextView
             android:id="@+id/lbl_eventos_siembra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cont_siembra_anterior"
+            app:layout_constraintTop_toBottomOf="@id/cont_regulacion_de_siembra"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="@dimen/padding_small"
             android:text="@string/eventos_de_siembra"
@@ -1308,6 +1464,10 @@
 
         </HorizontalScrollView>
 
+        <!-- TICKET 2515 - 2026-10-02: ahora TODA la seccion REGULACION SEMBRADORA (antes "Regulacion de
+             Siembra") es por evento, por eso su titulo+flechita entran al grupo. Los 5 campos que no son
+             por evento pasaron a la nueva seccion REGULACION DE SIEMBRA, mas arriba, que es de cabecera.
+             (El comentario que sigue es del TICKET 2494 y describe el estado anterior.) -->
         <!-- TICKET 2494 - 2026-10-01: agrupa SOLO los campos/secciones que son por evento, para
              ocultarlos cuando no hay un evento de siembra seleccionado. "Regulacion de siembra"
              mezcla 4 campos por evento con ~15 de configuracion de maquina (siempre visibles); por
@@ -1324,16 +1484,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="lbl_siembra_anterior,btn_oculta_siembra_anterior,lbl_prestador_servicio,et_prestador_servicio,lbl_estado_discos,sp_estado_discos,lbl_profundidad_siembra,et_profundidad_siembra,lbl_dist_entre_fert_semilla,et_dist_entre_fert_semilla,lbl_aseo_maquinaria_pre_siembra,btn_oculta_aseo_maquinaria_pre_siembra,lbl_aseo_maquinaria_post_siembra,btn_oculta_aseo_maquinaria_post_siembra,lbl_titulo_general,btn_oculta_general,lbl_titulo_ingreso,btn_oculta_ingreso,lbl_titulo_salida,btn_oculta_salida" />
+            app:constraint_referenced_ids="lbl_siembra_anterior,btn_oculta_siembra_anterior,lbl_regulacion_siembra,btn_oculta_regulacion_siembra,lbl_aseo_maquinaria_pre_siembra,btn_oculta_aseo_maquinaria_pre_siembra,lbl_aseo_maquinaria_post_siembra,btn_oculta_aseo_maquinaria_post_siembra,lbl_titulo_general,btn_oculta_general,lbl_titulo_ingreso,btn_oculta_ingreso,lbl_titulo_salida,btn_oculta_salida" />
 
         <TextView
             android:id="@+id/lbl_regulacion_siembra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/scroll_tabs_eventos_siembra"
+            app:layout_constraintTop_toBottomOf="@id/cont_siembra_anterior"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="@dimen/padding_small"
-            android:text="@string/regulacion_de_siembra"
+            android:text="@string/regulacion_sembradora"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             />
 
@@ -1342,7 +1502,7 @@
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_expand_down"
-            app:layout_constraintTop_toBottomOf="@id/scroll_tabs_eventos_siembra"
+            app:layout_constraintTop_toBottomOf="@id/cont_siembra_anterior"
             app:layout_constraintStart_toEndOf="@id/lbl_siembra_anterior"
             app:layout_constraintEnd_toEndOf="parent"
             app:tint="@color/colorOnBackground" />
@@ -1701,36 +1861,13 @@
                 android:autofillHints="" />
 
             <TextView
-                android:id="@+id/lbl_distancia_hileras"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/distancia_entre_hileras_mt"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_sistema_fertilizacion"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_distancia_hileras"
-                />
-
-            <EditText
-                android:id="@+id/et_distancia_hileras"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_sistema_fertilizacion"
-                app:layout_constraintStart_toEndOf="@id/lbl_distancia_hileras"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
-
-            <TextView
                 android:id="@+id/lbl_cheque_caidas"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/cheque_de_caidas_disco_botas"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_distancia_hileras"
+                app:layout_constraintTop_toBottomOf="@id/et_sistema_fertilizacion"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/grupo_cheque_caidas"
                 />
@@ -1740,7 +1877,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/et_distancia_hileras"
+                app:layout_constraintTop_toBottomOf="@id/et_sistema_fertilizacion"
                 app:layout_constraintStart_toEndOf="@id/lbl_cheque_caidas"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -1757,100 +1894,6 @@
                     android:text="@string/no" />
 
             </RadioGroup>
-
-
-            <TextView
-                android:id="@+id/lbl_numero_semillas_mt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/n_semillas_mt"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/grupo_cheque_caidas"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_numero_semillas_mt"
-                />
-
-            <EditText
-                android:id="@+id/et_numero_semillas_mt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/grupo_cheque_caidas"
-                app:layout_constraintStart_toEndOf="@id/lbl_numero_semillas_mt"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
-
-            <TextView
-                android:id="@+id/lbl_profundidad_fertilizante"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/prof_de_fertilizante_cm"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_numero_semillas_mt"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_profundidad_fertilizante"
-                />
-
-            <EditText
-                android:id="@+id/et_profundidad_fertilizante"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_numero_semillas_mt"
-                app:layout_constraintStart_toEndOf="@id/lbl_profundidad_fertilizante"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
-
-            <TextView
-                android:id="@+id/lbl_profundidad_siembra"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/profundidad_de_siembra_cm"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_profundidad_fertilizante"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_profundidad_siembra"
-                />
-
-            <EditText
-                android:id="@+id/et_profundidad_siembra"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_profundidad_fertilizante"
-                app:layout_constraintStart_toEndOf="@id/lbl_profundidad_siembra"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
-
-            <TextView
-                android:id="@+id/lbl_dist_entre_fert_semilla"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/dis_entre_fert_y_semilla_cm_n"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_profundidad_siembra"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_dist_entre_fert_semilla"
-                />
-
-            <EditText
-                android:id="@+id/et_dist_entre_fert_semilla"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_profundidad_siembra"
-                app:layout_constraintStart_toEndOf="@id/lbl_dist_entre_fert_semilla"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

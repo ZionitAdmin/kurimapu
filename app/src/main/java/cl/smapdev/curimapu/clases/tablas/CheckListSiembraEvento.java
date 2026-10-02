@@ -26,14 +26,9 @@ public class CheckListSiembraEvento {
     @Expose
     private String clave_unica_cl_siembra;
 
-    @SerializedName("fecha_evento")
-    @Expose
-    private String fecha_evento;
-
-    @SerializedName("tipo_evento")
-    @Expose
-    private String tipo_evento;
-
+    // TICKET 2515 - 2026-10-02: fecha_evento/tipo_evento (H/M1/M2/M3) eliminados. Ahora el evento se
+    // define por prestador_servicio + sembradora_marca + sembradora_modelo, y el tipo (H/M) vive en
+    // la cabecera (CheckListSiembra.tipo_siembra). Ver Migrations.MIGRATION_26_TO_27.
     // TICKET 2494 - 2026-10-01: seccion Siembra Anterior, tambien por evento (cada H/M1/M2/M3
     // puede venir de un cultivo anterior distinto)
     @SerializedName("especie")
@@ -55,12 +50,49 @@ public class CheckListSiembraEvento {
     @SerializedName("estado_discos")
     @Expose
     private String estado_discos;
-    @SerializedName("profundidad_siembra")
+
+    // TICKET 2515 - 2026-10-02: Regulacion Sembradora, todo por evento (los 5 campos de
+    // Regulacion de Siembra - prof. fertilizante, dist. fert-semilla, dist. hileras, N semillas/mt,
+    // prof. siembra - pasaron a la cabecera)
+    @SerializedName("sembradora_marca")
     @Expose
-    private String profundidad_siembra;
-    @SerializedName("distancia_fertilizante_semilla")
+    private String sembradora_marca;
+    @SerializedName("sembradora_modelo")
     @Expose
-    private String distancia_fertilizante_semilla;
+    private String sembradora_modelo;
+    @SerializedName("trocha")
+    @Expose
+    private String trocha;
+    @SerializedName("tipo_sembradora")
+    @Expose
+    private String tipo_sembradora;
+    @SerializedName("chequeo_selector")
+    @Expose
+    private String chequeo_selector;
+    @SerializedName("estado_maquina")
+    @Expose
+    private String estado_maquina;
+    @SerializedName("desterronadores")
+    @Expose
+    private String desterronadores;
+    @SerializedName("presion_neumaticos")
+    @Expose
+    private String presion_neumaticos;
+    @SerializedName("especie_lote_anterior")
+    @Expose
+    private String especie_lote_anterior;
+    @SerializedName("rueda_angosta")
+    @Expose
+    private String rueda_angosta;
+    @SerializedName("largo_guia")
+    @Expose
+    private String largo_guia;
+    @SerializedName("sistema_fertilizacion")
+    @Expose
+    private String sistema_fertilizacion;
+    @SerializedName("cheque_caidas")
+    @Expose
+    private String cheque_caidas;
 
     @SerializedName("tarros_semilla_pre_siembra")
     @Expose
@@ -221,22 +253,6 @@ public class CheckListSiembraEvento {
         this.clave_unica_cl_siembra = clave_unica_cl_siembra;
     }
 
-    public String getFecha_evento() {
-        return fecha_evento;
-    }
-
-    public void setFecha_evento(String fecha_evento) {
-        this.fecha_evento = fecha_evento;
-    }
-
-    public String getTipo_evento() {
-        return tipo_evento;
-    }
-
-    public void setTipo_evento(String tipo_evento) {
-        this.tipo_evento = tipo_evento;
-    }
-
     public String getEspecie() {
         return especie;
     }
@@ -285,20 +301,108 @@ public class CheckListSiembraEvento {
         this.estado_discos = estado_discos;
     }
 
-    public String getProfundidad_siembra() {
-        return profundidad_siembra;
+    public String getSembradora_marca() {
+        return sembradora_marca;
     }
 
-    public void setProfundidad_siembra(String profundidad_siembra) {
-        this.profundidad_siembra = profundidad_siembra;
+    public void setSembradora_marca(String sembradora_marca) {
+        this.sembradora_marca = sembradora_marca;
     }
 
-    public String getDistancia_fertilizante_semilla() {
-        return distancia_fertilizante_semilla;
+    public String getSembradora_modelo() {
+        return sembradora_modelo;
     }
 
-    public void setDistancia_fertilizante_semilla(String distancia_fertilizante_semilla) {
-        this.distancia_fertilizante_semilla = distancia_fertilizante_semilla;
+    public void setSembradora_modelo(String sembradora_modelo) {
+        this.sembradora_modelo = sembradora_modelo;
+    }
+
+    public String getTrocha() {
+        return trocha;
+    }
+
+    public void setTrocha(String trocha) {
+        this.trocha = trocha;
+    }
+
+    public String getTipo_sembradora() {
+        return tipo_sembradora;
+    }
+
+    public void setTipo_sembradora(String tipo_sembradora) {
+        this.tipo_sembradora = tipo_sembradora;
+    }
+
+    public String getChequeo_selector() {
+        return chequeo_selector;
+    }
+
+    public void setChequeo_selector(String chequeo_selector) {
+        this.chequeo_selector = chequeo_selector;
+    }
+
+    public String getEstado_maquina() {
+        return estado_maquina;
+    }
+
+    public void setEstado_maquina(String estado_maquina) {
+        this.estado_maquina = estado_maquina;
+    }
+
+    public String getDesterronadores() {
+        return desterronadores;
+    }
+
+    public void setDesterronadores(String desterronadores) {
+        this.desterronadores = desterronadores;
+    }
+
+    public String getPresion_neumaticos() {
+        return presion_neumaticos;
+    }
+
+    public void setPresion_neumaticos(String presion_neumaticos) {
+        this.presion_neumaticos = presion_neumaticos;
+    }
+
+    public String getEspecie_lote_anterior() {
+        return especie_lote_anterior;
+    }
+
+    public void setEspecie_lote_anterior(String especie_lote_anterior) {
+        this.especie_lote_anterior = especie_lote_anterior;
+    }
+
+    public String getRueda_angosta() {
+        return rueda_angosta;
+    }
+
+    public void setRueda_angosta(String rueda_angosta) {
+        this.rueda_angosta = rueda_angosta;
+    }
+
+    public String getLargo_guia() {
+        return largo_guia;
+    }
+
+    public void setLargo_guia(String largo_guia) {
+        this.largo_guia = largo_guia;
+    }
+
+    public String getSistema_fertilizacion() {
+        return sistema_fertilizacion;
+    }
+
+    public void setSistema_fertilizacion(String sistema_fertilizacion) {
+        this.sistema_fertilizacion = sistema_fertilizacion;
+    }
+
+    public String getCheque_caidas() {
+        return cheque_caidas;
+    }
+
+    public void setCheque_caidas(String cheque_caidas) {
+        this.cheque_caidas = cheque_caidas;
     }
 
     public String getTarros_semilla_pre_siembra() {

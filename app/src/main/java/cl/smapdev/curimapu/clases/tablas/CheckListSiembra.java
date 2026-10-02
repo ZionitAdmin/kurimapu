@@ -21,6 +21,9 @@ public class CheckListSiembra {
     private int id_ac_cl_siembra;
     @Expose
     private String apellido_checklist;
+    // TICKET 2515 - 2026-10-02: tipo del checklist, "H" (hembra) o "M" (macho). Se elige al crear el checklist.
+    @Expose
+    private String tipo_siembra;
     @Expose
     private int estado_sincronizacion;
     @Expose
@@ -259,6 +262,14 @@ public class CheckListSiembra {
     private String firma_operario_maquina_termino;
     private String stringed_operario_maquina_termino;
 
+
+    public String getTipo_siembra() {
+        return tipo_siembra;
+    }
+
+    public void setTipo_siembra(String tipo_siembra) {
+        this.tipo_siembra = tipo_siembra;
+    }
 
     public int getId_usuario() {
         return id_usuario;

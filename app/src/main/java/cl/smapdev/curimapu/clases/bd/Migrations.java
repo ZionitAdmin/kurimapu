@@ -455,4 +455,124 @@ public class Migrations {
             database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_termino_siembra_macho3 INTEGER NOT NULL DEFAULT 0;");
         }
     };
+
+    // TICKET 2515 - 2026-10-02: checklist de siembra es de H o M (tipo_siembra en cabecera) y el evento
+    // pasa a definirse por prestador + maquina. En el evento se eliminan fecha_evento, tipo_evento,
+    // profundidad_siembra y distancia_fertilizante_semilla (los 2 ultimos quedan en la cabecera) y se
+    // agregan los 13 campos de Regulacion Sembradora. Como Room valida que no sobren columnas, la tabla
+    // del evento se recrea y se copian los datos que siguen existiendo.
+    public static final Migration MIGRATION_26_TO_27 = new Migration(26, 27) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN tipo_siembra TEXT;");
+
+            database.execSQL("CREATE TABLE anexo_checklist_siembra_evento_nuevo ( " +
+                    " id_evento INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                    " clave_unica_evento TEXT, " +
+                    " clave_unica_cl_siembra TEXT, " +
+                    " especie TEXT, " +
+                    " variedad TEXT, " +
+                    " ogm INTEGER NOT NULL DEFAULT 0, " +
+                    " anexo_curimapu TEXT, " +
+                    " prestador_servicio TEXT, " +
+                    " estado_discos TEXT, " +
+                    " sembradora_marca TEXT, " +
+                    " sembradora_modelo TEXT, " +
+                    " trocha TEXT, " +
+                    " tipo_sembradora TEXT, " +
+                    " chequeo_selector TEXT, " +
+                    " estado_maquina TEXT, " +
+                    " desterronadores TEXT, " +
+                    " presion_neumaticos TEXT, " +
+                    " especie_lote_anterior TEXT, " +
+                    " rueda_angosta TEXT, " +
+                    " largo_guia TEXT, " +
+                    " sistema_fertilizacion TEXT, " +
+                    " cheque_caidas TEXT, " +
+                    " tarros_semilla_pre_siembra TEXT, " +
+                    " discos_sembradores_pre_siembra TEXT, " +
+                    " estructura_maquinaria_pre_siembra TEXT, " +
+                    " lugar_limpieza_pre_siembra TEXT, " +
+                    " responsable_aseo_pre_siembra TEXT, " +
+                    " rut_responsable_aseo_pre_siembra TEXT, " +
+                    " responsable_revision_limpieza_pre_siembra TEXT, " +
+                    " firma_responsable_aso_pre_siembra TEXT, " +
+                    " stringed_responsable_aso_pre_siembra TEXT, " +
+                    " firma_revision_limpieza_pre_siembra TEXT, " +
+                    " stringed_revision_limpieza_pre_siembra TEXT, " +
+                    " tarros_semilla_post_siembra TEXT, " +
+                    " discos_sembradores_post_siembra TEXT, " +
+                    " estructura_maquinaria_post_cosecha TEXT, " +
+                    " lugar_limpieza_post_siembra TEXT, " +
+                    " responsable_aseo_post_siembra TEXT, " +
+                    " rut_responsable_aseo_post_siembra TEXT, " +
+                    " encargado_revision_limpieza_post_siembra TEXT, " +
+                    " firma_responsable_aseo_post_siembra TEXT, " +
+                    " stringed_responsable_aseo_post_siembra TEXT, " +
+                    " firma_revision_limpieza_post_siembra TEXT, " +
+                    " stringed_revision_limpieza_post_siembra TEXT, " +
+                    " desempeno_siembra TEXT, " +
+                    " observacion_general TEXT, " +
+                    " fecha_ingreso TEXT, " +
+                    " hora_ingreso TEXT, " +
+                    " nombre_supervisor_siembra TEXT, " +
+                    " nombre_responsable_campo TEXT, " +
+                    " nombre_operario_maquina TEXT, " +
+                    " firma_responsable_campo TEXT, " +
+                    " stringed_responsable_campo TEXT, " +
+                    " firma_operario_maquina TEXT, " +
+                    " stringed_operario_maquina TEXT, " +
+                    " fecha_termino TEXT, " +
+                    " hora_termino TEXT, " +
+                    " nombre_supervisor_siembra_termino TEXT, " +
+                    " nombre_responsable_campo_termino TEXT, " +
+                    " nombre_operario_maquina_termino TEXT, " +
+                    " firma_responsable_campo_termino TEXT, " +
+                    " stringed_responsable_campo_termino TEXT, " +
+                    " firma_operario_maquina_termino TEXT, " +
+                    " stringed_operario_maquina_termino TEXT, " +
+                    " estado_sincronizacion INTEGER NOT NULL DEFAULT 0 " +
+                    ");");
+
+            database.execSQL("INSERT INTO anexo_checklist_siembra_evento_nuevo ( " +
+                    " id_evento, clave_unica_evento, clave_unica_cl_siembra, especie, variedad, ogm, anexo_curimapu, " +
+                    " prestador_servicio, estado_discos, " +
+                    " tarros_semilla_pre_siembra, discos_sembradores_pre_siembra, estructura_maquinaria_pre_siembra, " +
+                    " lugar_limpieza_pre_siembra, responsable_aseo_pre_siembra, rut_responsable_aseo_pre_siembra, " +
+                    " responsable_revision_limpieza_pre_siembra, firma_responsable_aso_pre_siembra, stringed_responsable_aso_pre_siembra, " +
+                    " firma_revision_limpieza_pre_siembra, stringed_revision_limpieza_pre_siembra, " +
+                    " tarros_semilla_post_siembra, discos_sembradores_post_siembra, estructura_maquinaria_post_cosecha, " +
+                    " lugar_limpieza_post_siembra, responsable_aseo_post_siembra, rut_responsable_aseo_post_siembra, " +
+                    " encargado_revision_limpieza_post_siembra, firma_responsable_aseo_post_siembra, stringed_responsable_aseo_post_siembra, " +
+                    " firma_revision_limpieza_post_siembra, stringed_revision_limpieza_post_siembra, " +
+                    " desempeno_siembra, observacion_general, fecha_ingreso, hora_ingreso, nombre_supervisor_siembra, " +
+                    " nombre_responsable_campo, nombre_operario_maquina, firma_responsable_campo, stringed_responsable_campo, " +
+                    " firma_operario_maquina, stringed_operario_maquina, fecha_termino, hora_termino, nombre_supervisor_siembra_termino, " +
+                    " nombre_responsable_campo_termino, nombre_operario_maquina_termino, firma_responsable_campo_termino, " +
+                    " stringed_responsable_campo_termino, firma_operario_maquina_termino, stringed_operario_maquina_termino, " +
+                    " estado_sincronizacion ) " +
+                    " SELECT " +
+                    " id_evento, clave_unica_evento, clave_unica_cl_siembra, especie, variedad, ogm, anexo_curimapu, " +
+                    " prestador_servicio, estado_discos, " +
+                    " tarros_semilla_pre_siembra, discos_sembradores_pre_siembra, estructura_maquinaria_pre_siembra, " +
+                    " lugar_limpieza_pre_siembra, responsable_aseo_pre_siembra, rut_responsable_aseo_pre_siembra, " +
+                    " responsable_revision_limpieza_pre_siembra, firma_responsable_aso_pre_siembra, stringed_responsable_aso_pre_siembra, " +
+                    " firma_revision_limpieza_pre_siembra, stringed_revision_limpieza_pre_siembra, " +
+                    " tarros_semilla_post_siembra, discos_sembradores_post_siembra, estructura_maquinaria_post_cosecha, " +
+                    " lugar_limpieza_post_siembra, responsable_aseo_post_siembra, rut_responsable_aseo_post_siembra, " +
+                    " encargado_revision_limpieza_post_siembra, firma_responsable_aseo_post_siembra, stringed_responsable_aseo_post_siembra, " +
+                    " firma_revision_limpieza_post_siembra, stringed_revision_limpieza_post_siembra, " +
+                    " desempeno_siembra, observacion_general, fecha_ingreso, hora_ingreso, nombre_supervisor_siembra, " +
+                    " nombre_responsable_campo, nombre_operario_maquina, firma_responsable_campo, stringed_responsable_campo, " +
+                    " firma_operario_maquina, stringed_operario_maquina, fecha_termino, hora_termino, nombre_supervisor_siembra_termino, " +
+                    " nombre_responsable_campo_termino, nombre_operario_maquina_termino, firma_responsable_campo_termino, " +
+                    " stringed_responsable_campo_termino, firma_operario_maquina_termino, stringed_operario_maquina_termino, " +
+                    " estado_sincronizacion " +
+                    " FROM anexo_checklist_siembra_evento;");
+
+            database.execSQL("DROP TABLE anexo_checklist_siembra_evento;");
+            database.execSQL("ALTER TABLE anexo_checklist_siembra_evento_nuevo RENAME TO anexo_checklist_siembra_evento;");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_anexo_checklist_siembra_evento_clave_unica_evento` ON `anexo_checklist_siembra_evento` (`clave_unica_evento`)");
+        }
+    };
 }

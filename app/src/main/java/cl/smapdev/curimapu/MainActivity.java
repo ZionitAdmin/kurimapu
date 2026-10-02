@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .addMigrations(Migrations.MIGRATION_23_TO_24) // TICKET 2494 - 2026-10-01: Siembra Anterior por evento
                 .addMigrations(Migrations.MIGRATION_24_TO_25) // TICKET 2494 - 2026-10-01: Mezcla -> 8 campos fertilizacion
                 .addMigrations(Migrations.MIGRATION_25_TO_26) // TICKET 2515 - 2026-10-02: fechas de siembra en anexo_correo_fechas
+                .addMigrations(Migrations.MIGRATION_26_TO_27) // TICKET 2515 - 2026-10-02: tipo H/M en cabecera, evento por prestador + maquina
                 .build();
 
 
