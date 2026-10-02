@@ -36,6 +36,7 @@ import cl.smapdev.curimapu.clases.bd.MyAppBD;
 import cl.smapdev.curimapu.clases.tablas.Config;
 import cl.smapdev.curimapu.clases.tablas.Usuario;
 import cl.smapdev.curimapu.clases.utilidades.Utilidades;
+import cl.smapdev.curimapu.clases.utilidades.RegistroErrores;
 import cl.smapdev.curimapu.fragments.FragmentFichas;
 import cl.smapdev.curimapu.fragments.FragmentLogin;
 import cl.smapdev.curimapu.fragments.FragmentPrincipal;
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // TICKET 2515 - 2026-10-02: registro de cierres inesperados (ver RegistroErrores). Va primero para cubrir todo el arranque.
+        RegistroErrores.instalar(this);
 
         // Create the dummy account
         myAppDB = Room.databaseBuilder(getApplicationContext(), MyAppBD.class, Utilidades.NOMBRE_DATABASE).allowMainThreadQueries()
@@ -136,6 +140,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         shared = getSharedPreferences(Utilidades.SHARED_NAME, MODE_PRIVATE);
+
+        // TICKET 2515 - 2026-10-02: si la app se cerro antes por un error, muestra el detalle para copiarlo/compartirlo
+        getWindow().getDecorView().post(() -> RegistroErrores.mostrarSiHay(MainActivity.this));
 
         if (savedInstanceState == null) {
             if (Objects.equals(shared.getString(Utilidades.SHARED_USER, ""), "")) {
