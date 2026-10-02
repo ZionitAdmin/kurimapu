@@ -443,7 +443,7 @@ public class FragmentCheckList extends Fragment {
                     tmp.setClave_unica(clSiembra.getClave_unica());
                     tmp.setTipo_documento(Utilidades.TIPO_DOCUMENTO_CHECKLIST_SIEMBRA);
                     // TICKET 2515 - 2026-10-02: el tipo del checklist (HEMBRA / MACHO) se muestra junto al estado
-                    String textoTipoSiembra = "H".equals(clSiembra.getTipo_siembra()) ? " - HEMBRA" : ("M".equals(clSiembra.getTipo_siembra()) ? " - MACHO" : "");
+                    String textoTipoSiembra = CheckListSiembra.textoTipo(clSiembra.getTipo_siembra()).isEmpty() ? "" : " - " + CheckListSiembra.textoTipo(clSiembra.getTipo_siembra());
                     tmp.setDescEstado(((clSiembra.getEstado_documento() <= 0) ? "SIN ESTADO" : (clSiembra.getEstado_documento() > 1) ? "PENDIENTE" : "ACTIVA") + textoTipoSiembra);
                     nested.add(tmp);
                 }

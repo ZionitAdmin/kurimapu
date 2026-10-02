@@ -263,6 +263,18 @@ public class CheckListSiembra {
     private String stringed_operario_maquina_termino;
 
 
+    // TICKET 2515 - 2026-10-02: tipos validos del checklist: H (hembra), M1, M2 y M3 (machos). "M" suelto
+    // es de pruebas anteriores y se trata como M1.
+    public static final String[] TIPOS_SIEMBRA = {"H", "M1", "M2", "M3"};
+
+    public static String textoTipo(String tipo) {
+        if ("H".equals(tipo)) return "HEMBRA";
+        if ("M1".equals(tipo) || "M".equals(tipo)) return "MACHO 1";
+        if ("M2".equals(tipo)) return "MACHO 2";
+        if ("M3".equals(tipo)) return "MACHO 3";
+        return "";
+    }
+
     public String getTipo_siembra() {
         return tipo_siembra;
     }

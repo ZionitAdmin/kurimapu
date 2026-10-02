@@ -379,16 +379,42 @@ public class FragmentCheckListSiembra extends Fragment {
             }
         }, getViewLifecycleOwner(), Lifecycle.State.CREATED);
 
+        // la toolbar se arma una sola vez; despues solo cambia el subtitulo (ver actualizarToolbarTipoSiembra)
+        Utilidades.setToolbar(activity, view, getResources().getString(R.string.app_name), "CHECKLIST SIEMBRA");
         actualizarToolbarTipoSiembra();
     }
 
-    // TICKET 2515 - 2026-10-02: el checklist de siembra es de Hembra (H) o de Macho (M)
+    // TICKET 2515 - 2026-10-02: el checklist de siembra es de Hembra (H) o Macho 1/2/3 (M1, M2, M3).
+    // Solo cambia el subtitulo: antes rearmaba toda la toolbar (Utilidades.setToolbar) en cada cambio del
+    // combobox, acumulando listeners del drawer. Todo protegido: nunca debe tumbar la pantalla.
     private void actualizarToolbarTipoSiembra() {
-        if (getView() == null) return;
-        String sufijo = "";
-        if ("H".equals(tipoSiembra)) sufijo = " - HEMBRA";
-        else if ("M".equals(tipoSiembra)) sufijo = " - MACHO";
-        Utilidades.setToolbar(activity, getView(), getResources().getString(R.string.app_name), "CHECKLIST SIEMBRA" + sufijo);
+        try {
+            if (activity == null) return;
+            androidx.appcompat.app.ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar == null) return;
+            String sufijo = CheckListSiembra.textoTipo(tipoSiembra).isEmpty() ? "" : " - " + CheckListSiembra.textoTipo(tipoSiembra);
+            actionBar.setSubtitle("CHECKLIST SIEMBRA" + sufijo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // TICKET 2515 - 2026-10-02: conversiones tolerantes (coma decimal, texto raro, notacion cientifica de datos
+    // antiguos): un valor mal escrito o heredado nunca debe tumbar el guardado, queda en 0.
+    private double parseDoubleSeguro(String texto) {
+        try {
+            return Double.parseDouble(texto.trim().replace(',', '.'));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private int parseIntSeguro(String texto) {
+        try {
+            return Integer.parseInt(texto.trim());
+        } catch (Exception e) {
+            return (int) parseDoubleSeguro(texto);
+        }
     }
 
     // Combobox Hembra / Macho. La seleccion inicial (checklist existente) se pone ANTES de enganchar el
@@ -396,13 +422,20 @@ public class FragmentCheckListSiembra extends Fragment {
     private void configurarSpinnerTipoSiembra() {
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item,
-                Arrays.asList("--Seleccione--", "HEMBRA", "MACHO"));
+                Arrays.asList("--Seleccione--", "HEMBRA", "MACHO 1", "MACHO 2", "MACHO 3"));
         sp_tipo_siembra.setAdapter(adapterTipo);
-        sp_tipo_siembra.setSelection("H".equals(tipoSiembra) ? 1 : ("M".equals(tipoSiembra) ? 2 : 0));
+        int posicionInicial = 0;
+        for (int i = 0; i < CheckListSiembra.TIPOS_SIEMBRA.length; i++) {
+            // un "M" suelto (pruebas anteriores) se muestra como MACHO 1
+            if (CheckListSiembra.TIPOS_SIEMBRA[i].equals(tipoSiembra) || ("M".equals(tipoSiembra) && i == 1)) {
+                posicionInicial = i + 1;
+            }
+        }
+        sp_tipo_siembra.setSelection(posicionInicial);
         sp_tipo_siembra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                tipoSiembra = (position == 1) ? "H" : (position == 2 ? "M" : null);
+                tipoSiembra = (position >= 1 && position <= CheckListSiembra.TIPOS_SIEMBRA.length) ? CheckListSiembra.TIPOS_SIEMBRA[position - 1] : null;
                 actualizarToolbarTipoSiembra();
             }
 
@@ -1562,7 +1595,7 @@ public class FragmentCheckListSiembra extends Fragment {
 
         // TICKET 2515 - 2026-10-02: el checklist es de Hembra o de Macho, no se puede guardar sin elegir
         if (tipoSiembra == null || tipoSiembra.isEmpty()) {
-            Toasty.error(requireActivity(), "Debes seleccionar el tipo de checklist (Hembra o Macho)", Toast.LENGTH_LONG, true).show();
+            Toasty.error(requireActivity(), "Debes seleccionar el tipo de checklist (Hembra, Macho 1, Macho 2 o Macho 3)", Toast.LENGTH_LONG, true).show();
             return false;
         }
         //crear clase y guardar en bd
@@ -1638,7 +1671,7 @@ public class FragmentCheckListSiembra extends Fragment {
         //siembra
         if (!et_protocolo_siembra.getText().toString().isEmpty()) {
             String protocoloSiembra = et_protocolo_siembra.getText().toString();
-            siembra.setProtocolo_siembra(Integer.parseInt(protocoloSiembra));
+            siembra.setProtocolo_siembra(parseIntSeguro(protocoloSiembra));
         }
 
         if (btn_fotografia_si.isChecked() || btn_fotografia_no.isChecked()) {
@@ -1653,12 +1686,12 @@ public class FragmentCheckListSiembra extends Fragment {
 
         if (!et_relacion_m.getText().toString().isEmpty()) {
             String relacionM = et_relacion_m.getText().toString();
-            siembra.setRelacion_m(Double.parseDouble(relacionM));
+            siembra.setRelacion_m(parseDoubleSeguro(relacionM));
         }
 
         if (!et_relacion_h.getText().toString().isEmpty()) {
             String relacionH = et_relacion_h.getText().toString();
-            siembra.setRelacion_h(Double.parseDouble(relacionH));
+            siembra.setRelacion_h(parseDoubleSeguro(relacionH));
         }
 
         //chequeo envases
@@ -1675,39 +1708,39 @@ public class FragmentCheckListSiembra extends Fragment {
 
         // TICKET 2494 - 2026-10-01: Mezcla abierta a 8 campos de fertilizacion
         if (!et_cal_kg_ha.getText().toString().isEmpty()) {
-            siembra.setCal_kg_ha(Double.parseDouble(et_cal_kg_ha.getText().toString()));
+            siembra.setCal_kg_ha(parseDoubleSeguro(et_cal_kg_ha.getText().toString()));
         }
         if (!et_nitrogeno_pct.getText().toString().isEmpty()) {
-            siembra.setNitrogeno_pct(Double.parseDouble(et_nitrogeno_pct.getText().toString()));
+            siembra.setNitrogeno_pct(parseDoubleSeguro(et_nitrogeno_pct.getText().toString()));
         }
         if (!et_fosforo_pct.getText().toString().isEmpty()) {
-            siembra.setFosforo_pct(Double.parseDouble(et_fosforo_pct.getText().toString()));
+            siembra.setFosforo_pct(parseDoubleSeguro(et_fosforo_pct.getText().toString()));
         }
         if (!et_potasio_pct.getText().toString().isEmpty()) {
-            siembra.setPotasio_pct(Double.parseDouble(et_potasio_pct.getText().toString()));
+            siembra.setPotasio_pct(parseDoubleSeguro(et_potasio_pct.getText().toString()));
         }
         if (!et_magnesio_pct.getText().toString().isEmpty()) {
-            siembra.setMagnesio_pct(Double.parseDouble(et_magnesio_pct.getText().toString()));
+            siembra.setMagnesio_pct(parseDoubleSeguro(et_magnesio_pct.getText().toString()));
         }
         if (!et_azufre_pct.getText().toString().isEmpty()) {
-            siembra.setAzufre_pct(Double.parseDouble(et_azufre_pct.getText().toString()));
+            siembra.setAzufre_pct(parseDoubleSeguro(et_azufre_pct.getText().toString()));
         }
         if (!et_zinc_pct.getText().toString().isEmpty()) {
-            siembra.setZinc_pct(Double.parseDouble(et_zinc_pct.getText().toString()));
+            siembra.setZinc_pct(parseDoubleSeguro(et_zinc_pct.getText().toString()));
         }
         if (!et_boro_pct.getText().toString().isEmpty()) {
-            siembra.setBoro_pct(Double.parseDouble(et_boro_pct.getText().toString()));
+            siembra.setBoro_pct(parseDoubleSeguro(et_boro_pct.getText().toString()));
         }
 
         if (!et_cantidad_fertilizante.getText().toString().isEmpty()) {
             String cantidadFertilizante = et_cantidad_fertilizante.getText().toString();
-            siembra.setCantidad_aplicada(Double.parseDouble(cantidadFertilizante));
+            siembra.setCantidad_aplicada(parseDoubleSeguro(cantidadFertilizante));
         }
 
 
         if (!et_cantidad_envases_h.getText().toString().isEmpty()) {
             String cantidadEnvasesH = et_cantidad_envases_h.getText().toString();
-            siembra.setCantidad_envase_h(Double.parseDouble(cantidadEnvasesH));
+            siembra.setCantidad_envase_h(parseDoubleSeguro(cantidadEnvasesH));
         }
 
         if (!et_lote_hembra.getText().toString().isEmpty()) {
@@ -1717,7 +1750,7 @@ public class FragmentCheckListSiembra extends Fragment {
 
         if (!et_cantidad_envases_m.getText().toString().isEmpty()) {
             String cantidadEnvasesM = et_cantidad_envases_m.getText().toString();
-            siembra.setCantidad_envase_m(Double.parseDouble(cantidadEnvasesM));
+            siembra.setCantidad_envase_m(parseDoubleSeguro(cantidadEnvasesM));
         }
 
         if (!et_lote_macho.getText().toString().isEmpty()) {
@@ -1739,25 +1772,25 @@ public class FragmentCheckListSiembra extends Fragment {
 
         if (!et_distancia_hileras.getText().toString().isEmpty()) {
             String distanciaHileras = et_distancia_hileras.getText().toString();
-            siembra.setDistancia_hileras(Double.parseDouble(distanciaHileras));
+            siembra.setDistancia_hileras(parseDoubleSeguro(distanciaHileras));
         }
 
         if (!et_numero_semillas_mt.getText().toString().isEmpty()) {
             String numeroSemillas = et_numero_semillas_mt.getText().toString();
-            siembra.setNumero_semillas(Double.parseDouble(numeroSemillas));
+            siembra.setNumero_semillas(parseDoubleSeguro(numeroSemillas));
         }
         if (!et_profundidad_fertilizante.getText().toString().isEmpty()) {
             String profFertilizante = et_profundidad_fertilizante.getText().toString();
-            siembra.setProfundidad_fertilizante(Double.parseDouble(profFertilizante));
+            siembra.setProfundidad_fertilizante(parseDoubleSeguro(profFertilizante));
         }
         if (!et_profundidad_siembra.getText().toString().isEmpty()) {
             String profSiembra = et_profundidad_siembra.getText().toString();
-            siembra.setProfundidad_siembra(Double.parseDouble(profSiembra));
+            siembra.setProfundidad_siembra(parseDoubleSeguro(profSiembra));
         }
 
         if (!et_dist_entre_fert_semilla.getText().toString().isEmpty()) {
             String distanciaFertSemilla = et_dist_entre_fert_semilla.getText().toString();
-            siembra.setDistancia_fertilizante_semilla(Double.parseDouble(distanciaFertSemilla));
+            siembra.setDistancia_fertilizante_semilla(parseDoubleSeguro(distanciaFertSemilla));
         }
 
 
