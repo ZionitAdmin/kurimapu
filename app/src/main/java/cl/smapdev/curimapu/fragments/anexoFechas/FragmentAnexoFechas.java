@@ -354,6 +354,14 @@ public class FragmentAnexoFechas extends Fragment {
                                         acf.setCorreo_inicio_despano(fc.getCorreo_inicio_despano());
                                         acf.setCorreo_inicio_cosecha(fc.getCorreo_inicio_cosecha());
                                         acf.setCorreo_inicio_siembra(fc.getCorreo_inicio_siembra());
+                                        // TICKET 2515 - 2026-10-02: estado del correo de las fechas de siembra nuevas
+                                        acf.setCorreo_termino_siembra_hembra(fc.getCorreo_termino_siembra_hembra());
+                                        acf.setCorreo_inicio_siembra_macho1(fc.getCorreo_inicio_siembra_macho1());
+                                        acf.setCorreo_termino_siembra_macho1(fc.getCorreo_termino_siembra_macho1());
+                                        acf.setCorreo_inicio_siembra_macho2(fc.getCorreo_inicio_siembra_macho2());
+                                        acf.setCorreo_termino_siembra_macho2(fc.getCorreo_termino_siembra_macho2());
+                                        acf.setCorreo_inicio_siembra_macho3(fc.getCorreo_inicio_siembra_macho3());
+                                        acf.setCorreo_termino_siembra_macho3(fc.getCorreo_termino_siembra_macho3());
                                         acf.setCorreo_inicio_corte_seda(fc.getCorreo_inicio_corte_seda());
                                         acf.setCorreo_cinco_porciento_floracion(fc.getCorreo_cinco_porciento());
                                         acf.setDetalle_labores(fc.getDetalle());

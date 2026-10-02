@@ -104,6 +104,91 @@ public class RespuestaFecha {
         this.correo_inicio_siembra = correo_inicio_siembra;
     }
 
+    // TICKET 2515 - 2026-10-02: estado del correo de las fechas de siembra nuevas
+    @SerializedName("correo_termino_siembra_hembra")
+    @Expose
+    private int correo_termino_siembra_hembra;
+
+    @SerializedName("correo_inicio_siembra_macho1")
+    @Expose
+    private int correo_inicio_siembra_macho1;
+
+    @SerializedName("correo_termino_siembra_macho1")
+    @Expose
+    private int correo_termino_siembra_macho1;
+
+    @SerializedName("correo_inicio_siembra_macho2")
+    @Expose
+    private int correo_inicio_siembra_macho2;
+
+    @SerializedName("correo_termino_siembra_macho2")
+    @Expose
+    private int correo_termino_siembra_macho2;
+
+    @SerializedName("correo_inicio_siembra_macho3")
+    @Expose
+    private int correo_inicio_siembra_macho3;
+
+    @SerializedName("correo_termino_siembra_macho3")
+    @Expose
+    private int correo_termino_siembra_macho3;
+
+    public int getCorreo_termino_siembra_hembra() {
+        return correo_termino_siembra_hembra;
+    }
+
+    public void setCorreo_termino_siembra_hembra(int correo_termino_siembra_hembra) {
+        this.correo_termino_siembra_hembra = correo_termino_siembra_hembra;
+    }
+
+    public int getCorreo_inicio_siembra_macho1() {
+        return correo_inicio_siembra_macho1;
+    }
+
+    public void setCorreo_inicio_siembra_macho1(int correo_inicio_siembra_macho1) {
+        this.correo_inicio_siembra_macho1 = correo_inicio_siembra_macho1;
+    }
+
+    public int getCorreo_termino_siembra_macho1() {
+        return correo_termino_siembra_macho1;
+    }
+
+    public void setCorreo_termino_siembra_macho1(int correo_termino_siembra_macho1) {
+        this.correo_termino_siembra_macho1 = correo_termino_siembra_macho1;
+    }
+
+    public int getCorreo_inicio_siembra_macho2() {
+        return correo_inicio_siembra_macho2;
+    }
+
+    public void setCorreo_inicio_siembra_macho2(int correo_inicio_siembra_macho2) {
+        this.correo_inicio_siembra_macho2 = correo_inicio_siembra_macho2;
+    }
+
+    public int getCorreo_termino_siembra_macho2() {
+        return correo_termino_siembra_macho2;
+    }
+
+    public void setCorreo_termino_siembra_macho2(int correo_termino_siembra_macho2) {
+        this.correo_termino_siembra_macho2 = correo_termino_siembra_macho2;
+    }
+
+    public int getCorreo_inicio_siembra_macho3() {
+        return correo_inicio_siembra_macho3;
+    }
+
+    public void setCorreo_inicio_siembra_macho3(int correo_inicio_siembra_macho3) {
+        this.correo_inicio_siembra_macho3 = correo_inicio_siembra_macho3;
+    }
+
+    public int getCorreo_termino_siembra_macho3() {
+        return correo_termino_siembra_macho3;
+    }
+
+    public void setCorreo_termino_siembra_macho3(int correo_termino_siembra_macho3) {
+        this.correo_termino_siembra_macho3 = correo_termino_siembra_macho3;
+    }
+
     public String getDetalle() {
         return detalle;
     }

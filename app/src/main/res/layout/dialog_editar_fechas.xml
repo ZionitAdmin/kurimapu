@@ -39,6 +39,189 @@
             android:drawableTint="@color/colorPrimary"
             />
 
+    <!-- TICKET 2515 - 2026-10-02: fechas de siembra nuevas, despues de Inicio Siembra Hembra -->
+    <TextView
+        android:id="@+id/lbl_termino_siembra_hembra"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/termino_siembra_hembra"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_termino_siembra_hembra"
+        app:layout_constraintBottom_toBottomOf="@id/et_termino_siembra_hembra"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_termino_siembra_hembra"
+        />
+
+    <EditText
+        android:id="@+id/et_termino_siembra_hembra"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_inicio_siembra"
+        app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_hembra"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_inicio_siembra_macho1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/inicio_siembra_macho1"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_inicio_siembra_macho1"
+        app:layout_constraintBottom_toBottomOf="@id/et_inicio_siembra_macho1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_inicio_siembra_macho1"
+        />
+
+    <EditText
+        android:id="@+id/et_inicio_siembra_macho1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_termino_siembra_hembra"
+        app:layout_constraintStart_toEndOf="@id/lbl_inicio_siembra_macho1"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_termino_siembra_macho1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/termino_siembra_macho1"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_termino_siembra_macho1"
+        app:layout_constraintBottom_toBottomOf="@id/et_termino_siembra_macho1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_termino_siembra_macho1"
+        />
+
+    <EditText
+        android:id="@+id/et_termino_siembra_macho1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_inicio_siembra_macho1"
+        app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_macho1"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_inicio_siembra_macho2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/inicio_siembra_macho2"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_inicio_siembra_macho2"
+        app:layout_constraintBottom_toBottomOf="@id/et_inicio_siembra_macho2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_inicio_siembra_macho2"
+        />
+
+    <EditText
+        android:id="@+id/et_inicio_siembra_macho2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_termino_siembra_macho1"
+        app:layout_constraintStart_toEndOf="@id/lbl_inicio_siembra_macho2"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_termino_siembra_macho2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/termino_siembra_macho2"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_termino_siembra_macho2"
+        app:layout_constraintBottom_toBottomOf="@id/et_termino_siembra_macho2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_termino_siembra_macho2"
+        />
+
+    <EditText
+        android:id="@+id/et_termino_siembra_macho2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_inicio_siembra_macho2"
+        app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_macho2"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_inicio_siembra_macho3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/inicio_siembra_macho3"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_inicio_siembra_macho3"
+        app:layout_constraintBottom_toBottomOf="@id/et_inicio_siembra_macho3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_inicio_siembra_macho3"
+        />
+
+    <EditText
+        android:id="@+id/et_inicio_siembra_macho3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_termino_siembra_macho2"
+        app:layout_constraintStart_toEndOf="@id/lbl_inicio_siembra_macho3"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
+    <TextView
+        android:id="@+id/lbl_termino_siembra_macho3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:text="@string/termino_siembra_macho3"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="@id/et_termino_siembra_macho3"
+        app:layout_constraintBottom_toBottomOf="@id/et_termino_siembra_macho3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/et_termino_siembra_macho3"
+        />
+
+    <EditText
+        android:id="@+id/et_termino_siembra_macho3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="3"
+        android:inputType="date"
+        app:layout_constraintTop_toBottomOf="@id/et_inicio_siembra_macho3"
+        app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_macho3"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableStart="@drawable/ic_date_range"
+        android:drawableTint="@color/colorPrimary"
+        />
+
     <!-- empiezan fechas -->
    <TextView
        android:id="@+id/lbl_inicio_despano"
@@ -59,7 +242,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_weight="3"
         android:inputType="date"
-        app:layout_constraintTop_toBottomOf="@id/et_inicio_siembra"
+        app:layout_constraintTop_toBottomOf="@id/et_termino_siembra_macho3"
         app:layout_constraintStart_toEndOf="@id/lbl_inicio_despano"
         app:layout_constraintEnd_toEndOf="parent"
         android:drawableStart="@drawable/ic_date_range"

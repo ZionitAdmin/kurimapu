@@ -37,6 +37,14 @@ public class DialogAnexoFecha extends DialogFragment {
 
     private EditText et_inicio_despano;
     private EditText et_inicio_siembra;
+    // TICKET 2515 - 2026-10-02
+    private EditText et_termino_siembra_hembra;
+    private EditText et_inicio_siembra_macho1;
+    private EditText et_termino_siembra_macho1;
+    private EditText et_inicio_siembra_macho2;
+    private EditText et_termino_siembra_macho2;
+    private EditText et_inicio_siembra_macho3;
+    private EditText et_termino_siembra_macho3;
     private EditText et_cinco_porc_floracion;
     // TICKET 2491 - 2026-09-15: solo lectura, se ingresan y modifican desde el Libro de Campo (web)
     private EditText et_floracion_hembra;
@@ -202,6 +210,72 @@ public class DialogAnexoFecha extends DialogFragment {
 
 
             et_inicio_siembra.setText(inicioSiembra);
+
+            // TICKET 2515 - 2026-10-02: fechas de siembra nuevas, mismo comportamiento que Inicio Siembra: editables
+            // hasta que el correo de esa fecha se envia (despues quedan bloqueadas). Pueden quedar vacias.
+            boolean terminoSiembraHembraEnabled = anexoFechas.getCorreo_termino_siembra_hembra() > 0;
+            String terminoSiembraHembra = (
+                    anexoFechas.getTermino_siembra_hembra() != null &&
+                            !anexoFechas.getTermino_siembra_hembra().isEmpty() &&
+                            !anexoFechas.getTermino_siembra_hembra().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getTermino_siembra_hembra())
+                    : "";
+            et_termino_siembra_hembra.setEnabled(!terminoSiembraHembraEnabled);
+            et_termino_siembra_hembra.setText(terminoSiembraHembra);
+            boolean inicioSiembraMacho1Enabled = anexoFechas.getCorreo_inicio_siembra_macho1() > 0;
+            String inicioSiembraMacho1 = (
+                    anexoFechas.getInicio_siembra_macho1() != null &&
+                            !anexoFechas.getInicio_siembra_macho1().isEmpty() &&
+                            !anexoFechas.getInicio_siembra_macho1().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getInicio_siembra_macho1())
+                    : "";
+            et_inicio_siembra_macho1.setEnabled(!inicioSiembraMacho1Enabled);
+            et_inicio_siembra_macho1.setText(inicioSiembraMacho1);
+            boolean terminoSiembraMacho1Enabled = anexoFechas.getCorreo_termino_siembra_macho1() > 0;
+            String terminoSiembraMacho1 = (
+                    anexoFechas.getTermino_siembra_macho1() != null &&
+                            !anexoFechas.getTermino_siembra_macho1().isEmpty() &&
+                            !anexoFechas.getTermino_siembra_macho1().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getTermino_siembra_macho1())
+                    : "";
+            et_termino_siembra_macho1.setEnabled(!terminoSiembraMacho1Enabled);
+            et_termino_siembra_macho1.setText(terminoSiembraMacho1);
+            boolean inicioSiembraMacho2Enabled = anexoFechas.getCorreo_inicio_siembra_macho2() > 0;
+            String inicioSiembraMacho2 = (
+                    anexoFechas.getInicio_siembra_macho2() != null &&
+                            !anexoFechas.getInicio_siembra_macho2().isEmpty() &&
+                            !anexoFechas.getInicio_siembra_macho2().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getInicio_siembra_macho2())
+                    : "";
+            et_inicio_siembra_macho2.setEnabled(!inicioSiembraMacho2Enabled);
+            et_inicio_siembra_macho2.setText(inicioSiembraMacho2);
+            boolean terminoSiembraMacho2Enabled = anexoFechas.getCorreo_termino_siembra_macho2() > 0;
+            String terminoSiembraMacho2 = (
+                    anexoFechas.getTermino_siembra_macho2() != null &&
+                            !anexoFechas.getTermino_siembra_macho2().isEmpty() &&
+                            !anexoFechas.getTermino_siembra_macho2().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getTermino_siembra_macho2())
+                    : "";
+            et_termino_siembra_macho2.setEnabled(!terminoSiembraMacho2Enabled);
+            et_termino_siembra_macho2.setText(terminoSiembraMacho2);
+            boolean inicioSiembraMacho3Enabled = anexoFechas.getCorreo_inicio_siembra_macho3() > 0;
+            String inicioSiembraMacho3 = (
+                    anexoFechas.getInicio_siembra_macho3() != null &&
+                            !anexoFechas.getInicio_siembra_macho3().isEmpty() &&
+                            !anexoFechas.getInicio_siembra_macho3().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getInicio_siembra_macho3())
+                    : "";
+            et_inicio_siembra_macho3.setEnabled(!inicioSiembraMacho3Enabled);
+            et_inicio_siembra_macho3.setText(inicioSiembraMacho3);
+            boolean terminoSiembraMacho3Enabled = anexoFechas.getCorreo_termino_siembra_macho3() > 0;
+            String terminoSiembraMacho3 = (
+                    anexoFechas.getTermino_siembra_macho3() != null &&
+                            !anexoFechas.getTermino_siembra_macho3().isEmpty() &&
+                            !anexoFechas.getTermino_siembra_macho3().equals("0000-00-00"))
+                    ? Utilidades.voltearFechaVista(anexoFechas.getTermino_siembra_macho3())
+                    : "";
+            et_termino_siembra_macho3.setEnabled(!terminoSiembraMacho3Enabled);
+            et_termino_siembra_macho3.setText(terminoSiembraMacho3);
             et_inicio_despano.setText(inicioDespano);
             et_cinco_porc_floracion.setText(cincoPorciento);
             et_inicio_corte_seda.setText(inicioCorteSeda);
@@ -281,6 +355,35 @@ public class DialogAnexoFecha extends DialogFragment {
 
         et_inicio_siembra.setOnFocusChangeListener((view, b) -> {
             if (b) levantarFecha(et_inicio_siembra);
+        });
+
+        // TICKET 2515 - 2026-10-02
+        et_termino_siembra_hembra.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_termino_siembra_hembra);
+        });
+
+        et_inicio_siembra_macho1.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_inicio_siembra_macho1);
+        });
+
+        et_termino_siembra_macho1.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_termino_siembra_macho1);
+        });
+
+        et_inicio_siembra_macho2.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_inicio_siembra_macho2);
+        });
+
+        et_termino_siembra_macho2.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_termino_siembra_macho2);
+        });
+
+        et_inicio_siembra_macho3.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_inicio_siembra_macho3);
+        });
+
+        et_termino_siembra_macho3.setOnFocusChangeListener((view, b) -> {
+            if (b) levantarFecha(et_termino_siembra_macho3);
         });
 
         et_fecha_siembra_temprada.setOnFocusChangeListener((view, b) -> {
@@ -441,6 +544,14 @@ public class DialogAnexoFecha extends DialogFragment {
         AnexoCorreoFechas fhc = new AnexoCorreoFechas();
 
         fhc.setInicio_siembra(Utilidades.voltearFechaBD(et_inicio_siembra.getText().toString()));
+        // TICKET 2515 - 2026-10-02
+        fhc.setTermino_siembra_hembra(Utilidades.voltearFechaBD(et_termino_siembra_hembra.getText().toString()));
+        fhc.setInicio_siembra_macho1(Utilidades.voltearFechaBD(et_inicio_siembra_macho1.getText().toString()));
+        fhc.setTermino_siembra_macho1(Utilidades.voltearFechaBD(et_termino_siembra_macho1.getText().toString()));
+        fhc.setInicio_siembra_macho2(Utilidades.voltearFechaBD(et_inicio_siembra_macho2.getText().toString()));
+        fhc.setTermino_siembra_macho2(Utilidades.voltearFechaBD(et_termino_siembra_macho2.getText().toString()));
+        fhc.setInicio_siembra_macho3(Utilidades.voltearFechaBD(et_inicio_siembra_macho3.getText().toString()));
+        fhc.setTermino_siembra_macho3(Utilidades.voltearFechaBD(et_termino_siembra_macho3.getText().toString()));
         fhc.setInicio_despano(Utilidades.voltearFechaBD(et_inicio_despano.getText().toString()));
         fhc.setCinco_porciento_floracion(Utilidades.voltearFechaBD(et_cinco_porc_floracion.getText().toString()));
         fhc.setTermino_cosecha(Utilidades.voltearFechaBD(et_termino_cosecha.getText().toString()));
@@ -474,6 +585,14 @@ public class DialogAnexoFecha extends DialogFragment {
         fhc.setCorreo_incremento_linea(anexoFechas == null ? 0 : anexoFechas.getCorreo_incremento_linea());
 
         fhc.setCorreo_inicio_siembra(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_siembra());
+        // TICKET 2515 - 2026-10-02: se preserva el estado del correo de las fechas de siembra nuevas
+        fhc.setCorreo_termino_siembra_hembra(anexoFechas == null ? 0 : anexoFechas.getCorreo_termino_siembra_hembra());
+        fhc.setCorreo_inicio_siembra_macho1(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_siembra_macho1());
+        fhc.setCorreo_termino_siembra_macho1(anexoFechas == null ? 0 : anexoFechas.getCorreo_termino_siembra_macho1());
+        fhc.setCorreo_inicio_siembra_macho2(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_siembra_macho2());
+        fhc.setCorreo_termino_siembra_macho2(anexoFechas == null ? 0 : anexoFechas.getCorreo_termino_siembra_macho2());
+        fhc.setCorreo_inicio_siembra_macho3(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_siembra_macho3());
+        fhc.setCorreo_termino_siembra_macho3(anexoFechas == null ? 0 : anexoFechas.getCorreo_termino_siembra_macho3());
         fhc.setCorreo_inicio_despano(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_despano());
         fhc.setCorreo_cinco_porciento_floracion(anexoFechas == null ? 0 : anexoFechas.getCorreo_cinco_porciento_floracion());
         fhc.setCorreo_inicio_corte_seda(anexoFechas == null ? 0 : anexoFechas.getCorreo_inicio_corte_seda());
@@ -559,6 +678,14 @@ public class DialogAnexoFecha extends DialogFragment {
 
         et_inicio_despano = view.findViewById(R.id.et_inicio_despano);
         et_inicio_siembra = view.findViewById(R.id.et_inicio_siembra);
+        // TICKET 2515 - 2026-10-02
+        et_termino_siembra_hembra = view.findViewById(R.id.et_termino_siembra_hembra);
+        et_inicio_siembra_macho1 = view.findViewById(R.id.et_inicio_siembra_macho1);
+        et_termino_siembra_macho1 = view.findViewById(R.id.et_termino_siembra_macho1);
+        et_inicio_siembra_macho2 = view.findViewById(R.id.et_inicio_siembra_macho2);
+        et_termino_siembra_macho2 = view.findViewById(R.id.et_termino_siembra_macho2);
+        et_inicio_siembra_macho3 = view.findViewById(R.id.et_inicio_siembra_macho3);
+        et_termino_siembra_macho3 = view.findViewById(R.id.et_termino_siembra_macho3);
         et_cinco_porc_floracion = view.findViewById(R.id.et_cinco_porc_floracion);
         et_floracion_hembra = view.findViewById(R.id.et_floracion_hembra);
         et_incremento_linea = view.findViewById(R.id.et_incremento_linea);
@@ -615,6 +742,21 @@ public class DialogAnexoFecha extends DialogFragment {
         et_inicio_despano.setInputType(InputType.TYPE_NULL);
         et_inicio_siembra.setKeyListener(null);
         et_inicio_siembra.setInputType(InputType.TYPE_NULL);
+        // TICKET 2515 - 2026-10-02
+        et_termino_siembra_hembra.setKeyListener(null);
+        et_termino_siembra_hembra.setInputType(InputType.TYPE_NULL);
+        et_inicio_siembra_macho1.setKeyListener(null);
+        et_inicio_siembra_macho1.setInputType(InputType.TYPE_NULL);
+        et_termino_siembra_macho1.setKeyListener(null);
+        et_termino_siembra_macho1.setInputType(InputType.TYPE_NULL);
+        et_inicio_siembra_macho2.setKeyListener(null);
+        et_inicio_siembra_macho2.setInputType(InputType.TYPE_NULL);
+        et_termino_siembra_macho2.setKeyListener(null);
+        et_termino_siembra_macho2.setInputType(InputType.TYPE_NULL);
+        et_inicio_siembra_macho3.setKeyListener(null);
+        et_inicio_siembra_macho3.setInputType(InputType.TYPE_NULL);
+        et_termino_siembra_macho3.setKeyListener(null);
+        et_termino_siembra_macho3.setInputType(InputType.TYPE_NULL);
         et_inicio_corte_seda.setKeyListener(null);
         et_inicio_corte_seda.setInputType(InputType.TYPE_NULL);
 

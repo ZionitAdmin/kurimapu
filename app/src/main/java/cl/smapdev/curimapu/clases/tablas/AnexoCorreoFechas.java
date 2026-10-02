@@ -214,6 +214,183 @@ public class AnexoCorreoFechas {
         this.correo_inicio_siembra = correo_inicio_siembra;
     }
 
+    // TICKET 2515 - 2026-10-02: fechas de siembra agregadas despues de Inicio Siembra (hembra). No son obligatorias,
+    // pueden quedar vacias. Mismo patron que inicio_siembra / correo_inicio_siembra.
+    @SerializedName("termino_siembra_hembra")
+    @Expose
+    private String termino_siembra_hembra;
+
+    @SerializedName("correo_termino_siembra_hembra")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_termino_siembra_hembra;
+
+    @SerializedName("inicio_siembra_macho1")
+    @Expose
+    private String inicio_siembra_macho1;
+
+    @SerializedName("correo_inicio_siembra_macho1")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_inicio_siembra_macho1;
+
+    @SerializedName("termino_siembra_macho1")
+    @Expose
+    private String termino_siembra_macho1;
+
+    @SerializedName("correo_termino_siembra_macho1")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_termino_siembra_macho1;
+
+    @SerializedName("inicio_siembra_macho2")
+    @Expose
+    private String inicio_siembra_macho2;
+
+    @SerializedName("correo_inicio_siembra_macho2")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_inicio_siembra_macho2;
+
+    @SerializedName("termino_siembra_macho2")
+    @Expose
+    private String termino_siembra_macho2;
+
+    @SerializedName("correo_termino_siembra_macho2")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_termino_siembra_macho2;
+
+    @SerializedName("inicio_siembra_macho3")
+    @Expose
+    private String inicio_siembra_macho3;
+
+    @SerializedName("correo_inicio_siembra_macho3")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_inicio_siembra_macho3;
+
+    @SerializedName("termino_siembra_macho3")
+    @Expose
+    private String termino_siembra_macho3;
+
+    @SerializedName("correo_termino_siembra_macho3")
+    @Expose
+    @ColumnInfo(defaultValue = "0")
+    private int correo_termino_siembra_macho3;
+
+    public String getTermino_siembra_hembra() {
+        return termino_siembra_hembra;
+    }
+
+    public void setTermino_siembra_hembra(String termino_siembra_hembra) {
+        this.termino_siembra_hembra = termino_siembra_hembra;
+    }
+
+    public int getCorreo_termino_siembra_hembra() {
+        return correo_termino_siembra_hembra;
+    }
+
+    public void setCorreo_termino_siembra_hembra(int correo_termino_siembra_hembra) {
+        this.correo_termino_siembra_hembra = correo_termino_siembra_hembra;
+    }
+
+    public String getInicio_siembra_macho1() {
+        return inicio_siembra_macho1;
+    }
+
+    public void setInicio_siembra_macho1(String inicio_siembra_macho1) {
+        this.inicio_siembra_macho1 = inicio_siembra_macho1;
+    }
+
+    public int getCorreo_inicio_siembra_macho1() {
+        return correo_inicio_siembra_macho1;
+    }
+
+    public void setCorreo_inicio_siembra_macho1(int correo_inicio_siembra_macho1) {
+        this.correo_inicio_siembra_macho1 = correo_inicio_siembra_macho1;
+    }
+
+    public String getTermino_siembra_macho1() {
+        return termino_siembra_macho1;
+    }
+
+    public void setTermino_siembra_macho1(String termino_siembra_macho1) {
+        this.termino_siembra_macho1 = termino_siembra_macho1;
+    }
+
+    public int getCorreo_termino_siembra_macho1() {
+        return correo_termino_siembra_macho1;
+    }
+
+    public void setCorreo_termino_siembra_macho1(int correo_termino_siembra_macho1) {
+        this.correo_termino_siembra_macho1 = correo_termino_siembra_macho1;
+    }
+
+    public String getInicio_siembra_macho2() {
+        return inicio_siembra_macho2;
+    }
+
+    public void setInicio_siembra_macho2(String inicio_siembra_macho2) {
+        this.inicio_siembra_macho2 = inicio_siembra_macho2;
+    }
+
+    public int getCorreo_inicio_siembra_macho2() {
+        return correo_inicio_siembra_macho2;
+    }
+
+    public void setCorreo_inicio_siembra_macho2(int correo_inicio_siembra_macho2) {
+        this.correo_inicio_siembra_macho2 = correo_inicio_siembra_macho2;
+    }
+
+    public String getTermino_siembra_macho2() {
+        return termino_siembra_macho2;
+    }
+
+    public void setTermino_siembra_macho2(String termino_siembra_macho2) {
+        this.termino_siembra_macho2 = termino_siembra_macho2;
+    }
+
+    public int getCorreo_termino_siembra_macho2() {
+        return correo_termino_siembra_macho2;
+    }
+
+    public void setCorreo_termino_siembra_macho2(int correo_termino_siembra_macho2) {
+        this.correo_termino_siembra_macho2 = correo_termino_siembra_macho2;
+    }
+
+    public String getInicio_siembra_macho3() {
+        return inicio_siembra_macho3;
+    }
+
+    public void setInicio_siembra_macho3(String inicio_siembra_macho3) {
+        this.inicio_siembra_macho3 = inicio_siembra_macho3;
+    }
+
+    public int getCorreo_inicio_siembra_macho3() {
+        return correo_inicio_siembra_macho3;
+    }
+
+    public void setCorreo_inicio_siembra_macho3(int correo_inicio_siembra_macho3) {
+        this.correo_inicio_siembra_macho3 = correo_inicio_siembra_macho3;
+    }
+
+    public String getTermino_siembra_macho3() {
+        return termino_siembra_macho3;
+    }
+
+    public void setTermino_siembra_macho3(String termino_siembra_macho3) {
+        this.termino_siembra_macho3 = termino_siembra_macho3;
+    }
+
+    public int getCorreo_termino_siembra_macho3() {
+        return correo_termino_siembra_macho3;
+    }
+
+    public void setCorreo_termino_siembra_macho3(int correo_termino_siembra_macho3) {
+        this.correo_termino_siembra_macho3 = correo_termino_siembra_macho3;
+    }
+
     public int getCorreo_destruccion_semillero() {
         return correo_destruccion_semillero;
     }

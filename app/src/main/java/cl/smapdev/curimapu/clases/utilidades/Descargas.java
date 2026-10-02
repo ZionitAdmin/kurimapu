@@ -232,6 +232,22 @@ public class Descargas {
                         f.setFecha_incremento_linea(fch.getFecha_incremento_linea());
                         f.setCorreo_incremento_linea(fch.getCorreo_incremento_linea());
 
+                        // TICKET 2515 - 2026-10-02: fechas de siembra nuevas (fecha + estado de correo)
+                        f.setTermino_siembra_hembra(fch.getTermino_siembra_hembra());
+                        f.setCorreo_termino_siembra_hembra(fch.getCorreo_termino_siembra_hembra());
+                        f.setInicio_siembra_macho1(fch.getInicio_siembra_macho1());
+                        f.setCorreo_inicio_siembra_macho1(fch.getCorreo_inicio_siembra_macho1());
+                        f.setTermino_siembra_macho1(fch.getTermino_siembra_macho1());
+                        f.setCorreo_termino_siembra_macho1(fch.getCorreo_termino_siembra_macho1());
+                        f.setInicio_siembra_macho2(fch.getInicio_siembra_macho2());
+                        f.setCorreo_inicio_siembra_macho2(fch.getCorreo_inicio_siembra_macho2());
+                        f.setTermino_siembra_macho2(fch.getTermino_siembra_macho2());
+                        f.setCorreo_termino_siembra_macho2(fch.getCorreo_termino_siembra_macho2());
+                        f.setInicio_siembra_macho3(fch.getInicio_siembra_macho3());
+                        f.setCorreo_inicio_siembra_macho3(fch.getCorreo_inicio_siembra_macho3());
+                        f.setTermino_siembra_macho3(fch.getTermino_siembra_macho3());
+                        f.setCorreo_termino_siembra_macho3(fch.getCorreo_termino_siembra_macho3());
+
                         f.setEstado_sincro_corr_fech(1);
 
                         MainActivity.myAppDB.DaoAnexosFechas().UpdateFechasAnexos(f);

@@ -432,4 +432,27 @@ public class Migrations {
             database.execSQL("ALTER TABLE anexo_checklist_siembra ADD COLUMN boro_pct REAL NOT NULL DEFAULT 0;");
         }
     };
+
+    // TICKET 2515 - 2026-10-02: fechas de siembra agregadas despues de Inicio Siembra (hembra) en anexo_correo_fechas
+    // (termino hembra + inicio/termino macho 1, 2 y 3), cada una con su marca de correo.
+    // Solo ADD COLUMN: fecha TEXT nullable y correo INTEGER NOT NULL DEFAULT 0 (igual que MIGRATION_17_TO_18).
+    public static final Migration MIGRATION_25_TO_26 = new Migration(25, 26) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN termino_siembra_hembra TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_termino_siembra_hembra INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN inicio_siembra_macho1 TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_inicio_siembra_macho1 INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN termino_siembra_macho1 TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_termino_siembra_macho1 INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN inicio_siembra_macho2 TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_inicio_siembra_macho2 INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN termino_siembra_macho2 TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_termino_siembra_macho2 INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN inicio_siembra_macho3 TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_inicio_siembra_macho3 INTEGER NOT NULL DEFAULT 0;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN termino_siembra_macho3 TEXT;");
+            database.execSQL("ALTER TABLE anexo_correo_fechas ADD COLUMN correo_termino_siembra_macho3 INTEGER NOT NULL DEFAULT 0;");
+        }
+    };
 }

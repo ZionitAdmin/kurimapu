@@ -245,6 +245,60 @@
         </LinearLayout>
 
 
+        <!-- TICKET 2515 - 2026-10-02: segunda fila de iconos de correo (fechas de siembra nuevas) -->
+        <LinearLayout
+            android:id="@+id/contenedor_resumen_icono_correo_2515"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/contenedor_resumen_icono_correo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/contenedor_alerta">
+
+            <ImageView
+                android:id="@+id/corr_termino_siembra_hembra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+            <ImageView
+                android:id="@+id/corr_inicio_siembra_macho1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+            <ImageView
+                android:id="@+id/corr_termino_siembra_macho1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+            <ImageView
+                android:id="@+id/corr_inicio_siembra_macho2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+            <ImageView
+                android:id="@+id/corr_termino_siembra_macho2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+            <ImageView
+                android:id="@+id/corr_inicio_siembra_macho3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+            <ImageView
+                android:id="@+id/corr_termino_siembra_macho3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_email_24_no" />
+
+        </LinearLayout>
+
+
         <LinearLayout
             android:id="@+id/contenedor_alerta"
             app:layout_constraintTop_toTopOf="parent"
@@ -323,12 +377,237 @@
             app:layout_constraintStart_toEndOf="@id/tv_inicio_siembra"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- TICKET 2515 - 2026-10-02: fechas de siembra nuevas, despues de Inicio Siembra Hembra -->
+        <TextView
+            android:id="@+id/lbl_termino_siembra_hembra"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_termino_siembra_hembra"
+            android:text="@string/termino_siembra_hembra"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_termino_siembra_hembra"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra"
+            app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_hembra"
+            app:layout_constraintEnd_toStartOf="@id/iv_termino_siembra_hembra"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_termino_siembra_hembra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra"
+            app:layout_constraintStart_toEndOf="@id/tv_termino_siembra_hembra"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_inicio_siembra_macho1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_hembra"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_inicio_siembra_macho1"
+            android:text="@string/inicio_siembra_macho1"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_inicio_siembra_macho1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_hembra"
+            app:layout_constraintStart_toEndOf="@id/lbl_inicio_siembra_macho1"
+            app:layout_constraintEnd_toStartOf="@id/iv_inicio_siembra_macho1"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_inicio_siembra_macho1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_hembra"
+            app:layout_constraintStart_toEndOf="@id/tv_inicio_siembra_macho1"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_termino_siembra_macho1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_termino_siembra_macho1"
+            android:text="@string/termino_siembra_macho1"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_termino_siembra_macho1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho1"
+            app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_macho1"
+            app:layout_constraintEnd_toStartOf="@id/iv_termino_siembra_macho1"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_termino_siembra_macho1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho1"
+            app:layout_constraintStart_toEndOf="@id/tv_termino_siembra_macho1"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_inicio_siembra_macho2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_inicio_siembra_macho2"
+            android:text="@string/inicio_siembra_macho2"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_inicio_siembra_macho2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho1"
+            app:layout_constraintStart_toEndOf="@id/lbl_inicio_siembra_macho2"
+            app:layout_constraintEnd_toStartOf="@id/iv_inicio_siembra_macho2"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_inicio_siembra_macho2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho1"
+            app:layout_constraintStart_toEndOf="@id/tv_inicio_siembra_macho2"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_termino_siembra_macho2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_termino_siembra_macho2"
+            android:text="@string/termino_siembra_macho2"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_termino_siembra_macho2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho2"
+            app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_macho2"
+            app:layout_constraintEnd_toStartOf="@id/iv_termino_siembra_macho2"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_termino_siembra_macho2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho2"
+            app:layout_constraintStart_toEndOf="@id/tv_termino_siembra_macho2"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_inicio_siembra_macho3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_inicio_siembra_macho3"
+            android:text="@string/inicio_siembra_macho3"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_inicio_siembra_macho3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho2"
+            app:layout_constraintStart_toEndOf="@id/lbl_inicio_siembra_macho3"
+            app:layout_constraintEnd_toStartOf="@id/iv_inicio_siembra_macho3"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_inicio_siembra_macho3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho2"
+            app:layout_constraintStart_toEndOf="@id/tv_inicio_siembra_macho3"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/lbl_termino_siembra_macho3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_termino_siembra_macho3"
+            android:text="@string/termino_siembra_macho3"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
+
+        <TextView
+            android:id="@+id/tv_termino_siembra_macho3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tool:text="2022-07-01"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho3"
+            app:layout_constraintStart_toEndOf="@id/lbl_termino_siembra_macho3"
+            app:layout_constraintEnd_toStartOf="@id/iv_termino_siembra_macho3"
+            android:textAlignment="textEnd"
+            android:layout_marginTop="@dimen/padding_small" />
+
+        <ImageView
+            android:id="@+id/iv_termino_siembra_macho3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:src="@drawable/ic_baseline_email_24_no"
+            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra_macho3"
+            app:layout_constraintStart_toEndOf="@id/tv_termino_siembra_macho3"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <TextView
             android:id="@+id/lbl_inicio_despano"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_small"
-            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_inicio_despano"
             android:text="@string/inicio_despano"
@@ -340,7 +619,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_small"
             tool:text="2022-07-01"
-            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho3"
             app:layout_constraintStart_toEndOf="@id/lbl_inicio_despano"
             app:layout_constraintEnd_toStartOf="@id/iv_inicio_despano"
             android:textAlignment="textEnd" />
@@ -351,7 +630,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_email_24_no"
             android:layout_marginTop="@dimen/padding_small"
-            app:layout_constraintTop_toBottomOf="@id/lbl_inicio_siembra"
+            app:layout_constraintTop_toBottomOf="@id/lbl_termino_siembra_macho3"
             app:layout_constraintStart_toEndOf="@id/tv_inicio_despano"
             app:layout_constraintEnd_toEndOf="parent" />
 

@@ -163,6 +163,13 @@
     <string name="fotografia_raices">fotografia raices</string>
     <string name="fotos_raices">Fotos Raices</string>
     <string name="inicio_siembra">Inicio siembra hembra</string>
+    <string name="termino_siembra_hembra">Termino siembra hembra</string>
+    <string name="inicio_siembra_macho1">Inicio siembra macho 1</string>
+    <string name="termino_siembra_macho1">Termino siembra macho 1</string>
+    <string name="inicio_siembra_macho2">Inicio siembra macho 2</string>
+    <string name="termino_siembra_macho2">Termino siembra macho 2</string>
+    <string name="inicio_siembra_macho3">Inicio siembra macho 3</string>
+    <string name="termino_siembra_macho3">Termino siembra macho 3</string>
 
 
     <string name="alfanumericos_sin_signos">abcdefghijklmnñopqrstuvwxyzáéíóú ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚ 0123456789., </string>

@@ -85,7 +85,7 @@ import cl.smapdev.curimapu.clases.temporales.TempVisitas;
         ChecklistLimpiezaCamionesDetalle.class, ChecklistDevolucionSemilla.class, AnexoVilab.class,
         EstacionFloracion.class, EstacionFloracionDetalle.class, EstacionFloracionEstaciones.class, MuestraHumedad.class,
         PrimeraPrioridad.class, SitiosNoVisitados.class, CheckListSiembraEvento.class
-}, version = 25) // TICKET 2494: 21->22 eventos, 22->23 indices, 23->24 Siembra Anterior por evento, 24->25 Mezcla -> 8 campos fertilizacion, ver Migrations
+}, version = 26) // TICKET 2515 - 2026-10-02: 25->26 fechas de siembra en anexo_correo_fechas. Antes: TICKET 2494: 21->22 eventos, 22->23 indices, 23->24 Siembra Anterior por evento, 24->25 Mezcla -> 8 campos fertilizacion, ver Migrations
 public abstract class MyAppBD extends RoomDatabase {
     public abstract MyDao myDao();
 
