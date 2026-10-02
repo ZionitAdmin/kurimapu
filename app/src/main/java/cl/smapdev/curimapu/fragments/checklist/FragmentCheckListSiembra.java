@@ -263,6 +263,7 @@ public class FragmentCheckListSiembra extends Fragment {
     // TICKET 2515 - 2026-10-02: el evento ya no tiene tipo ni fecha, se define por prestador + sembradora
     // (marca y modelo). El tipo H/M es del checklist completo y se elige al crearlo.
     private String tipoSiembra = null;
+    private Spinner sp_tipo_siembra;
     private ImageView btn_oculta_regulacion_de_siembra;
     private ConstraintLayout cont_regulacion_de_siembra;
     private LinearLayout cont_tabs_eventos_siembra;
@@ -361,10 +362,10 @@ public class FragmentCheckListSiembra extends Fragment {
 
             levantarDatos();
 
-        } else {
-            // TICKET 2515 - 2026-10-02: el tipo (Hembra / Macho) se elige al comenzar un checklist nuevo
-            preguntarTipoSiembra();
         }
+
+        // TICKET 2515 - 2026-10-02: el tipo (Hembra / Macho) se elige en un combobox, siempre editable
+        configurarSpinnerTipoSiembra();
 
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
@@ -390,17 +391,25 @@ public class FragmentCheckListSiembra extends Fragment {
         Utilidades.setToolbar(activity, getView(), getResources().getString(R.string.app_name), "CHECKLIST SIEMBRA" + sufijo);
     }
 
-    private void preguntarTipoSiembra() {
-        final String[] opciones = {"HEMBRA", "MACHO"};
-        new androidx.appcompat.app.AlertDialog.Builder(requireActivity())
-                .setTitle("Tipo de checklist de siembra")
-                .setCancelable(false)
-                .setItems(opciones, (dialog, which) -> {
-                    tipoSiembra = (which == 0) ? "H" : "M";
-                    actualizarToolbarTipoSiembra();
-                })
-                .setNegativeButton("Cancelar", (dialog, which) -> getParentFragmentManager().popBackStack())
-                .show();
+    // Combobox Hembra / Macho. La seleccion inicial (checklist existente) se pone ANTES de enganchar el
+    // listener para que la carga no cuente como un cambio del usuario.
+    private void configurarSpinnerTipoSiembra() {
+        ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                Arrays.asList("--Seleccione--", "HEMBRA", "MACHO"));
+        sp_tipo_siembra.setAdapter(adapterTipo);
+        sp_tipo_siembra.setSelection("H".equals(tipoSiembra) ? 1 : ("M".equals(tipoSiembra) ? 2 : 0));
+        sp_tipo_siembra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tipoSiembra = (position == 1) ? "H" : (position == 2 ? "M" : null);
+                actualizarToolbarTipoSiembra();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     // TICKET 2494 - 2026-09-29: colores pedidos en la reunion para Medicion de compactacion.
@@ -805,6 +814,7 @@ public class FragmentCheckListSiembra extends Fragment {
         btn_oculta_siembra_anterior = view.findViewById(R.id.btn_oculta_siembra_anterior);
         btn_oculta_regulacion_siembra = view.findViewById(R.id.btn_oculta_regulacion_siembra);
         btn_oculta_regulacion_de_siembra = view.findViewById(R.id.btn_oculta_regulacion_de_siembra);
+        sp_tipo_siembra = view.findViewById(R.id.sp_tipo_siembra);
         btn_oculta_aseo_maquinaria_pre_siembra = view.findViewById(R.id.btn_oculta_aseo_maquinaria_pre_siembra);
         btn_oculta_aseo_maquinaria_post_siembra = view.findViewById(R.id.btn_oculta_aseo_maquinaria_post_siembra);
         btn_oculta_general = view.findViewById(R.id.btn_oculta_general);
@@ -1549,6 +1559,12 @@ public class FragmentCheckListSiembra extends Fragment {
     private boolean guardar(int state, String description) {
 
         String comparaSpinner = "--Seleccione--";
+
+        // TICKET 2515 - 2026-10-02: el checklist es de Hembra o de Macho, no se puede guardar sin elegir
+        if (tipoSiembra == null || tipoSiembra.isEmpty()) {
+            Toasty.error(requireActivity(), "Debes seleccionar el tipo de checklist (Hembra o Macho)", Toast.LENGTH_LONG, true).show();
+            return false;
+        }
         //crear clase y guardar en bd
 
         //levantar modal para preguntar si quiere guardar y activar o solo guardar.
