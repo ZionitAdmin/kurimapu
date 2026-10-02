@@ -1165,7 +1165,7 @@ public class FragmentCheckListSiembra extends Fragment {
         et_fecha_termino.setOnFocusChangeListener((view1, b) -> {
             if (b) levantarFecha(et_fecha_termino);
         });
-        et_fecha_termino.setOnClickListener(view1 -> levantarFecha(et_fecha_ingreso));
+        et_fecha_termino.setOnClickListener(view1 -> levantarFecha(et_fecha_termino));
 
         et_hora_ingreso.setOnFocusChangeListener((view1, b) -> {
             if (b) Utilidades.levantarHora(et_hora_ingreso, requireActivity());
@@ -2280,13 +2280,13 @@ public class FragmentCheckListSiembra extends Fragment {
         }
         et_observaciones_general.setText(evento.getObservacion_general() != null ? evento.getObservacion_general() : "");
 
-        et_fecha_ingreso.setText(evento.getFecha_ingreso() != null ? evento.getFecha_ingreso() : "");
+        et_fecha_ingreso.setText(fechaParaMostrar(evento.getFecha_ingreso()));
         et_hora_ingreso.setText(evento.getHora_ingreso() != null ? evento.getHora_ingreso() : "");
         et_nombre_supervisor_ingreso_siembra.setText(evento.getNombre_supervisor_siembra() != null ? evento.getNombre_supervisor_siembra() : "");
         et_nombre_responsable_campo_ingreso.setText(evento.getNombre_responsable_campo() != null ? evento.getNombre_responsable_campo() : "");
         et_operador_maquina_ingreso.setText(evento.getNombre_operario_maquina() != null ? evento.getNombre_operario_maquina() : "");
 
-        et_fecha_termino.setText(evento.getFecha_termino() != null ? evento.getFecha_termino() : "");
+        et_fecha_termino.setText(fechaParaMostrar(evento.getFecha_termino()));
         et_hora_termino.setText(evento.getHora_termino() != null ? evento.getHora_termino() : "");
         et_nombre_supervisor_termino_siembra.setText(evento.getNombre_supervisor_siembra_termino() != null ? evento.getNombre_supervisor_siembra_termino() : "");
         et_nombre_responsable_campo_termino.setText(evento.getNombre_responsable_campo_termino() != null ? evento.getNombre_responsable_campo_termino() : "");
@@ -2721,38 +2721,76 @@ public class FragmentCheckListSiembra extends Fragment {
         builder.show();
     }
 
+    // TICKET 2515 - 2026-10-02: las fechas del evento pueden venir en varios formatos (el servidor las guarda como
+    // AAAA-MM-DD; la APK las muestra como DD-MM-AAAA; datos antiguos traen DD-MM-AA o con basura, ej "-02-11-2024").
+    // Antes el selector de fecha asumia DD-MM-AAAA y hacia parseInt sin proteccion: cualquier otro formato tumbaba la APK.
+    // Devuelve {anio, mes, dia} o null si no se puede interpretar.
+    private int[] partesFecha(String texto) {
+        try {
+            if (texto == null) return null;
+            String limpio = texto.trim().replaceAll("^[^0-9]+|[^0-9]+$", "");
+            String[] p = limpio.split("[-/]");
+            if (p.length != 3) return null;
+            int a = Integer.parseInt(p[0]);
+            int b = Integer.parseInt(p[1]);
+            int c = Integer.parseInt(p[2]);
+            int anio, mes, dia;
+            if (p[0].length() == 4) {
+                anio = a;
+                mes = b;
+                dia = c;
+            } else {
+                dia = a;
+                mes = b;
+                anio = (p[2].length() == 2) ? 2000 + c : c;
+            }
+            if (anio < 1900 || anio > 2100 || mes < 1 || mes > 12 || dia < 1 || dia > 31) return null;
+            return new int[]{anio, mes, dia};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // fecha como la muestra la APK (DD-MM-AAAA); si no se puede interpretar queda vacia
+    private String fechaParaMostrar(String texto) {
+        int[] f = partesFecha(texto);
+        if (f == null) return "";
+        return String.format(Locale.ROOT, "%02d-%02d-%04d", f[2], f[1], f[0]);
+    }
+
     private void levantarFecha(final EditText edit) {
 
-        String fecha = Utilidades.fechaActualSinHora();
-        String[] fechaRota;
-
-        if (!TextUtils.isEmpty(edit.getText())) {
-            try {
-                fechaRota = Utilidades.voltearFechaBD(edit.getText().toString()).split("-");
-            } catch (Exception e) {
-                fechaRota = fecha.split("-");
-            }
-        } else {
-            fechaRota = fecha.split("-");
+        int[] inicial = partesFecha(edit.getText() != null ? edit.getText().toString() : "");
+        if (inicial == null) {
+            inicial = partesFecha(Utilidades.fechaActualSinHora());
         }
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (datePicker, year, month, dayOfMonth) -> {
+        if (inicial == null) {
+            java.util.Calendar hoy = java.util.Calendar.getInstance();
+            inicial = new int[]{hoy.get(java.util.Calendar.YEAR), hoy.get(java.util.Calendar.MONTH) + 1, hoy.get(java.util.Calendar.DAY_OF_MONTH)};
+        }
 
-            month = month + 1;
-            String mes = "", dia;
+        try {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), (datePicker, year, month, dayOfMonth) -> {
 
-            if (month < 10) {
-                mes = "0" + month;
-            } else {
-                mes = String.valueOf(month);
-            }
+                month = month + 1;
+                String mes = "", dia;
 
-            if (dayOfMonth < 10) dia = "0" + dayOfMonth;
-            else dia = String.valueOf(dayOfMonth);
+                if (month < 10) {
+                    mes = "0" + month;
+                } else {
+                    mes = String.valueOf(month);
+                }
 
-            String finalDate = dia + "-" + mes + "-" + year;
-            edit.setText(finalDate);
-        }, Integer.parseInt(fechaRota[0]), (Integer.parseInt(fechaRota[1]) - 1), Integer.parseInt(fechaRota[2]));
-        datePickerDialog.show();
+                if (dayOfMonth < 10) dia = "0" + dayOfMonth;
+                else dia = String.valueOf(dayOfMonth);
+
+                String finalDate = dia + "-" + mes + "-" + year;
+                edit.setText(finalDate);
+            }, inicial[0], inicial[1] - 1, inicial[2]);
+            datePickerDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
