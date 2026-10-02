@@ -263,6 +263,8 @@ public class FragmentCheckListSiembra extends Fragment {
     // TICKET 2515 - 2026-10-02: el evento ya no tiene tipo ni fecha, se define por prestador + sembradora
     // (marca y modelo). El tipo H/M es del checklist completo y se elige al crearlo.
     private String tipoSiembra = null;
+    private int posicionTipoAceptada = 0;
+    private boolean revirtiendoTipoSiembra = false;
     private Spinner sp_tipo_siembra;
     private ImageView btn_oculta_regulacion_de_siembra;
     private ConstraintLayout cont_regulacion_de_siembra;
@@ -417,6 +419,36 @@ public class FragmentCheckListSiembra extends Fragment {
         }
     }
 
+    // TICKET 2515 - 2026-10-02: true si OTRO checklist de siembra de este mismo anexo ya es de ese tipo
+    // (un tipo H / M1 / M2 / M3 por anexo). El checklist que se esta editando no cuenta contra si mismo.
+    // Cualquier error al consultar deja pasar (el servidor sigue siendo el que guarda); nunca tumba la pantalla.
+    private boolean tipoSiembraYaUsadoEnAnexo(String tipo) {
+        if (tipo == null || anexoCompleto == null) return false;
+        try {
+            final int idAnexo = Integer.parseInt(anexoCompleto.getAnexoContrato().getId_anexo_contrato());
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Future<List<CheckListSiembra>> future = executor.submit(() ->
+                    MainActivity.myAppDB.DaoClSiembra().getAllClSiembraByAc(idAnexo));
+            List<CheckListSiembra> existentes = future.get();
+            executor.shutdown();
+            if (existentes == null) return false;
+
+            String tipoNormalizado = "M".equals(tipo) ? "M1" : tipo;
+            for (CheckListSiembra otro : existentes) {
+                if (checkListSiembra != null && otro.getId_cl_siembra() == checkListSiembra.getId_cl_siembra()) {
+                    continue;
+                }
+                String tipoOtro = "M".equals(otro.getTipo_siembra()) ? "M1" : otro.getTipo_siembra();
+                if (tipoNormalizado.equals(tipoOtro)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     // Combobox Hembra / Macho. La seleccion inicial (checklist existente) se pone ANTES de enganchar el
     // listener para que la carga no cuente como un cambio del usuario.
     private void configurarSpinnerTipoSiembra() {
@@ -432,10 +464,29 @@ public class FragmentCheckListSiembra extends Fragment {
             }
         }
         sp_tipo_siembra.setSelection(posicionInicial);
+        posicionTipoAceptada = posicionInicial;
         sp_tipo_siembra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                tipoSiembra = (position >= 1 && position <= CheckListSiembra.TIPOS_SIEMBRA.length) ? CheckListSiembra.TIPOS_SIEMBRA[position - 1] : null;
+                if (revirtiendoTipoSiembra) {
+                    revirtiendoTipoSiembra = false;
+                    return;
+                }
+                String nuevoTipo = (position >= 1 && position <= CheckListSiembra.TIPOS_SIEMBRA.length) ? CheckListSiembra.TIPOS_SIEMBRA[position - 1] : null;
+
+                // TICKET 2515 - 2026-10-02: un solo checklist por tipo en cada anexo
+                // (solo cuando el usuario cambia el valor: la disparada inicial al abrir la pantalla no se valida,
+                // asi un checklist antiguo con tipo repetido se puede abrir y editar sin bloqueos)
+                if (position != posicionTipoAceptada && nuevoTipo != null && tipoSiembraYaUsadoEnAnexo(nuevoTipo)) {
+                    Toasty.error(requireActivity(), "Este anexo ya tiene un checklist de tipo " + CheckListSiembra.textoTipo(nuevoTipo)
+                            + ". Solo se permite uno por tipo.", Toast.LENGTH_LONG, true).show();
+                    revirtiendoTipoSiembra = true;
+                    sp_tipo_siembra.setSelection(posicionTipoAceptada);
+                    return;
+                }
+
+                tipoSiembra = nuevoTipo;
+                posicionTipoAceptada = position;
                 actualizarToolbarTipoSiembra();
             }
 
@@ -1596,6 +1647,17 @@ public class FragmentCheckListSiembra extends Fragment {
         // TICKET 2515 - 2026-10-02: el checklist es de Hembra o de Macho, no se puede guardar sin elegir
         if (tipoSiembra == null || tipoSiembra.isEmpty()) {
             Toasty.error(requireActivity(), "Debes seleccionar el tipo de checklist (Hembra, Macho 1, Macho 2 o Macho 3)", Toast.LENGTH_LONG, true).show();
+            return false;
+        }
+        // un solo checklist por tipo en cada anexo (tambien se valida al elegirlo en el combobox)
+        // (si el checklist ya existia con ese mismo tipo no se vuelve a validar, para no bloquear la edicion de
+        // checklists antiguos que quedaron con tipo repetido)
+        boolean tipoSinCambio = checkListSiembra != null && checkListSiembra.getTipo_siembra() != null
+                && ("M".equals(checkListSiembra.getTipo_siembra()) ? "M1" : checkListSiembra.getTipo_siembra())
+                .equals("M".equals(tipoSiembra) ? "M1" : tipoSiembra);
+        if (!tipoSinCambio && tipoSiembraYaUsadoEnAnexo(tipoSiembra)) {
+            Toasty.error(requireActivity(), "Este anexo ya tiene un checklist de tipo " + CheckListSiembra.textoTipo(tipoSiembra)
+                    + ". Solo se permite uno por tipo.", Toast.LENGTH_LONG, true).show();
             return false;
         }
         //crear clase y guardar en bd
