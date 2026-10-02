@@ -521,12 +521,12 @@ public class FragmentCheckListSiembra extends Fragment {
         // TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
         if (checkListSiembra.getCama_raices() != null && !checkListSiembra.getCama_raices().isEmpty()) {
             int d = chkCamaRaices.indexOf(checkListSiembra.getCama_raices());
-            sp_cama_raices.setSelection(d);
+            sp_cama_raices.setSelection(Math.max(d, 0));
         }
 
         if (checkListSiembra.getMedicion_compactacion() != null && !checkListSiembra.getMedicion_compactacion().isEmpty()) {
             int d = chk_1.indexOf(checkListSiembra.getMedicion_compactacion());
-            sp_medicion_compactacion.setSelection(d);
+            sp_medicion_compactacion.setSelection(Math.max(d, 0));
             // TICKET 2494 - 2026-09-29: no depender solo del listener (setSelection en la carga
             // inicial no siempre lo dispara, y getSelectedView() puede ser null hasta que termine
             // el layout) - se aplica el color en un post() para asegurar que la vista ya exista.
@@ -545,12 +545,12 @@ public class FragmentCheckListSiembra extends Fragment {
 
         if (checkListSiembra.getCama_semilla() != null && !checkListSiembra.getCama_semilla().isEmpty()) {
             int d = chkCamaSemilla.indexOf(checkListSiembra.getCama_semilla());
-            sp_cama_semilla.setSelection(d);
+            sp_cama_semilla.setSelection(Math.max(d, 0));
         }
 
         if (checkListSiembra.getEstado_humedad() != null && !checkListSiembra.getEstado_humedad().isEmpty()) {
             int d = chk_1.indexOf(checkListSiembra.getEstado_humedad());
-            sp_estado_humedad.setSelection(d);
+            sp_estado_humedad.setSelection(Math.max(d, 0));
         }
 
         if (checkListSiembra.getTemperatura_suelo() != null && !checkListSiembra.getTemperatura_suelo().isEmpty()) {
@@ -764,7 +764,7 @@ public class FragmentCheckListSiembra extends Fragment {
 
         if (checkListSiembra.getDesempeno_siembra() != null && !checkListSiembra.getDesempeno_siembra().isEmpty()) {
             int d = chk_1.indexOf(checkListSiembra.getDesempeno_siembra());
-            sp_desempeno_siembra.setSelection(d);
+            sp_desempeno_siembra.setSelection(Math.max(d, 0));
         }
 
         if (checkListSiembra.getObservacion_general() != null && !checkListSiembra.getObservacion_general().isEmpty()) {
@@ -1684,13 +1684,13 @@ public class FragmentCheckListSiembra extends Fragment {
         }
 
         //suelo - TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
-        if (!sp_cama_raices.getSelectedItem().toString().equals(comparaSpinner)) {
-            String camaRaices = sp_cama_raices.getSelectedItem().toString();
+        if (!textoSpinner(sp_cama_raices).equals(comparaSpinner)) {
+            String camaRaices = textoSpinner(sp_cama_raices);
             siembra.setCama_raices(camaRaices);
         }
 
-        if (!sp_medicion_compactacion.getSelectedItem().toString().equals(comparaSpinner)) {
-            String medicionCompactacion = sp_medicion_compactacion.getSelectedItem().toString();
+        if (!textoSpinner(sp_medicion_compactacion).equals(comparaSpinner)) {
+            String medicionCompactacion = textoSpinner(sp_medicion_compactacion);
             siembra.setMedicion_compactacion(medicionCompactacion);
         }
 
@@ -1699,13 +1699,13 @@ public class FragmentCheckListSiembra extends Fragment {
             siembra.setProfundidad_cama_raices(profundidadCamaRaices);
         }
 
-        if (!sp_cama_semilla.getSelectedItem().toString().equals(comparaSpinner)) {
-            String cama_semilla = sp_cama_semilla.getSelectedItem().toString();
+        if (!textoSpinner(sp_cama_semilla).equals(comparaSpinner)) {
+            String cama_semilla = textoSpinner(sp_cama_semilla);
             siembra.setCama_semilla(cama_semilla);
         }
 
-        if (!sp_estado_humedad.getSelectedItem().toString().equals(comparaSpinner)) {
-            String estadoHumedad = sp_estado_humedad.getSelectedItem().toString();
+        if (!textoSpinner(sp_estado_humedad).equals(comparaSpinner)) {
+            String estadoHumedad = textoSpinner(sp_estado_humedad);
             siembra.setEstado_humedad(estadoHumedad);
         }
 
@@ -1931,8 +1931,8 @@ public class FragmentCheckListSiembra extends Fragment {
 
 
         //general
-        if (!sp_desempeno_siembra.getSelectedItem().toString().equals(comparaSpinner)) {
-            String desempenoSiembra = sp_desempeno_siembra.getSelectedItem().toString();
+        if (!textoSpinner(sp_desempeno_siembra).equals(comparaSpinner)) {
+            String desempenoSiembra = textoSpinner(sp_desempeno_siembra);
             siembra.setDesempeno_siembra(desempenoSiembra);
         }
 
@@ -2312,6 +2312,15 @@ public class FragmentCheckListSiembra extends Fragment {
         return Math.max(opciones.indexOf(valor), 0);
     }
 
+    // TICKET 2515 - 2026-10-02: texto del combobox sin riesgo de null. Un checklist antiguo puede traer un valor que
+    // ya no existe en la lista de opciones (ej: Cama de semillas cambio de opciones en el ticket 2494): indexOf daba
+    // -1, el combobox quedaba sin seleccion y getSelectedItem() devolvia null (NullPointerException al guardar,
+    // detectado en el registro de errores). Ahora un combobox sin seleccion cuenta como "--Seleccione--".
+    private String textoSpinner(Spinner spinner) {
+        Object item = spinner.getSelectedItem();
+        return item != null ? item.toString() : "--Seleccione--";
+    }
+
     private String textoOVacio(String valor) {
         return valor != null ? valor : "";
     }
@@ -2342,8 +2351,8 @@ public class FragmentCheckListSiembra extends Fragment {
         if (!et_prestador_servicio.getText().toString().isEmpty()) {
             evento.setPrestador_servicio(et_prestador_servicio.getText().toString());
         }
-        if (!sp_estado_discos.getSelectedItem().toString().equals(comparaSpinner)) {
-            evento.setEstado_discos(sp_estado_discos.getSelectedItem().toString());
+        if (!textoSpinner(sp_estado_discos).equals(comparaSpinner)) {
+            evento.setEstado_discos(textoSpinner(sp_estado_discos));
         }
         // TICKET 2515 - 2026-10-02: Regulacion Sembradora completa por evento
         if (!et_sembradora_marca.getText().toString().isEmpty()) {
@@ -2355,20 +2364,20 @@ public class FragmentCheckListSiembra extends Fragment {
         if (!et_trocha.getText().toString().isEmpty()) {
             evento.setTrocha(et_trocha.getText().toString());
         }
-        if (!sp_tipo_sembradora.getSelectedItem().toString().equals(comparaSpinner)) {
-            evento.setTipo_sembradora(sp_tipo_sembradora.getSelectedItem().toString());
+        if (!textoSpinner(sp_tipo_sembradora).equals(comparaSpinner)) {
+            evento.setTipo_sembradora(textoSpinner(sp_tipo_sembradora));
         }
-        if (!sp_chequeo_selector.getSelectedItem().toString().equals(comparaSpinner)) {
-            evento.setChequeo_selector(sp_chequeo_selector.getSelectedItem().toString());
+        if (!textoSpinner(sp_chequeo_selector).equals(comparaSpinner)) {
+            evento.setChequeo_selector(textoSpinner(sp_chequeo_selector));
         }
-        if (!sp_estado_maquina.getSelectedItem().toString().equals(comparaSpinner)) {
-            evento.setEstado_maquina(sp_estado_maquina.getSelectedItem().toString());
+        if (!textoSpinner(sp_estado_maquina).equals(comparaSpinner)) {
+            evento.setEstado_maquina(textoSpinner(sp_estado_maquina));
         }
         if (btn_desterronadores_si.isChecked() || btn_desterronadores_no.isChecked()) {
             evento.setDesterronadores(btn_desterronadores_si.isChecked() ? "1" : "2");
         }
-        if (!sp_presion_neumaticos.getSelectedItem().toString().equals(comparaSpinner)) {
-            evento.setPresion_neumaticos(sp_presion_neumaticos.getSelectedItem().toString());
+        if (!textoSpinner(sp_presion_neumaticos).equals(comparaSpinner)) {
+            evento.setPresion_neumaticos(textoSpinner(sp_presion_neumaticos));
         }
         if (!et_especie_lote.getText().toString().isEmpty()) {
             evento.setEspecie_lote_anterior(et_especie_lote.getText().toString());
@@ -2430,8 +2439,8 @@ public class FragmentCheckListSiembra extends Fragment {
             evento.setEncargado_revision_limpieza_post_siembra(et_responsable_revision_limpieza_ingreso_post_siembra.getText().toString());
         }
 
-        if (!sp_desempeno_siembra.getSelectedItem().toString().equals(comparaSpinner)) {
-            evento.setDesempeno_siembra(sp_desempeno_siembra.getSelectedItem().toString());
+        if (!textoSpinner(sp_desempeno_siembra).equals(comparaSpinner)) {
+            evento.setDesempeno_siembra(textoSpinner(sp_desempeno_siembra));
         }
         if (!et_observaciones_general.getText().toString().isEmpty()) {
             evento.setObservacion_general(et_observaciones_general.getText().toString());
@@ -2473,15 +2482,15 @@ public class FragmentCheckListSiembra extends Fragment {
     private String snapshotCamposEventoSiembra() {
         StringBuilder sb = new StringBuilder();
         sb.append(et_prestador_servicio.getText().toString());
-        sb.append("|").append(sp_estado_discos.getSelectedItem() != null ? sp_estado_discos.getSelectedItem().toString() : "");
+        sb.append("|").append(sp_estado_discos.getSelectedItem() != null ? textoSpinner(sp_estado_discos) : "");
         sb.append("|").append(et_sembradora_marca.getText().toString());
         sb.append("|").append(et_sembradora_modelo.getText().toString());
         sb.append("|").append(et_trocha.getText().toString());
-        sb.append("|").append(sp_tipo_sembradora.getSelectedItem() != null ? sp_tipo_sembradora.getSelectedItem().toString() : "");
-        sb.append("|").append(sp_chequeo_selector.getSelectedItem() != null ? sp_chequeo_selector.getSelectedItem().toString() : "");
-        sb.append("|").append(sp_estado_maquina.getSelectedItem() != null ? sp_estado_maquina.getSelectedItem().toString() : "");
+        sb.append("|").append(sp_tipo_sembradora.getSelectedItem() != null ? textoSpinner(sp_tipo_sembradora) : "");
+        sb.append("|").append(sp_chequeo_selector.getSelectedItem() != null ? textoSpinner(sp_chequeo_selector) : "");
+        sb.append("|").append(sp_estado_maquina.getSelectedItem() != null ? textoSpinner(sp_estado_maquina) : "");
         sb.append("|").append(btn_desterronadores_si.isChecked()).append(btn_desterronadores_no.isChecked());
-        sb.append("|").append(sp_presion_neumaticos.getSelectedItem() != null ? sp_presion_neumaticos.getSelectedItem().toString() : "");
+        sb.append("|").append(sp_presion_neumaticos.getSelectedItem() != null ? textoSpinner(sp_presion_neumaticos) : "");
         sb.append("|").append(et_especie_lote.getText().toString());
         sb.append("|").append(btn_rueda_angosta_si.isChecked()).append(btn_rueda_angosta_no.isChecked());
         sb.append("|").append(et_largo_guia.getText().toString());
@@ -2501,7 +2510,7 @@ public class FragmentCheckListSiembra extends Fragment {
         sb.append("|").append(et_responsable_aseo_post_siembra.getText().toString());
         sb.append("|").append(et_rut_responsable_aseo_post_siembra.getText().toString());
         sb.append("|").append(et_responsable_revision_limpieza_ingreso_post_siembra.getText().toString());
-        sb.append("|").append(sp_desempeno_siembra.getSelectedItem() != null ? sp_desempeno_siembra.getSelectedItem().toString() : "");
+        sb.append("|").append(sp_desempeno_siembra.getSelectedItem() != null ? textoSpinner(sp_desempeno_siembra) : "");
         sb.append("|").append(et_observaciones_general.getText().toString());
         sb.append("|").append(et_fecha_ingreso.getText().toString());
         sb.append("|").append(et_hora_ingreso.getText().toString());
