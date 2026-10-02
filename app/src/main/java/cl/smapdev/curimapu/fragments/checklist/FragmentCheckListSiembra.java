@@ -520,13 +520,11 @@ public class FragmentCheckListSiembra extends Fragment {
 
         // TICKET 2494 - 2026-09-29: rediseno seccion Suelo y nuevo apartado Aislacion
         if (checkListSiembra.getCama_raices() != null && !checkListSiembra.getCama_raices().isEmpty()) {
-            int d = chkCamaRaices.indexOf(checkListSiembra.getCama_raices());
-            sp_cama_raices.setSelection(Math.max(d, 0));
+            seleccionarConservandoValor(sp_cama_raices, checkListSiembra.getCama_raices());
         }
 
         if (checkListSiembra.getMedicion_compactacion() != null && !checkListSiembra.getMedicion_compactacion().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getMedicion_compactacion());
-            sp_medicion_compactacion.setSelection(Math.max(d, 0));
+            seleccionarConservandoValor(sp_medicion_compactacion, checkListSiembra.getMedicion_compactacion());
             // TICKET 2494 - 2026-09-29: no depender solo del listener (setSelection en la carga
             // inicial no siempre lo dispara, y getSelectedView() puede ser null hasta que termine
             // el layout) - se aplica el color en un post() para asegurar que la vista ya exista.
@@ -544,13 +542,11 @@ public class FragmentCheckListSiembra extends Fragment {
         }
 
         if (checkListSiembra.getCama_semilla() != null && !checkListSiembra.getCama_semilla().isEmpty()) {
-            int d = chkCamaSemilla.indexOf(checkListSiembra.getCama_semilla());
-            sp_cama_semilla.setSelection(Math.max(d, 0));
+            seleccionarConservandoValor(sp_cama_semilla, checkListSiembra.getCama_semilla());
         }
 
         if (checkListSiembra.getEstado_humedad() != null && !checkListSiembra.getEstado_humedad().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getEstado_humedad());
-            sp_estado_humedad.setSelection(Math.max(d, 0));
+            seleccionarConservandoValor(sp_estado_humedad, checkListSiembra.getEstado_humedad());
         }
 
         if (checkListSiembra.getTemperatura_suelo() != null && !checkListSiembra.getTemperatura_suelo().isEmpty()) {
@@ -763,8 +759,7 @@ public class FragmentCheckListSiembra extends Fragment {
 
 
         if (checkListSiembra.getDesempeno_siembra() != null && !checkListSiembra.getDesempeno_siembra().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getDesempeno_siembra());
-            sp_desempeno_siembra.setSelection(Math.max(d, 0));
+            seleccionarConservandoValor(sp_desempeno_siembra, checkListSiembra.getDesempeno_siembra());
         }
 
         if (checkListSiembra.getObservacion_general() != null && !checkListSiembra.getObservacion_general().isEmpty()) {
@@ -2310,6 +2305,34 @@ public class FragmentCheckListSiembra extends Fragment {
     private int spinnerIndice(List<String> opciones, String valor) {
         if (valor == null || valor.isEmpty()) return 0;
         return Math.max(opciones.indexOf(valor), 0);
+    }
+
+    // TICKET 2515 - 2026-10-02: selecciona en el combobox el valor guardado del checklist. Si ese valor ya no existe en
+    // la lista de opciones (checklist antiguo), lo agrega al final como una opcion mas y lo deja seleccionado, asi no se
+    // pierde al guardar (el usuario puede cambiarlo por una opcion nueva cuando quiera). Para valores que SI estan en la
+    // lista el resultado es el mismo de antes. Protegido: un error aqui nunca debe tumbar la pantalla.
+    private void seleccionarConservandoValor(Spinner spinner, String valor) {
+        try {
+            if (valor == null || valor.isEmpty() || spinner.getAdapter() == null) return;
+
+            List<String> items = new ArrayList<>();
+            for (int i = 0; i < spinner.getAdapter().getCount(); i++) {
+                Object item = spinner.getAdapter().getItem(i);
+                items.add(item != null ? item.toString() : "");
+            }
+
+            int posicion = items.indexOf(valor);
+            if (posicion < 0) {
+                items.add(valor);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, items);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                posicion = items.size() - 1;
+            }
+            spinner.setSelection(posicion);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // TICKET 2515 - 2026-10-02: texto del combobox sin riesgo de null. Un checklist antiguo puede traer un valor que
