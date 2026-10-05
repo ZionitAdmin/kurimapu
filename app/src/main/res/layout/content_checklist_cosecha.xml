@@ -561,23 +561,26 @@
                 android:id="@+id/lbl_humedad_cosecha"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="HUMEDAD DE COSECHA"
+                android:text="HUMEDAD DE COSECHA (%)"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintTop_toBottomOf="@id/sp_estado_visual"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/sp_humedad_cosecha"
+                app:layout_constraintEnd_toStartOf="@id/et_humedad_cosecha"
                 />
 
-            <Spinner
-                android:id="@+id/sp_humedad_cosecha"
-                android:layout_width="wrap_content"
+            <!-- TICKET 2515 - 2026-10-05: antes era un combobox (BUENO/REGULAR/MALO), ahora es un porcentaje numerico -->
+            <EditText
+                android:id="@+id/et_humedad_cosecha"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_small"
-                android:entries="@array/desplegable_checklist_1"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
                 app:layout_constraintTop_toBottomOf="@id/sp_estado_visual"
                 app:layout_constraintStart_toEndOf="@id/lbl_humedad_cosecha"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                android:autofillHints="" />
 
             <TextView
                 android:id="@+id/lbl_cometario"
@@ -586,7 +589,7 @@
                 android:text="COMENTARIOS"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/sp_humedad_cosecha"
+                app:layout_constraintTop_toBottomOf="@id/et_humedad_cosecha"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/et_comentario"
                 />
@@ -597,7 +600,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:maxLines="5"
-                app:layout_constraintTop_toBottomOf="@id/sp_humedad_cosecha"
+                app:layout_constraintTop_toBottomOf="@id/et_humedad_cosecha"
                 app:layout_constraintStart_toEndOf="@id/lbl_cometario"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />
@@ -802,29 +805,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />
 
-            <TextView
-                android:id="@+id/lbl_humedad_semilla"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="HUMEDAD DE SEMILLA (%)"
-                android:layout_marginTop="@dimen/padding_small"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_fast_green"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/et_humedad_semilla"
-                />
-
-            <EditText
-                android:id="@+id/et_humedad_semilla"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_fast_green"
-                app:layout_constraintStart_toEndOf="@id/lbl_humedad_semilla"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:autofillHints="" />
-
+            <!-- TICKET 2515 - 2026-10-05: se quita HUMEDAD DE SEMILLA; la humedad ahora se registra en HUMEDAD DE COSECHA (%) -->
             <TextView
                 android:id="@+id/lbl_cosecha_anterior"
                 android:layout_width="0dp"
@@ -832,7 +813,7 @@
                 android:text="COSECHA ANTERIOR"
                 android:layout_marginTop="@dimen/padding_small"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:layout_constraintTop_toBottomOf="@id/et_humedad_semilla"
+                app:layout_constraintTop_toBottomOf="@id/et_fast_green"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/et_cosecha_anterior"
                 />
@@ -843,7 +824,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="1"
-                app:layout_constraintTop_toBottomOf="@id/et_humedad_semilla"
+                app:layout_constraintTop_toBottomOf="@id/et_fast_green"
                 app:layout_constraintStart_toEndOf="@id/lbl_cosecha_anterior"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:autofillHints="" />

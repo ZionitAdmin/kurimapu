@@ -84,9 +84,6 @@ public class CheckListCosecha {
     private String fast_green;
 
     @Expose
-    private String humedad_semilla;
-
-    @Expose
     private String cosecha_anterior;
 
 
@@ -317,14 +314,6 @@ public class CheckListCosecha {
 
     public void setFast_green(String fast_green) {
         this.fast_green = fast_green;
-    }
-
-    public String getHumedad_semilla() {
-        return humedad_semilla;
-    }
-
-    public void setHumedad_semilla(String humedad_semilla) {
-        this.humedad_semilla = humedad_semilla;
     }
 
     public int getId_usuario() {

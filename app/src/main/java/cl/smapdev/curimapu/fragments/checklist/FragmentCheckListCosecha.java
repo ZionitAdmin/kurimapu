@@ -77,7 +77,7 @@ public class FragmentCheckListCosecha extends Fragment {
     private RadioButton btn_eliminacion_regueros_no;
     private Spinner sp_humedad_suelo;
     private Spinner sp_estado_visual;
-    private Spinner sp_humedad_cosecha;
+    private EditText et_humedad_cosecha; // TICKET 2515 - 2026-10-05: antes Spinner (BUENO/REGULAR/MALO), ahora porcentaje numerico
     private EditText et_comentario;
 
 
@@ -90,7 +90,6 @@ public class FragmentCheckListCosecha extends Fragment {
     private EditText et_concavo_utilizado;
     private EditText et_bushel_plus;
     private EditText et_fast_green;
-    private EditText et_humedad_semilla;
     private EditText et_cosecha_anterior;
 
 
@@ -393,8 +392,8 @@ public class FragmentCheckListCosecha extends Fragment {
         }
 
         if (checkListSiembra.getHumedad_cosecha() != null && !checkListSiembra.getHumedad_cosecha().isEmpty()) {
-            int d = chk_1.indexOf(checkListSiembra.getHumedad_cosecha());
-            sp_humedad_cosecha.setSelection(d);
+            // TICKET 2515 - 2026-10-05: se muestra el valor tal cual; un checklist antiguo trae BUENO/REGULAR/MALO y no debe romper
+            et_humedad_cosecha.setText(checkListSiembra.getHumedad_cosecha());
         }
 
         if (checkListSiembra.getResponsable_cosecha() != null && !checkListSiembra.getResponsable_cosecha().isEmpty()) {
@@ -436,9 +435,6 @@ public class FragmentCheckListCosecha extends Fragment {
         }
         if (checkListSiembra.getFast_green() != null && !checkListSiembra.getFast_green().isEmpty()) {
             et_fast_green.setText(checkListSiembra.getFast_green());
-        }
-        if (checkListSiembra.getHumedad_semilla() != null && !checkListSiembra.getHumedad_semilla().isEmpty()) {
-            et_humedad_semilla.setText(checkListSiembra.getHumedad_semilla());
         }
         if (checkListSiembra.getCosecha_anterior() != null && !checkListSiembra.getCosecha_anterior().isEmpty()) {
             et_cosecha_anterior.setText(checkListSiembra.getCosecha_anterior());
@@ -565,7 +561,7 @@ public class FragmentCheckListCosecha extends Fragment {
         btn_eliminacion_regueros_no = view.findViewById(R.id.btn_eliminacion_regueros_no);
         sp_humedad_suelo = view.findViewById(R.id.sp_humedad_suelo);
         sp_estado_visual = view.findViewById(R.id.sp_estado_visual);
-        sp_humedad_cosecha = view.findViewById(R.id.sp_humedad_cosecha);
+        et_humedad_cosecha = view.findViewById(R.id.et_humedad_cosecha);
         et_comentario = view.findViewById(R.id.et_comentario);
         et_prestador_servicio = view.findViewById(R.id.et_prestador_servicio);
         et_operador_maquina = view.findViewById(R.id.et_operador_maquina);
@@ -575,7 +571,6 @@ public class FragmentCheckListCosecha extends Fragment {
         et_concavo_utilizado = view.findViewById(R.id.et_concavo_utilizado);
         et_bushel_plus = view.findViewById(R.id.et_bushel_plus);
         et_fast_green = view.findViewById(R.id.et_fast_green);
-        et_humedad_semilla = view.findViewById(R.id.et_humedad_semilla);
         et_cosecha_anterior = view.findViewById(R.id.et_cosecha_anterior);
         et_fecha_ingreso = view.findViewById(R.id.et_fecha_ingreso);
         grupo_cabezal_ingreso = view.findViewById(R.id.grupo_cabezal_ingreso);
@@ -1026,9 +1021,9 @@ public class FragmentCheckListCosecha extends Fragment {
             siembra.setEstado_visual(cama_semilla);
         }
 
-        if (!sp_humedad_cosecha.getSelectedItem().toString().equals(comparaSpinner)) {
-            String cama_semilla = sp_humedad_cosecha.getSelectedItem().toString();
-            siembra.setHumedad_cosecha(cama_semilla);
+        // TICKET 2515 - 2026-10-05: humedad de cosecha ahora es un porcentaje numerico (coma -> punto)
+        if (!et_humedad_cosecha.getText().toString().trim().isEmpty()) {
+            siembra.setHumedad_cosecha(et_humedad_cosecha.getText().toString().trim().replace(",", "."));
         }
 
 
@@ -1085,9 +1080,6 @@ public class FragmentCheckListCosecha extends Fragment {
         }
         if (!et_fast_green.getText().toString().isEmpty()) {
             siembra.setFast_green(et_fast_green.getText().toString().replace(",", "."));
-        }
-        if (!et_humedad_semilla.getText().toString().isEmpty()) {
-            siembra.setHumedad_semilla(et_humedad_semilla.getText().toString().replace(",", "."));
         }
 
         if (!et_cosecha_anterior.getText().toString().isEmpty()) {

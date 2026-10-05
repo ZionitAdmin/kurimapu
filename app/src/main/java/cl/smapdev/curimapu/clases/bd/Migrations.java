@@ -303,14 +303,14 @@ public class Migrations {
         }
     };
 
-    // TICKET 2494 - 2026-09-30: 4 campos nuevos de la seccion Cosechadora del checklist de cosecha
+    // TICKET 2494 - 2026-09-30: campos nuevos de la seccion Cosechadora del checklist de cosecha
+    // TICKET 2515 - 2026-10-05: se quita humedad_semilla (la humedad va en humedad_cosecha); la APK se reinstala, no se migra
     public static final Migration MIGRATION_20_TO_21 = new Migration(20, 21) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE anexo_checklist_cosecha ADD COLUMN concavo_utilizado TEXT;");
             database.execSQL("ALTER TABLE anexo_checklist_cosecha ADD COLUMN bushel_plus TEXT;");
             database.execSQL("ALTER TABLE anexo_checklist_cosecha ADD COLUMN fast_green TEXT;");
-            database.execSQL("ALTER TABLE anexo_checklist_cosecha ADD COLUMN humedad_semilla TEXT;");
         }
     };
 
