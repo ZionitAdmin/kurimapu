@@ -57,7 +57,7 @@ import cl.smapdev.curimapu.clases.tablas.EstacionFloracionDetalle;
 
 public class Utilidades {
 
-    public static final String APPLICATION_VERSION = "6.1.29092026"; // cambio de version - TICKET 2512 - 2026-09-29
+    public static final String APPLICATION_VERSION = "6.1.06102026"; // cambio de version - TICKET 2494 y 2515 - 2026-10-06
 
     public static final String FRAGMENT_INICIO = "fragmental_inicio";
     public static final String FRAGMENT_FICHAS = "fragment_fichas";
