@@ -234,6 +234,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (version != null) {
             Config config = MainActivity.myAppDB.myDao().getConfig();
             String data = "ID: " + config.getId() + " VERSION: " + Utilidades.APPLICATION_VERSION;
+            // TICKET 2494 - 2026-10-07: curiexport.zcloud.cl es siempre produccion; cualquier otro servidor se marca como PRUEBAS
+            if (!"curiexport.zcloud.cl".equals(Utilidades.IP_PRODUCCION)) {
+                data += " PRUEBAS";
+            }
             version.setText(data);
         }
     }
