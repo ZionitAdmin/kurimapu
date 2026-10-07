@@ -99,6 +99,7 @@ import cl.smapdev.curimapu.clases.tablas.detalle_visita_prop;
 import cl.smapdev.curimapu.clases.utilidades.DatosUsuarioJson;
 import cl.smapdev.curimapu.clases.utilidades.DescargaImagenes;
 import cl.smapdev.curimapu.clases.utilidades.DescargaImagenesI;
+import cl.smapdev.curimapu.clases.utilidades.EventosSiembraSubida;
 import cl.smapdev.curimapu.clases.utilidades.InternetStateClass;
 import cl.smapdev.curimapu.clases.utilidades.Utilidades;
 import es.dmoral.toasty.Toasty;
@@ -666,7 +667,11 @@ public class FragmentPrincipal extends Fragment {
 
         try {
 
-            List<CheckListSiembra> chk = chkF.get();
+            // TICKET 2494 y 2515 - 2026-10-07: igual que el menu "Subir" de FragmentCheckList, esta subida tambien
+            // lleva los eventos de siembra: se agregan los checklists ya sincronizados con eventos pendientes
+            // y mas abajo se adjuntan los eventos de cada checklist (antes se subia la cabecera sin eventos).
+            List<CheckListSiembra> chk = new ArrayList<>(chkF.get());
+            EventosSiembraSubida.agregarChecklistsConEventosPendientes(chk);
 
             List<CheckListCosecha> chkC = chkFC.get();
 
@@ -750,6 +755,8 @@ public class FragmentPrincipal extends Fragment {
             }
 
             if (!chk.isEmpty()) {
+                // TICKET 2494 y 2515 - 2026-10-07: adjunta los eventos de siembra a cada checklist
+                EventosSiembraSubida.adjuntarEventos(chk);
                 chkS.setCheckListSiembras(chk);
             }
             prepararSubir(chkS);

@@ -49,6 +49,7 @@ import cl.smapdev.curimapu.clases.tablas.CheckListSiembraEvento;
 import cl.smapdev.curimapu.clases.tablas.CheckLists;
 import cl.smapdev.curimapu.clases.tablas.ChecklistDevolucionSemilla;
 import cl.smapdev.curimapu.clases.tablas.ChecklistLimpiezaCamionesDetalle;
+import cl.smapdev.curimapu.clases.utilidades.EventosSiembraSubida;
 import cl.smapdev.curimapu.clases.utilidades.Utilidades;
 import es.dmoral.toasty.Toasty;
 
@@ -1005,6 +1006,10 @@ public class FragmentCheckList extends Fragment {
 
                                 List<CheckListSiembra> chkList = new ArrayList<>();
                                 chkList.add(checkListSiembras);
+
+                                // TICKET 2494 y 2515 - 2026-10-07: antes este checklist se subia sin sus eventos (solo el
+                                // menu "Subir" los adjuntaba)
+                                EventosSiembraSubida.adjuntarEventos(chkList);
 
                                 chk.setCheckListSiembras(chkList);
                                 prepararSubir(chk);

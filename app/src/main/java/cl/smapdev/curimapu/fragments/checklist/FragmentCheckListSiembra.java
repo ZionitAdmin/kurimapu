@@ -675,6 +675,11 @@ public class FragmentCheckListSiembra extends Fragment {
             et_dist_entre_fert_semilla.setText(String.valueOf(checkListSiembra.getDistancia_fertilizante_semilla()));
         }
 
+        // TICKET 2494 y 2515 - 2026-10-06: desde aca hasta el bloque de Salida (firma_operario_maquina_termino)
+        // se carga desde la CABECERA lo de aseo pre/post, general, ingreso y salida (y sus firmas). Es un resto
+        // del diseno anterior: esos datos ahora son por evento. No genera errores porque al final de este metodo
+        // cargarEventosSiembraDesdeBD() -> cargarCamposDesdeEventoSiembra() sobrescribe todos estos campos (y el
+        // estado de los botones de firma) con los del evento; sin eventos estos apartados quedan ocultos.
         if (checkListSiembra.getTarros_semilla_pre_siembra() > 0) {
             btn_tarros_semilla_si.setChecked((checkListSiembra.getTarros_semilla_pre_siembra() == 1));
             btn_tarros_semilla_no.setChecked((checkListSiembra.getTarros_semilla_pre_siembra() == 2));
