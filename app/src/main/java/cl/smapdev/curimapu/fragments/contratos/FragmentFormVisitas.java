@@ -577,7 +577,10 @@ public class FragmentFormVisitas extends Fragment {
                 return;
             }
 
-            Bitmap nuevaFoto = CameraUtils.escribirFechaImg(originalBtm, activity);
+            // TICKET 2515 (extra) - 2026-10-16: se deja la foto derecha segun el EXIF de la camara ANTES de reescribir el
+            // archivo (si no hay giro o falla, devuelve el mismo bitmap y todo sigue como antes)
+            Bitmap derechaBtm = CameraUtils.corregirOrientacion(originalBtm, currentPhotoPath);
+            Bitmap nuevaFoto = CameraUtils.escribirFechaImg(derechaBtm, activity);
 
             File file = new File(currentPhotoPath);
             FileOutputStream fos = new FileOutputStream(file);
@@ -586,9 +589,13 @@ public class FragmentFormVisitas extends Fragment {
             fos.flush();
             fos.close();
 
-            // TICKET 2515 (extra) - 2026-10-16: se liberan los bitmaps apenas se escribio el archivo (no esperar al GC)
-            if (nuevaFoto != originalBtm) {
+            // TICKET 2515 (extra) - 2026-10-16: se liberan los bitmaps apenas se escribio el archivo (no esperar al GC);
+            // pueden ser hasta 3 distintos (original, girado y con fecha), cada uno se libera una sola vez
+            if (derechaBtm != originalBtm) {
                 originalBtm.recycle();
+            }
+            if (nuevaFoto != derechaBtm) {
+                derechaBtm.recycle();
             }
             nuevaFoto.recycle();
 
