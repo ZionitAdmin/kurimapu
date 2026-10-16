@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import cl.smapdev.curimapu.clases.utilidades.RegistroErrores;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ParseException;
@@ -167,16 +168,30 @@ public class FragmentCreaFicha extends Fragment {
             outState.putSerializable(VIENE_A_EDITAR, this.fichasCompletas);
         }
 
-        if (sp_provincia_agricultor.getSelectedItemPosition() != AdapterView.INVALID_POSITION) {
-            outState.putString("id_provincia", idProvincias.get(sp_provincia_agricultor.getSelectedItemPosition()));
+        // TICKET 2515 (extra) - 2026-10-16: se guarda la ruta de la foto en curso (antes se perdia al recrearse la pantalla
+        // mientras la camara estaba abierta) y se protegen las lecturas de los desplegables (la comuna se leia de la lista
+        // de regiones y podia fallar con IndexOutOfBounds).
+        if (currentPhotoPath != null) {
+            outState.putString("current_photo_path", currentPhotoPath);
         }
 
-        if (sp_region_agricultor.getSelectedItemPosition() != AdapterView.INVALID_POSITION) {
-            outState.putString("id_region", idRegiones.get(sp_region_agricultor.getSelectedItemPosition()));
-        }
+        try {
+            if (sp_provincia_agricultor != null && sp_provincia_agricultor.getSelectedItemPosition() != AdapterView.INVALID_POSITION
+                    && sp_provincia_agricultor.getSelectedItemPosition() < idProvincias.size()) {
+                outState.putString("id_provincia", idProvincias.get(sp_provincia_agricultor.getSelectedItemPosition()));
+            }
 
-        if (sp_comuna_agricultor.getSelectedItemPosition() != AdapterView.INVALID_POSITION) {
-            outState.putString("id_comuna", idRegiones.get(sp_comuna_agricultor.getSelectedItemPosition()));
+            if (sp_region_agricultor != null && sp_region_agricultor.getSelectedItemPosition() != AdapterView.INVALID_POSITION
+                    && sp_region_agricultor.getSelectedItemPosition() < idRegiones.size()) {
+                outState.putString("id_region", idRegiones.get(sp_region_agricultor.getSelectedItemPosition()));
+            }
+
+            if (sp_comuna_agricultor != null && sp_comuna_agricultor.getSelectedItemPosition() != AdapterView.INVALID_POSITION
+                    && sp_comuna_agricultor.getSelectedItemPosition() < idComunas.size()) {
+                outState.putString("id_comuna", idComunas.get(sp_comuna_agricultor.getSelectedItemPosition()));
+            }
+        } catch (Exception e) {
+            android.util.Log.e("CREA_FICHA", "No se pudo guardar el estado de los desplegables", e);
         }
 
         if (fileImagen != null) {
@@ -260,6 +275,11 @@ public class FragmentCreaFicha extends Fragment {
         }
 
         if (savedInstanceState != null) {
+            // TICKET 2515 (extra) - 2026-10-16: recupera la foto que estaba tomando la camara
+            if (savedInstanceState.getString("current_photo_path") != null) {
+                currentPhotoPath = savedInstanceState.getString("current_photo_path");
+            }
+
             Uri ui = savedInstanceState.getParcelable("file_uri");
             if (ui != null && ui.getPath() != null) {
                 fileImagen = new File(ui.getPath());
@@ -1696,10 +1716,21 @@ public class FragmentCreaFicha extends Fragment {
 
 
     public void procesarFotoTomada() {
+        // TICKET 2515 (extra) - 2026-10-16: sin ruta de foto (pantalla recreada sin poder recuperarla) o error al procesar:
+        // no se cierra la app, se avisa y se muestra el informe para compartirlo.
+        if (currentPhotoPath == null) {
+            Toasty.error(activity, "No se pudo recuperar la foto. Vuelve a tomarla.", Toast.LENGTH_LONG, true).show();
+            RegistroErrores.informarErrorNoRecuperado(activity, "No se pudo recuperar la foto que se estaba tomando en la ficha. Vuelve a tomarla.", null);
+            return;
+        }
         try {
-            Bitmap originalBtm = BitmapFactory.decodeFile(currentPhotoPath);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inMutable = true;
+            opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap originalBtm = BitmapFactory.decodeFile(currentPhotoPath, opts);
             if (originalBtm == null) {
-                Toasty.error(requireActivity(), "No se pudo decodificar la imagen.", Toast.LENGTH_LONG, true).show();
+                Toasty.error(activity, "No se pudo decodificar la imagen.", Toast.LENGTH_LONG, true).show();
+                RegistroErrores.informarErrorNoRecuperado(activity, "No se pudo leer la foto tomada en la ficha. Vuelve a tomarla.", null);
                 return;
             }
 
@@ -1712,10 +1743,16 @@ public class FragmentCreaFicha extends Fragment {
             fos.flush();
             fos.close();
 
+            if (nuevaFoto != originalBtm) {
+                originalBtm.recycle();
+            }
+            nuevaFoto.recycle();
+
             guardarBD();
 
-        } catch (Exception e) {
-            Toasty.error(requireActivity(), "Error al procesar la foto: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
+        } catch (Throwable e) {
+            Toasty.error(activity, "Error al procesar la foto: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
+            RegistroErrores.informarErrorNoRecuperado(activity, "No se pudo procesar la foto de la ficha. Vuelve a tomarla.", e);
         }
     }
 
@@ -1748,7 +1785,10 @@ public class FragmentCreaFicha extends Fragment {
                 MainActivity.myAppDB.myDao().insertFotosFichas(fotos);
                 handler.post(this::agregarImagenToFichas);
             } catch (Exception e) {
-                handler.post(() -> Toasty.error(activity, "Error guardando foto" + e.getMessage(), Toast.LENGTH_LONG, true).show());
+                handler.post(() -> {
+                    Toasty.error(activity, "Error guardando foto" + e.getMessage(), Toast.LENGTH_LONG, true).show();
+                    RegistroErrores.informarErrorNoRecuperado(activity, "No se pudo guardar la foto de la ficha. Vuelve a tomarla.", e);
+                });
             }
         });
     }
@@ -1759,18 +1799,29 @@ public class FragmentCreaFicha extends Fragment {
         final int idFichaLocal = (fichasCompletas != null && fichasCompletas.getFichas() != null) ? fichasCompletas.getFichas().getId_ficha_local_ficha() : 0;
         final int idFicha = (fichasCompletas != null && fichasCompletas.getFichas() != null) ? fichasCompletas.getFichas().getId_ficha() : 0;
         ejecutarSeguro(() -> {
+            // TICKET 2515 (extra) - 2026-10-16: este hilo no tenia proteccion; si fallaba la lectura de la BD la app se cerraba.
+            // Ahora se avisa con el informe para compartir (mismo criterio que en la visita).
+            try {
+                Config config = MainActivity.myAppDB.myDao().getConfig();
+                if (config == null) {
+                    return;
+                }
+                List<FotosFichas> myImageList = MainActivity.myAppDB.myDao().getFotosFichasByIdes(idFichaLocal, idFicha, config.getId());
 
-            Config config = MainActivity.myAppDB.myDao().getConfig();
-            List<FotosFichas> myImageList = MainActivity.myAppDB.myDao().getFotosFichasByIdes(idFichaLocal, idFicha, config.getId());
+                handler.post(() -> {
+                    if (lista_fotos_ficha == null) {
+                        return;
+                    }
+                    lista_fotos_ficha.setHasFixedSize(true);
 
-            handler.post(() -> {
-                lista_fotos_ficha.setHasFixedSize(true);
-
-                adapterFotosFichas = new FotosFichasAdapter(myImageList, activity, fotos -> {
-                }, fotos -> {
+                    adapterFotosFichas = new FotosFichasAdapter(myImageList, activity, fotos -> {
+                    }, fotos -> {
+                    });
+                    lista_fotos_ficha.setAdapter(adapterFotosFichas);
                 });
-                lista_fotos_ficha.setAdapter(adapterFotosFichas);
-            });
+            } catch (Throwable e) {
+                handler.post(() -> RegistroErrores.informarErrorNoRecuperado(activity, "No se pudieron cargar las fotos de la ficha.", e));
+            }
         });
     }
 

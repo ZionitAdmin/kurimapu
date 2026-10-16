@@ -12,7 +12,12 @@ public class CameraUtils {
 
     public static Bitmap escribirFechaImg(Bitmap bm, Activity activity){
 
-        Bitmap dest = Bitmap.createBitmap(bm,0, 0,bm.getWidth(), bm.getHeight()).copy(Bitmap.Config.ARGB_8888, true);
+        // TICKET 2515 (extra) - 2026-10-16: si el bitmap ya es mutable (FragmentFormVisitas lo decodifica asi) se dibuja la
+        // fecha directamente sobre el, sin crear una segunda copia completa en memoria. Si no lo es (FragmentCreaFicha),
+        // se mantiene el comportamiento de siempre: copia mutable.
+        Bitmap dest = (bm.isMutable() && bm.getConfig() == Bitmap.Config.ARGB_8888)
+                ? bm
+                : Bitmap.createBitmap(bm,0, 0,bm.getWidth(), bm.getHeight()).copy(Bitmap.Config.ARGB_8888, true);
 
         String fecha = Utilidades.fechaActualInvSinHora();
 

@@ -57,7 +57,7 @@ import cl.smapdev.curimapu.clases.tablas.EstacionFloracionDetalle;
 
 public class Utilidades {
 
-    public static final String APPLICATION_VERSION = "6.1.06102026"; // cambio de version - TICKET 2494 y 2515 - 2026-10-06
+    public static final String APPLICATION_VERSION = "6.1.16102026"; // cambio de version - TICKET 2494 y 2515 - 2026-10-06 / TICKET 2515 (extra) - 2026-10-16: 6.1.16102026
 
     public static final String FRAGMENT_INICIO = "fragmental_inicio";
     public static final String FRAGMENT_FICHAS = "fragment_fichas";
@@ -109,8 +109,10 @@ public class Utilidades {
     public static final String KEY_EXPORT = "9aB4c5D7eF";
     //    public static final String IP_PRODUCCION = "192.168.1.42";
     // TICKET 2494 - 2026-10-07: APK apuntando a produccion (zcloud); para pruebas usar zpruebas
-    //public static final String IP_PRODUCCION = "curiexport.zpruebas.cl";
-    public static final String IP_PRODUCCION = "curiexport.zcloud.cl";
+    // TICKET 2515 (extra) - 2026-10-16: APK de PRUEBAS (zpruebas) para probar en celular real antes de pasar a produccion.
+    // PARA PRODUCCION: comentar la linea de zpruebas y descomentar la de zcloud.
+    public static final String IP_PRODUCCION = "curiexport.zpruebas.cl";
+    //public static final String IP_PRODUCCION = "curiexport.zcloud.cl";
     public static final String URL_SERVER_API = "https://" + IP_PRODUCCION;
     //    public static final String URL_SERVER_API = "http://" + IP_PRODUCCION + "/curimapu";
 

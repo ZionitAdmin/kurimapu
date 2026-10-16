@@ -75,6 +75,7 @@ import cl.smapdev.curimapu.clases.tablas.Fotos;
 import cl.smapdev.curimapu.clases.tablas.Visitas;
 import cl.smapdev.curimapu.clases.tablas.detalle_visita_prop;
 import cl.smapdev.curimapu.clases.utilidades.CameraUtils;
+import cl.smapdev.curimapu.clases.utilidades.RegistroErrores;
 import cl.smapdev.curimapu.clases.utilidades.Utilidades;
 import cl.smapdev.curimapu.fragments.FragmentVisitas;
 import cl.smapdev.curimapu.fragments.dialogos.DialogBuscaObsRecAnterior;
@@ -115,6 +116,22 @@ public class FragmentFormVisitas extends Fragment {
 
 
     private String medidaRaices;
+
+    // TICKET 2515 (extra) - 2026-10-16: Android puede destruir esta pantalla mientras la camara esta abierta
+    // (poca memoria) y la restaura con el constructor vacio, sin el anexo, la visita ni la foto en curso.
+    // Estas claves guardan lo necesario en onSaveInstanceState para recuperarlo en onCreate.
+    private static final String ST_ID_ANEXO = "restaurar_id_anexo";
+    private static final String ST_ID_VISITA = "restaurar_id_visita";
+    private static final String ST_FOTO_RUTA = "restaurar_foto_ruta";
+    private static final String ST_FOTO_MEDIDA = "restaurar_foto_medida";
+    private static final String ST_EVAL_ID = "restaurar_eval_id";
+    private static final String ST_EVAL_VALOR = "restaurar_eval_valor";
+    private static final String ST_EVAL_COMENTARIO = "restaurar_eval_comentario";
+    private static final String ST_SPINNERS = "restaurar_spinners";
+    private boolean pantallaRestaurada = false;
+    private boolean restauracionFallida = false;
+    private int[] posSpinnersRestaurar = null;
+    private Throwable causaRestauracion = null;
 
     private final ArrayList<String> fenologico = new ArrayList<>(),
             planta_voluntaria = new ArrayList<>(), cosecha = new ArrayList<>(),
@@ -197,6 +214,12 @@ public class FragmentFormVisitas extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // TICKET 2515 (extra) - 2026-10-16: si Android restauro la pantalla (savedInstanceState != null) sin el
+        // anexo/visita (llegan por setters, no se guardan solos), se recuperan antes de cualquier uso.
+        if (savedInstanceState != null) {
+            restaurarEstado(savedInstanceState);
+        }
+
         executors = Executors.newSingleThreadExecutor();
 
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(),
@@ -227,6 +250,131 @@ public class FragmentFormVisitas extends Fragment {
         exec.shutDownBackground();
     }
 
+    // TICKET 2515 (extra) - 2026-10-16: recupera lo que Android no restaura solo cuando destruye la pantalla
+    // (por ejemplo al abrir la camara con poca memoria). Todo va protegido: si algo falla, restauracionFallida
+    // queda en true y onViewCreated devuelve al usuario a la lista de anexos en vez de cerrar la app.
+    private void restaurarEstado(Bundle estado) {
+        try {
+            pantallaRestaurada = true;
+
+            currentPhotoPath = estado.getString(ST_FOTO_RUTA, currentPhotoPath);
+            medidaRaices = estado.getString(ST_FOTO_MEDIDA, medidaRaices);
+            posSpinnersRestaurar = estado.getIntArray(ST_SPINNERS);
+
+            if (evaluacionAnterior == null) {
+                evaluacionAnterior = new EvaluacionAnterior(
+                        estado.getInt(ST_EVAL_ID, 0),
+                        estado.getFloat(ST_EVAL_VALOR, 0f),
+                        estado.getString(ST_EVAL_COMENTARIO, "") == null ? "" : estado.getString(ST_EVAL_COMENTARIO, ""));
+            }
+
+            String idAnexo = estado.getString(ST_ID_ANEXO, "");
+            if ((idAnexo == null || idAnexo.isEmpty()) && prefs != null) {
+                idAnexo = prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, "");
+            }
+
+            if (anexoCompleto == null && idAnexo != null && !idAnexo.isEmpty()) {
+                anexoCompleto = MainActivity.myAppDB.myDao().getAnexoCompletoById(idAnexo);
+            }
+
+            if (anexoCompleto == null || anexoCompleto.getAnexoContrato() == null) {
+                restauracionFallida = true;
+                causaRestauracion = new IllegalStateException("No se encontro el anexo " + idAnexo + " en la base local del telefono");
+                Log.e("TICKET_2515_EXTRA", "No se pudo recuperar el anexo al restaurar el formulario de visita. id=" + idAnexo);
+                return;
+            }
+
+            // variedad y temporada son las mismas que pasan los lugares que abren este formulario (ver newInstance)
+            if (variedad == null) {
+                variedad = anexoCompleto.getAnexoContrato().getId_especie_anexo();
+            }
+            if (temporada == null) {
+                temporada = anexoCompleto.getAnexoContrato().getTemporada_anexo();
+            }
+
+            // si se estaba viendo una visita ya guardada, se recupera para no abrirla como visita nueva y editable
+            int idVisita = estado.getInt(ST_ID_VISITA, 0);
+            if (visitasCompletas == null && idVisita > 0) {
+                List<VisitasCompletas> visitas = MainActivity.myAppDB.myDao().getVisitasCompletasWithFotos(anexoCompleto.getAnexoContrato().getId_anexo_contrato());
+                if (visitas != null) {
+                    for (VisitasCompletas vc : visitas) {
+                        if (vc != null && vc.getVisitas() != null && vc.getVisitas().getId_visita() == idVisita) {
+                            visitasCompletas = vc;
+                            break;
+                        }
+                    }
+                }
+                if (visitasCompletas == null) {
+                    restauracionFallida = true;
+                    causaRestauracion = new IllegalStateException("No se encontro la visita " + idVisita + " del anexo " + idAnexo + " en la base local del telefono");
+                    Log.e("TICKET_2515_EXTRA", "No se pudo recuperar la visita " + idVisita + " al restaurar el formulario");
+                }
+            }
+        } catch (Exception e) {
+            restauracionFallida = true;
+            causaRestauracion = e;
+            Log.e("TICKET_2515_EXTRA", "Error al restaurar el formulario de visita", e);
+        }
+    }
+
+    // TICKET 2515 (extra) - 2026-10-16: posicion elegida en cada lista desplegable, en este orden: fenologico, cosecha,
+    // crecimiento, fito, general_cultivo, humedad, malezas, planta_voluntaria, origen_visita. Si una lista aun no tiene
+    // adaptador (la pantalla se esta restaurando) se conserva el valor restaurado, para no pisarlo con 0.
+    private int[] posicionesSpinners() {
+        Spinner[] lista = new Spinner[]{sp_fenologico, sp_cosecha, sp_crecimiento, sp_fito, sp_general_cultivo,
+                sp_humedad, sp_malezas, sp_planta_voluntaria, sp_origen_visita};
+        int[] pos = new int[lista.length];
+        for (int i = 0; i < lista.length; i++) {
+            if (lista[i] != null && lista[i].getAdapter() != null) {
+                pos[i] = lista[i].getSelectedItemPosition();
+            } else if (posSpinnersRestaurar != null && i < posSpinnersRestaurar.length) {
+                pos[i] = posSpinnersRestaurar[i];
+            } else {
+                pos[i] = -1;
+            }
+        }
+        return pos;
+    }
+
+    // TICKET 2515 (extra) - 2026-10-16: devuelve a las listas desplegables lo que habia elegido el usuario. Solo para visita
+    // nueva (visitasCompletas == null): una visita ya guardada se carga desde la base en accionSpinners().
+    private void aplicarSpinnersRestaurados() {
+        if (posSpinnersRestaurar == null || visitasCompletas != null) {
+            return;
+        }
+        try {
+            Spinner[] lista = new Spinner[]{sp_fenologico, sp_cosecha, sp_crecimiento, sp_fito, sp_general_cultivo,
+                    sp_humedad, sp_malezas, sp_planta_voluntaria, sp_origen_visita};
+            for (int i = 0; i < lista.length && i < posSpinnersRestaurar.length; i++) {
+                int p = posSpinnersRestaurar[i];
+                if (lista[i] != null && lista[i].getAdapter() != null && p > 0 && p < lista[i].getAdapter().getCount()) {
+                    lista[i].setSelection(p);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("TICKET_2515_EXTRA", "No se pudieron restaurar las listas desplegables", e);
+        }
+    }
+
+    // TICKET 2515 (extra) - 2026-10-16: ultimo recurso si no se pudo recuperar el anexo (sin anexo no se puede guardar la
+    // visita): se avisa y se vuelve a la lista en vez de dejar un formulario roto o cerrar la app.
+    private void volverAListaPorRestauracionFallida() {
+        try {
+            if (progressBar != null && progressBar.isShowing()) {
+                progressBar.dismiss();
+            }
+            if (activity != null) {
+                activity.cambiarFragment(new FragmentVisitas(), Utilidades.FRAGMENT_VISITAS, R.anim.slide_in_right, R.anim.slide_out_right);
+                // se muestra el informe en pantalla (Compartir / Copiar) para que el usuario sepa que hubo un problema y pueda enviarlo
+                RegistroErrores.informarErrorNoRecuperado(activity,
+                        "No se pudo recuperar la visita que estaba en curso. Lo que no estaba guardado se perdio. Vuelve a abrirla desde la lista de anexos.",
+                        causaRestauracion);
+            }
+        } catch (Exception e) {
+            Log.e("TICKET_2515_EXTRA", "No se pudo volver a la lista tras una restauracion fallida", e);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -236,6 +384,15 @@ public class FragmentFormVisitas extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // TICKET 2515 (extra) - 2026-10-16: si no se pudo recuperar el anexo al restaurar la pantalla, no se arma el
+        // formulario (quedaria sin datos) y se vuelve a la lista con un aviso. Los rw* quedan null, asi que los
+        // agregarImagenTo*() de onResume salen solos.
+        if (restauracionFallida) {
+            handler.post(this::volverAListaPorRestauracionFallida);
+            return;
+        }
+
         bind(view);
 
 
@@ -397,9 +554,26 @@ public class FragmentFormVisitas extends Fragment {
 
     public void procesarFotoTomada() {
         try {
-            Bitmap originalBtm = BitmapFactory.decodeFile(currentPhotoPath);
+            // TICKET 2515 (extra) - 2026-10-16: sin ruta de foto (no se pudo recuperar tras una restauracion) no hay nada que procesar
+            if (currentPhotoPath == null) {
+                RegistroErrores.informarErrorNoRecuperado(activity,
+                        "No se pudo recuperar la foto que se acababa de tomar (se perdio su ubicacion). Saca la foto de nuevo.",
+                        new IllegalStateException("currentPhotoPath es null al procesar la foto"));
+                return;
+            }
+
+            // TICKET 2515 (extra) - 2026-10-16: la foto se decodifica UNA sola vez como mutable y la fecha se escribe sobre
+            // ella. Antes se hacia una segunda copia completa (~50 MB en una foto de 12 MP) solo para poder dibujar, lo que
+            // duplicaba la memoria justo mientras la camara de Samsung ya la tiene casi toda. El resultado es el mismo.
+            BitmapFactory.Options opcionesFoto = new BitmapFactory.Options();
+            opcionesFoto.inMutable = true;
+            opcionesFoto.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap originalBtm = BitmapFactory.decodeFile(currentPhotoPath, opcionesFoto);
             if (originalBtm == null) {
                 Toasty.error(requireActivity(), "No se pudo decodificar la imagen.", Toast.LENGTH_LONG, true).show();
+                RegistroErrores.informarErrorNoRecuperado(activity,
+                        "No se pudo leer la foto recien tomada, por lo que no quedo guardada en la visita. Saca la foto de nuevo.",
+                        new IllegalStateException("BitmapFactory.decodeFile devolvio null para " + currentPhotoPath));
                 return;
             }
 
@@ -412,10 +586,20 @@ public class FragmentFormVisitas extends Fragment {
             fos.flush();
             fos.close();
 
+            // TICKET 2515 (extra) - 2026-10-16: se liberan los bitmaps apenas se escribio el archivo (no esperar al GC)
+            if (nuevaFoto != originalBtm) {
+                originalBtm.recycle();
+            }
+            nuevaFoto.recycle();
+
             guardarBD();
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // TICKET 2515 (extra) - 2026-10-16: tambien OutOfMemoryError (es un Error, no una Exception): sin esto la app
+            // se cerraba justo al procesar la foto en un telefono con poca memoria
             Toasty.error(requireActivity(), "Error al procesar la foto: " + e.getMessage(), Toast.LENGTH_LONG, true).show();
+            RegistroErrores.informarErrorNoRecuperado(activity,
+                    "No se pudo procesar la foto recien tomada, por lo que no quedo guardada en la visita. Saca la foto de nuevo.", e);
         }
     }
 
@@ -429,12 +613,18 @@ public class FragmentFormVisitas extends Fragment {
                 int vista = prefs.getInt(Utilidades.VISTA_FOTOS, 0);
                 File file = new File(currentPhotoPath);
 
-                fotos.setFieldbook(Utilidades.getPhenoState(sp_fenologico.getSelectedItemPosition()));
+                // TICKET 2515 (extra) - 2026-10-16: si la pantalla se acaba de restaurar, la lista de estado fenologico puede
+                // no estar cargada todavia (posicion 0): se usa la que se habia elegido antes de salir a la camara.
+                int posFenologico = sp_fenologico.getSelectedItemPosition();
+                if (posFenologico <= 0 && posSpinnersRestaurar != null && posSpinnersRestaurar.length > 0 && posSpinnersRestaurar[0] > 0) {
+                    posFenologico = posSpinnersRestaurar[0];
+                }
+                fotos.setFieldbook(Utilidades.getPhenoState(posFenologico));
                 fotos.setHora(Utilidades.hora());
                 fotos.setNombre_foto(file.getName());
                 fotos.setFavorita(false);
                 fotos.setPlano(0);
-                fotos.setMedida_raices(!medidaRaices.isEmpty() ? medidaRaices : "0");
+                fotos.setMedida_raices((medidaRaices != null && !medidaRaices.isEmpty()) ? medidaRaices : "0");
                 fotos.setAcepto_regla_raices((vista == 3) ? 1 : 0);
 
                 if (anexoCompleto != null) {
@@ -462,6 +652,8 @@ public class FragmentFormVisitas extends Fragment {
                 });
             } catch (Exception e) {
                 handler.post(() -> Toasty.error(activity, "Error guardando foto" + e.getMessage(), Toast.LENGTH_LONG, true).show());
+                RegistroErrores.informarErrorNoRecuperado(activity,
+                        "No se pudo guardar la foto en la visita. Saca la foto de nuevo.", e);
             }
         });
     }
@@ -592,6 +784,28 @@ public class FragmentFormVisitas extends Fragment {
         if (fileImagen != null) {
             outState.putParcelable("file_uri", Uri.fromFile(fileImagen));
         }
+
+        // TICKET 2515 (extra) - 2026-10-16: se guarda lo que Android no conserva solo al destruir la pantalla (anexo,
+        // visita, foto en curso, evaluacion y listas desplegables). Los textos escritos los restaura Android por si solo.
+        try {
+            String idAnexoGuardar = (anexoCompleto != null && anexoCompleto.getAnexoContrato() != null)
+                    ? anexoCompleto.getAnexoContrato().getId_anexo_contrato() : "";
+            if ((idAnexoGuardar == null || idAnexoGuardar.isEmpty()) && prefs != null) {
+                idAnexoGuardar = prefs.getString(Utilidades.SHARED_VISIT_ANEXO_ID, "");
+            }
+            outState.putString(ST_ID_ANEXO, idAnexoGuardar);
+            outState.putInt(ST_ID_VISITA, (visitasCompletas != null && visitasCompletas.getVisitas() != null) ? visitasCompletas.getVisitas().getId_visita() : 0);
+            outState.putString(ST_FOTO_RUTA, currentPhotoPath);
+            outState.putString(ST_FOTO_MEDIDA, medidaRaices);
+            if (evaluacionAnterior != null) {
+                outState.putInt(ST_EVAL_ID, evaluacionAnterior.id_evaluacion);
+                outState.putFloat(ST_EVAL_VALOR, evaluacionAnterior.evaluacion);
+                outState.putString(ST_EVAL_COMENTARIO, evaluacionAnterior.comentario);
+            }
+            outState.putIntArray(ST_SPINNERS, posicionesSpinners());
+        } catch (Exception e) {
+            Log.e("TICKET_2515_EXTRA", "No se pudo guardar el estado del formulario de visita", e);
+        }
     }
 
     @Override
@@ -684,7 +898,9 @@ public class FragmentFormVisitas extends Fragment {
 
         final ImageView imageView = viewInfalted.findViewById(R.id.img_alert_foto);
 
-        Picasso.get().load("file:///" + foto.getRuta()).into(imageView);
+        // TICKET 2515 (extra) - 2026-10-16: la vista previa cargaba la foto completa (~50 MB decodificada en una de 12 MP);
+        // se reduce al tamano de pantalla (solo se escala hacia abajo). El archivo guardado no cambia.
+        Picasso.get().load("file:///" + foto.getRuta()).resize(1280, 1280).onlyScaleDown().centerInside().into(imageView);
         builder.setOnShowListener(dialog -> {
             Button b = builder.getButton(AlertDialog.BUTTON_POSITIVE);
             Button c = builder.getButton(AlertDialog.BUTTON_NEUTRAL);
@@ -838,6 +1054,12 @@ public class FragmentFormVisitas extends Fragment {
 
         ejecutarSeguro(() -> {
 
+            // TICKET 2515 (extra) - 2026-10-16: sin anexo (pantalla restaurada que no pudo recuperarlo) no hay fotos que
+            // cargar; antes esta linea lanzaba NullPointerException en un hilo y cerraba toda la app.
+            if (anexoCompleto == null || anexoCompleto.getAnexoContrato() == null) {
+                return;
+            }
+
             Config config = MainActivity.myAppDB.myDao().getConfig();
             int idDispo = config.getId();
 
@@ -875,6 +1097,11 @@ public class FragmentFormVisitas extends Fragment {
         int visitaLocal = (visitasCompletas != null) ? visitasCompletas.getVisitas().getId_visita() : 0;
 
         ejecutarSeguro(() -> {
+            // TICKET 2515 (extra) - 2026-10-16: mismo resguardo que en agregarImagenToAgronomos()
+            if (anexoCompleto == null || anexoCompleto.getAnexoContrato() == null) {
+                return;
+            }
+
             Config config = MainActivity.myAppDB.myDao().getConfig();
             int idDispo = config.getId();
 
@@ -904,6 +1131,11 @@ public class FragmentFormVisitas extends Fragment {
         int visitaServidor = (visitasCompletas != null && visitasCompletas.getVisitas().getEstado_server_visitas() > 0) ? visitasCompletas.getVisitas().getId_visita() : 0;
         int visitaLocal = (visitasCompletas != null) ? visitasCompletas.getVisitas().getId_visita() : 0;
         ejecutarSeguro(() -> {
+
+            // TICKET 2515 (extra) - 2026-10-16: mismo resguardo que en agregarImagenToAgronomos()
+            if (anexoCompleto == null || anexoCompleto.getAnexoContrato() == null) {
+                return;
+            }
 
             Config config = MainActivity.myAppDB.myDao().getConfig();
             int idDispo = config.getId();
@@ -969,7 +1201,9 @@ public class FragmentFormVisitas extends Fragment {
             progressBar.dismiss();
         }
 
-        if (visitasCompletas == null && anexoCompleto != null) {
+        // TICKET 2515 (extra) - 2026-10-16: si la pantalla se restauro, la evaluacion/recomendaciones ya estaban hechas
+        // (evaluacionAnterior se recupero), asi que no se vuelve a abrir el dialogo.
+        if (visitasCompletas == null && anexoCompleto != null && !pantallaRestaurada) {
             levantarDialogoObservationTodo();
         }
 
@@ -1008,6 +1242,8 @@ public class FragmentFormVisitas extends Fragment {
         }
 
         cargarSpinners();
+        // TICKET 2515 (extra) - 2026-10-16: devuelve las listas desplegables a lo que habia elegido el usuario
+        aplicarSpinnersRestaurados();
         foto_raices.setOnClickListener(v -> preguntarFotoRaices());
 
         material_private.setOnClickListener(v -> {

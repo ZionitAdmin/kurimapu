@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // TICKET 2515 - 2026-10-02: registro de cierres inesperados (ver RegistroErrores). Va primero para cubrir todo el arranque.
         RegistroErrores.instalar(this);
+        // TICKET 2515 (extra) - 2026-10-16: anota por que murio la app la vez anterior (congelada, cierre nativo, memoria)
+        RegistroErrores.registrarCierresDelSistema(this);
 
         // Create the dummy account
         myAppDB = Room.databaseBuilder(getApplicationContext(), MyAppBD.class, Utilidades.NOMBRE_DATABASE).allowMainThreadQueries()
